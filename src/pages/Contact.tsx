@@ -159,10 +159,24 @@ const Contact = () => {
 
                     <div className="flex items-start space-x-4">
                       <div className="w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center flex-shrink-0">
-                        <span className="text-primary text-xl">📍</span>
+                        <span className="text-primary text-xl"></span>
                       </div>
                       <div>
                         <h4 className="font-semibold text-gray-900">Office Location</h4>
+                        <p className="text-gray-600">
+                          6418 Pungol Drive<br />
+                          Singapore,<br />
+                          821641<br />
+                        </p>
+                        <p className="text-sm text-gray-500">By appointment only</p>
+                      </div>
+                    </div>
+                      <div className="flex items-start space-x-4">
+                      <div className="w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center flex-shrink-0">
+                        <span className="text-primary text-xl"></span>
+                      </div>
+                      <div>
+                        <h4 className="font-semibold text-gray-900">Support Location</h4>
                         <p className="text-gray-600">
                           IPage UM Services Pvt Ltd<br />
                           5A/6B, White Waters,<br />
