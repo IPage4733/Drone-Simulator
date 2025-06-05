@@ -10,7 +10,7 @@ import Tutorials from "./pages/Tutorials";
 import Download from "./pages/Download";
 import Contact from "./pages/Contact";
 import NotFound from "./pages/NotFound";
-
+import Product from "./pages/products/src/Products page";
 const queryClient = new QueryClient();
 
 const App = () => (
@@ -26,6 +26,7 @@ const App = () => (
           <Route path="/download" element={<Download />} />
           <Route path="/contact" element={<Contact />} />
           <Route path="*" element={<NotFound />} />
+          <Route path="/product" element={<Product />} />
         </Routes>
       </BrowserRouter>
     </TooltipProvider>

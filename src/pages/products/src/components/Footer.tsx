@@ -1,0 +1,80 @@
+
+import { Link } from "react-router-dom";
+
+const Footer = () => {
+  return (
+    <footer className="bg-gray-900 text-white">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+        <div className="grid md:grid-cols-4 gap-8">
+          {/* Logo and Description */}
+          <div className="md:col-span-2">
+            <div className="flex items-center space-x-2 mb-4">
+              <div className="w-10 h-10 bg-gradient-to-r from-primary to-accent rounded-lg flex items-center justify-center">
+                <span className="text-white font-bold text-xl">D</span>
+              </div>
+              <span className="text-xl font-bold">DroneSimulator</span>
+            </div>
+            <p className="text-gray-400 mb-6 max-w-md">
+              The most comprehensive drone flight simulator for learning, practicing, 
+              and mastering drone piloting skills safely from your device.
+            </p>
+            <div className="flex space-x-4">
+              <div className="w-10 h-10 bg-primary rounded-full flex items-center justify-center hover:bg-primary/80 transition-colors cursor-pointer">
+                <span className="text-white font-bold">f</span>
+              </div>
+              <div className="w-10 h-10 bg-primary rounded-full flex items-center justify-center hover:bg-primary/80 transition-colors cursor-pointer">
+                <span className="text-white font-bold">t</span>
+              </div>
+              <div className="w-10 h-10 bg-primary rounded-full flex items-center justify-center hover:bg-primary/80 transition-colors cursor-pointer">
+                <span className="text-white font-bold">in</span>
+              </div>
+              <div className="w-10 h-10 bg-primary rounded-full flex items-center justify-center hover:bg-primary/80 transition-colors cursor-pointer">
+                <span className="text-white font-bold">yt</span>
+              </div>
+            </div>
+          </div>
+
+          {/* Quick Links */}
+          <div>
+            <h3 className="text-lg font-semibold mb-4">Quick Links</h3>
+            <ul className="space-y-2">
+              <li><Link to="/" className="text-gray-400 hover:text-white transition-colors">Home</Link></li>
+              <li><Link to="/features" className="text-gray-400 hover:text-white transition-colors">Features</Link></li>
+              <li><Link to="/tutorials" className="text-gray-400 hover:text-white transition-colors">Tutorials</Link></li>
+              <li><Link to="/download" className="text-gray-400 hover:text-white transition-colors">Download</Link></li>
+              <li><Link to="/contact" className="text-gray-400 hover:text-white transition-colors">Contact Us</Link></li>
+            </ul>
+          </div>
+
+          {/* Contact Info */}
+          <div>
+            <h3 className="text-lg font-semibold mb-4">Contact Info</h3>
+            <div className="space-y-2 text-gray-400">
+              <p>📧 support@dronesimulator.com</p>
+              <p>📞 +1 (555) 123-4567</p>
+              <p>📍 IPage UM Services Pvt Ltd<br />
+                5A/6B, White Waters,<br />
+                Timber Lake Colony, Shaikpet,<br />
+                Gachibowli, Hyderabad - 500008<br />
+                India</p>
+            </div>
+          </div>
+        </div>
+
+        {/* Bottom Bar */}
+        <div className="border-t border-gray-800 mt-12 pt-8 flex flex-col md:flex-row justify-between items-center">
+          <p className="text-gray-400 text-sm">
+            © 2024 DroneSimulator. All rights reserved.
+          </p>
+          <div className="flex space-x-6 mt-4 md:mt-0">
+            <Link to="#" className="text-gray-400 hover:text-white text-sm transition-colors">Privacy Policy</Link>
+            <Link to="#" className="text-gray-400 hover:text-white text-sm transition-colors">Terms of Service</Link>
+            <Link to="#" className="text-gray-400 hover:text-white text-sm transition-colors">Cookie Policy</Link>
+          </div>
+        </div>
+      </div>
+    </footer>
+  );
+};
+
+export default Footer;

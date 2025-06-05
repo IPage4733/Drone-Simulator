@@ -13,6 +13,7 @@ const Navigation = () => {
     { name: "Features", path: "/features" },
     { name: "Tutorials", path: "/tutorials" },
     { name: "Download", path: "/download" },
+    { name: "Products", path: "/product" },
     { name: "Contact", path: "/contact" }
   ];
 
