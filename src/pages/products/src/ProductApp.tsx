@@ -2,7 +2,7 @@ import React from 'react';
 import { Routes, Route } from 'react-router-dom';
 import HomePage from './pages/HomePage';
 import CheckoutPage from './pages/CheckoutPage';
-import Footer from './components/Footer';
+import Footer from '../src/components/Footer';
 import MiniCart from './components/MiniCart';
 
 const ProductApp = () => {
