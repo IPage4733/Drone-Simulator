@@ -75,7 +75,7 @@ const MiniCart: React.FC = () => {
                 </Button>
                 <Button 
                   variant="primary" 
-                  onClick={() => window.location.href = '/checkout'}
+                  onClick={() => window.location.href = '/product/checkout'}
                   fullWidth
                 >
                   Checkout

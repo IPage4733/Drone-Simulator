@@ -10,7 +10,8 @@ import Tutorials from "./pages/Tutorials";
 import Download from "./pages/Download";
 import Contact from "./pages/Contact";
 import NotFound from "./pages/NotFound";
-import Product from "./pages/products/src/Products page";
+import ProductApp from "../src/pages/products/src/ProductApp"; // ✅ New import
+import { CartProvider } from "../src/pages/products/src/context/CartContext"; // ✅ Add this
 const queryClient = new QueryClient();
 
 const App = () => (
@@ -19,6 +20,7 @@ const App = () => (
       <Toaster />
       <Sonner />
       <BrowserRouter>
+      <CartProvider>
         <Routes>
           <Route path="/" element={<Index />} />
           <Route path="/features" element={<Features />} />
@@ -26,8 +28,9 @@ const App = () => (
           <Route path="/download" element={<Download />} />
           <Route path="/contact" element={<Contact />} />
           <Route path="*" element={<NotFound />} />
-          <Route path="/product" element={<Product />} />
+          <Route path="/product/*" element={<ProductApp />} />
         </Routes>
+        </CartProvider>
       </BrowserRouter>
     </TooltipProvider>
   </QueryClientProvider>

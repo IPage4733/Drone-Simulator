@@ -1,76 +1,74 @@
+import React from 'react';
+import { Facebook, Twitter, Instagram, Linkedin, Mail, Phone } from 'lucide-react';
 
-import { Link } from "react-router-dom";
-
-const Footer = () => {
+const Footer: React.FC = () => {
   return (
     <footer className="bg-gray-900 text-white">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
-        <div className="grid md:grid-cols-4 gap-8">
-          {/* Logo and Description */}
-          <div className="md:col-span-2">
-            <div className="flex items-center space-x-2 mb-4">
-              <div className="w-10 h-10 bg-gradient-to-r from-primary to-accent rounded-lg flex items-center justify-center">
-                <span className="text-white font-bold text-xl">D</span>
-              </div>
-              <span className="text-xl font-bold">DroneSimulator</span>
-            </div>
-            <p className="text-gray-400 mb-6 max-w-md">
-              The most comprehensive drone flight simulator for learning, practicing, 
-              and mastering drone piloting skills safely from your device.
+      <div className="container mx-auto px-4 py-12">
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
+          <div>
+            <h3 className="text-xl font-bold mb-4">IPage Drone Simulator</h3>
+            <p className="text-gray-400 mb-4">
+              India's most versatile drone simulator – Real drones. Real scenarios. Real learning.
             </p>
             <div className="flex space-x-4">
-              <div className="w-10 h-10 bg-primary rounded-full flex items-center justify-center hover:bg-primary/80 transition-colors cursor-pointer">
-                <span className="text-white font-bold">f</span>
-              </div>
-              <div className="w-10 h-10 bg-primary rounded-full flex items-center justify-center hover:bg-primary/80 transition-colors cursor-pointer">
-                <span className="text-white font-bold">t</span>
-              </div>
-              <div className="w-10 h-10 bg-primary rounded-full flex items-center justify-center hover:bg-primary/80 transition-colors cursor-pointer">
-                <span className="text-white font-bold">in</span>
-              </div>
-              <div className="w-10 h-10 bg-primary rounded-full flex items-center justify-center hover:bg-primary/80 transition-colors cursor-pointer">
-                <span className="text-white font-bold">yt</span>
-              </div>
+              <a href="#" className="text-gray-400 hover:text-white">
+                <Facebook size={20} />
+              </a>
+              <a href="#" className="text-gray-400 hover:text-white">
+                <Twitter size={20} />
+              </a>
+              <a href="#" className="text-gray-400 hover:text-white">
+                <Instagram size={20} />
+              </a>
+              <a href="#" className="text-gray-400 hover:text-white">
+                <Linkedin size={20} />
+              </a>
             </div>
           </div>
-
-          {/* Quick Links */}
+          
           <div>
-            <h3 className="text-lg font-semibold mb-4">Quick Links</h3>
+            <h3 className="text-lg font-bold mb-4">Quick Links</h3>
             <ul className="space-y-2">
-              <li><Link to="/" className="text-gray-400 hover:text-white transition-colors">Home</Link></li>
-              <li><Link to="/features" className="text-gray-400 hover:text-white transition-colors">Features</Link></li>
-              <li><Link to="/tutorials" className="text-gray-400 hover:text-white transition-colors">Tutorials</Link></li>
-              <li><Link to="/download" className="text-gray-400 hover:text-white transition-colors">Download</Link></li>
-              <li><Link to="/contact" className="text-gray-400 hover:text-white transition-colors">Contact Us</Link></li>
+              <li><a href="#" className="text-gray-400 hover:text-white">Home</a></li>
+              <li><a href="#drones" className="text-gray-400 hover:text-white">Drones</a></li>
+              <li><a href="#scenarios" className="text-gray-400 hover:text-white">Scenarios</a></li>
+              <li><a href="#plans" className="text-gray-400 hover:text-white">Pricing</a></li>
+              <li><a href="#features" className="text-gray-400 hover:text-white">Features</a></li>
             </ul>
           </div>
-
-          {/* Contact Info */}
+          
           <div>
-            <h3 className="text-lg font-semibold mb-4">Contact Info</h3>
-            <div className="space-y-2 text-gray-400">
-              <p>📧 support@dronesimulator.com</p>
-              <p>📞 +1 (555) 123-4567</p>
-              <p>📍 IPage UM Services Pvt Ltd<br />
-                5A/6B, White Waters,<br />
-                Timber Lake Colony, Shaikpet,<br />
-                Gachibowli, Hyderabad - 500008<br />
-                India</p>
-            </div>
+            <h3 className="text-lg font-bold mb-4">Support</h3>
+            <ul className="space-y-2">
+              <li><a href="#" className="text-gray-400 hover:text-white">FAQ</a></li>
+              <li><a href="#" className="text-gray-400 hover:text-white">Contact Us</a></li>
+              <li><a href="#" className="text-gray-400 hover:text-white">Terms of Service</a></li>
+              <li><a href="#" className="text-gray-400 hover:text-white">Privacy Policy</a></li>
+            </ul>
+          </div>
+          
+          <div>
+            <h3 className="text-lg font-bold mb-4">Contact Us</h3>
+            <ul className="space-y-2">
+              <li className="flex items-center text-gray-400">
+                <Mail size={16} className="mr-2" />
+                <a href="mailto:info@dronesimulator.in" className="hover:text-white">
+                  info@dronesimulator.in
+                </a>
+              </li>
+              <li className="flex items-center text-gray-400">
+                <Phone size={16} className="mr-2" />
+                <a href="tel:+919876543210" className="hover:text-white">
+                  +91 9876543210
+                </a>
+              </li>
+            </ul>
           </div>
         </div>
-
-        {/* Bottom Bar */}
-        <div className="border-t border-gray-800 mt-12 pt-8 flex flex-col md:flex-row justify-between items-center">
-          <p className="text-gray-400 text-sm">
-            © 2024 DroneSimulator. All rights reserved.
-          </p>
-          <div className="flex space-x-6 mt-4 md:mt-0">
-            <Link to="#" className="text-gray-400 hover:text-white text-sm transition-colors">Privacy Policy</Link>
-            <Link to="#" className="text-gray-400 hover:text-white text-sm transition-colors">Terms of Service</Link>
-            <Link to="#" className="text-gray-400 hover:text-white text-sm transition-colors">Cookie Policy</Link>
-          </div>
+        
+        <div className="border-t border-gray-800 mt-8 pt-8 text-center text-gray-400">
+          <p>© 2025 IPage Drone Simulator. All rights reserved.</p>
         </div>
       </div>
     </footer>
