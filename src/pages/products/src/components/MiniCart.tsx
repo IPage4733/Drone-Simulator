@@ -8,7 +8,7 @@ const MiniCart: React.FC = () => {
   const [isPopupOpen, setIsPopupOpen] = useState(false);
 
   const handleCheckout = () => {
-    window.location.href = '/product/checkout';
+    window.location.href = 'product/checkout';
   };
 
   const handleCartClick = () => {
@@ -24,33 +24,28 @@ const MiniCart: React.FC = () => {
 
   return (
     <>
-      {/* Cart Icon and Checkout Button */}
+      {/* Unified Cart Button with Checkout Text */}
       <div className="fixed bottom-6 right-6 z-50">
-        <div className="flex items-center space-x-3">
+        <button
+          onClick={handleCartClick}
+          className="flex items-center space-x-3 bg-orange-500 text-white px-6 py-3 rounded-full shadow-lg hover:bg-orange-600 transition-all font-semibold"
+        >
           {/* Cart Icon with Count */}
-          <button
-            onClick={handleCartClick}
-            className="relative bg-gray-800 text-white p-3 rounded-full shadow-lg hover:bg-gray-700 transition-colors"
-          >
+          <div className="relative">
             <ShoppingCart size={24} />
-            <span className="absolute -top-2 -right-2 bg-orange-500 text-white text-xs rounded-full w-6 h-6 flex items-center justify-center font-semibold">
+            <span className="absolute -top-2 -right-2 bg-white text-orange-500 text-xs rounded-full w-6 h-6 flex items-center justify-center font-semibold">
               {totalItems}
             </span>
-          </button>
+          </div>
           
-          {/* Checkout Button */}
-          <button 
-            onClick={handleCheckout}
-            className="bg-orange-500 text-white px-6 py-3 rounded-full shadow-lg hover:bg-orange-600 transition-all font-semibold"
-          >
-            Checkout
-          </button>
-        </div>
+          {/* Checkout Text */}
+          <span>Checkout</span>
+        </button>
       </div>
 
       {/* Cart Popup */}
       {isPopupOpen && (
-        <div className="fixed inset-0 z-60 flex items-center justify-center">
+        <div className="fixed inset-0 z-60 flex items-center justify-center p-4">
           {/* Backdrop */}
           <div 
             className="absolute inset-0 bg-black/50 backdrop-blur-sm"
@@ -58,9 +53,9 @@ const MiniCart: React.FC = () => {
           />
           
           {/* Popup Content */}
-          <div className="relative bg-white rounded-2xl shadow-2xl w-full max-w-md mx-4 max-h-[80vh] overflow-hidden">
+          <div className="relative bg-white rounded-2xl shadow-2xl w-full max-w-md max-h-[90vh] flex flex-col overflow-hidden">
             {/* Header */}
-            <div className="flex items-center justify-between p-6 border-b border-gray-200">
+            <div className="flex items-center justify-between p-6 border-b border-gray-200 flex-shrink-0">
               <h3 className="text-xl font-bold text-gray-800">Your Cart ({totalItems})</h3>
               <button 
                 onClick={() => setIsPopupOpen(false)}
@@ -70,8 +65,8 @@ const MiniCart: React.FC = () => {
               </button>
             </div>
 
-            {/* Cart Items */}
-            <div className="max-h-96 overflow-y-auto p-6">
+            {/* Cart Items - Scrollable */}
+            <div className="flex-1 overflow-y-auto p-6">
               {items.length > 0 ? (
                 <div className="space-y-4">
                   {items.map((item) => (
@@ -103,9 +98,9 @@ const MiniCart: React.FC = () => {
               )}
             </div>
 
-            {/* Footer */}
+            {/* Footer - Fixed at bottom */}
             {items.length > 0 && (
-              <div className="border-t border-gray-200 p-6">
+              <div className="border-t border-gray-200 p-6 flex-shrink-0 bg-white">
                 <div className="flex justify-between items-center mb-4">
                   <span className="text-lg font-semibold text-gray-800">Total:</span>
                   <span className="text-xl font-bold text-orange-500">₹{totalPrice}</span>
