@@ -4,6 +4,7 @@ import { ArrowLeft, CreditCard, Smartphone, Package, Bone as Drone, FileText, Se
 import { useCart } from '../context/CartContext';
 import Button from '../components/Button';
 import Badge from '../components/Badge';
+import Navigation from '@/components/Navigation';
 
 interface FormData {
   name: string;
@@ -58,15 +59,17 @@ const CheckoutPage: React.FC = () => {
   const discountedTotal = formData.autoRenew ? totalPrice * 0.9 : totalPrice;
 
   return (
+    <div className="min-h-screen bg-gray-50">
+      <Navigation /> {/* ✅ Add your header here */}
     <div className="min-h-screen bg-gray-50 py-12">
-      <div className="container mx-auto px-4 max-w-4xl">
+      <div className="container mx-auto px-5 max-w-4xl">
         <button
-          onClick={() => navigate('/product')}
-          className="flex items-center text-gray-600 hover:text-orange-500 mb-8"
-        >
-          <ArrowLeft size={20} className="mr-2" />
-          Back to Products
-        </button>
+  onClick={() => navigate('/product')}
+  className="mt-6 flex items-center text-gray-600 hover:text-orange-500 mb-8"
+>
+  <ArrowLeft size={20} className="mr-2" />
+  Back to Products
+</button>
 
         <div className="bg-white rounded-xl shadow-lg p-8">
           <h1 className="text-3xl font-bold mb-8">Checkout</h1>
@@ -232,6 +235,7 @@ const CheckoutPage: React.FC = () => {
           </div>
         </div>
       </div>
+    </div>
     </div>
   );
 };
