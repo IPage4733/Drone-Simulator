@@ -12,6 +12,7 @@ export interface Scenario {
   name: string;
   description: string;
   icon: string;
+  image: string;
   includedIn: string[];
   price: number;
 }
