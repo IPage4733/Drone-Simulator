@@ -3,8 +3,8 @@ import { Scenario } from '../types';
 const scenarios: Scenario[] = [
   {
     id: 1,
-    name: 'RPTO Ground',
-    description: 'Remote Pilot Training Organization ground-based flight training scenarios',
+    name: 'RPTO Ground/Land Survey',
+    description: 'Comprehensive RPTO training simulations covering real-world drone operations including takeoff, navigation, safety procedures, and mission execution in varied ground scenarios.',
     icon: 'school',
     image: '/images/scenarios/RPTOzone.jpeg',
     includedIn: ['pro', 'institution'],
@@ -13,7 +13,7 @@ const scenarios: Scenario[] = [
   {
     id: 2,
     name: 'Agriculture Zone',
-    description: 'Agricultural mapping, crop monitoring, and precision spraying simulations',
+    description: 'Comprehensive agricultural drone simulations covering crop health analysis, field operations, spraying, and farm-level decision support to optimize yield and reduce resource use.',
     icon: 'wheat',
     image: '/images/scenarios/AgriZone.jpeg',
     includedIn: ['pro', 'institution'],
@@ -22,7 +22,7 @@ const scenarios: Scenario[] = [
   {
     id: 3,
     name: 'Defense Zone',
-    description: 'Military-grade training scenarios for surveillance and reconnaissance',
+    description: 'Comprehensive defense zone simulations focused on tactical drone operations, surveillance, reconnaissance, target tracking, and emergency mission handling in sensitive areas.',
     icon: 'shield',
     image: '/images/scenarios/Defencezone.jpeg',
     includedIn: ['pro', 'institution'],
@@ -30,8 +30,8 @@ const scenarios: Scenario[] = [
   },
   {
     id: 4,
-    name: 'HV Line / Solar Panel',
-    description: 'Inspection scenarios for high voltage lines and solar panel installations',
+    name: 'HT Line / Solar Panel / Windmills',
+    description: 'Comprehensive simulations for drone-based inspection of power lines, solar farms, and wind turbines, ensuring energy asset reliability, maintenance planning, and safety checks.',
     icon: 'zap',
     image: '/images/scenarios/HVSOLARZone.jpeg',
     includedIn: ['pro', 'institution'],
@@ -39,8 +39,8 @@ const scenarios: Scenario[] = [
   },
   {
     id: 5,
-    name: 'Factory',
-    description: 'Industrial inspection and monitoring simulations in factory environments',
+    name: 'Factory/Pipeline/Chimney',
+    description: 'Comprehensive industrial drone simulations covering pipeline inspection, factory surveillance, chimney checks, and fault detection for preventive maintenance and safety control.',
     icon: 'factory',
     image: '/images/scenarios/FactoryZone.jpeg',
     includedIn: ['pro', 'institution'],
@@ -48,8 +48,8 @@ const scenarios: Scenario[] = [
   },
   {
     id: 6,
-    name: 'Bridge & Road',
-    description: 'Infrastructure inspection and traffic monitoring simulation scenarios',
+    name: 'Canal/Bridge/Road & Railway',
+    description: 'Comprehensive simulations for inspecting critical infrastructure including canals, bridges, roads, and railway lines, focusing on structural integrity and safety compliance.',
     icon: 'bridge',
     image: '/images/scenarios/Roadinspectionzone.jpeg',
     includedIn: ['pro', 'institution'],
@@ -57,8 +57,8 @@ const scenarios: Scenario[] = [
   },
   {
     id: 7,
-    name: 'City',
-    description: 'Urban flight navigation, building inspection, and delivery simulations',
+    name: 'City/Asset Mapping',
+    description: 'Comprehensive urban drone simulations for mapping city assets, inspecting high-rise structures, navigating complex environments, and supporting smart city planning and services.',
     icon: 'building-2',
     image: '/images/scenarios/Urbanplanningzone.jpeg',
     includedIn: ['pro', 'institution'],
