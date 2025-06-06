@@ -1,29 +1,32 @@
 import React from 'react';
 import * as LucideIcons from 'lucide-react';
 import { Feature } from '../types';
-import Card from './Card';
 
 interface FeatureCardProps {
   feature: Feature;
 }
 
 const FeatureCard: React.FC<FeatureCardProps> = ({ feature }) => {
-  // Dynamically select the icon from lucide-react
   const IconComponent = (LucideIcons as any)[
     feature.icon.charAt(0).toUpperCase() + feature.icon.slice(1)
   ] || LucideIcons.Activity;
 
   return (
-    <Card className="h-full">
-      <div className="p-6">
-        <div className="bg-orange-100 p-3 rounded-lg text-orange-600 inline-block mb-4">
-          <IconComponent size={24} />
+    <div className="w-[320px] bg-white rounded-[2rem] shadow-lg overflow-hidden group hover:shadow-xl transition-all duration-300">
+      <div className="relative h-32 bg-gradient-to-br from-orange-400 to-orange-600 flex items-center justify-center overflow-hidden">
+        <div className="absolute inset-0 bg-black/5 group-hover:bg-black/0 transition-colors" />
+        <IconComponent size={48} className="text-white relative z-10 transform group-hover:scale-110 transition-transform duration-300" />
+        <div className="absolute -bottom-6 left-1/2 -translate-x-1/2 w-12 h-12 bg-white rounded-full flex items-center justify-center shadow-lg">
+          <IconComponent size={24} className="text-orange-500" />
         </div>
-        <h3 className="text-lg font-bold mb-2">{feature.name}</h3>
+      </div>
+      
+      <div className="px-6 pt-10 pb-6 text-center">
+        <h3 className="text-xl font-bold mb-3 text-gray-800">{feature.name}</h3>
         <p className="text-gray-600">{feature.description}</p>
       </div>
-    </Card>
+    </div>
   );
 };
 
-export default FeatureCard;
+export default FeatureCard

@@ -15,15 +15,10 @@ const ScenariosSection: React.FC = () => {
           </p>
         </div>
         
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+        <div className="flex flex-wrap justify-center gap-8">
           {scenarios.map((scenario) => (
             <ScenarioCard key={scenario.id} scenario={scenario} />
           ))}
-        </div>
-        
-        <div className="mt-12 text-center">
-          <p className="text-gray-500 mb-2">Need access to all scenarios?</p>
-          <p className="text-lg font-semibold text-orange-500">Get all scenarios for just ₹1,999</p>
         </div>
       </div>
     </section>

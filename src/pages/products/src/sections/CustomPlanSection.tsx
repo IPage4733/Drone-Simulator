@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { PlusCircle } from 'lucide-react';
 import Card from '../components/Card';
 import Button from '../components/Button';
 import { useCart } from '../context/CartContext';
@@ -83,7 +84,6 @@ const CustomPlanSection: React.FC = () => {
         </div>
         
         <div className="bg-white rounded-xl shadow-md overflow-hidden max-w-5xl mx-auto">
-          {/* Tabs */}
           <div className="flex border-b">
             <button
               className={`flex-1 py-4 px-6 text-center font-medium ${
@@ -117,7 +117,6 @@ const CustomPlanSection: React.FC = () => {
             </button>
           </div>
           
-          {/* Tab Content */}
           <div className="p-6">
             {selectedTab === 'drones' && (
               <div>
@@ -183,11 +182,11 @@ const CustomPlanSection: React.FC = () => {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   {scenarios.map(scenario => (
                     <Card key={scenario.id} className="flex p-4">
-                      <div className="w-16 h-16 bg-orange-100 rounded-lg flex items-center justify-center mr-4">
-                        <span className="text-orange-500 text-2xl">
-                          {scenario.id}
-                        </span>
-                      </div>
+                      <img 
+                        src={scenario.image} 
+                        alt={scenario.name}
+                        className="w-16 h-16 object-cover rounded-lg mr-4" 
+                      />
                       <div className="flex-grow">
                         <h4 className="font-medium">{scenario.name}</h4>
                         <p className="text-sm text-gray-500 mb-2">{scenario.description.slice(0, 60)}...</p>
@@ -216,7 +215,6 @@ const CustomPlanSection: React.FC = () => {
             {selectedTab === 'addons' && (
               <div>
                 <h3 className="text-lg font-bold mb-6">Additional Features</h3>
-                
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   {addons.map(addon => (
                     <Card key={addon.id} className="p-4">
