@@ -22,7 +22,7 @@ const Navigation = () => {
   return (
     <nav className="fixed top-0 w-full bg-white/95 backdrop-blur-sm shadow-lg z-50 font-poppins">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-between items-center h-16">
+        <div className="flex justify-between items-center h-20 md:h-24 py-2">
           {/* Logo */}
           <Link to="/" className="flex items-center space-x-4">
   <img
