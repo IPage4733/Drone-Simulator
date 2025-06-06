@@ -26,7 +26,7 @@ const Navigation = () => {
           {/* Logo */}
           <Link to="/" className="flex items-center space-x-4">
   <img
-    src="/public/images/logo.jpg"
+    src="/images/logo.jpg"
     alt="DroneSimulator Logo"
      className="w-[190px] h-auto object-contain"
   />
