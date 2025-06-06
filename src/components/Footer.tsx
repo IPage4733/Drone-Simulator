@@ -8,12 +8,11 @@ const Footer = () => {
         <div className="grid md:grid-cols-4 gap-8">
           {/* Logo and Description */}
           <div className="md:col-span-2">
-            <div className="flex items-center space-x-2 mb-4">
-              <div className="w-10 h-10 bg-gradient-to-r from-primary to-accent rounded-lg flex items-center justify-center">
-                <span className="text-white font-bold text-xl">D</span>
-              </div>
-              <span className="text-xl font-bold">DroneSimulator</span>
-            </div>
+<img
+    src="/public/images/logo.jpg"
+    alt="DroneSimulator Logo"
+     className="w-[200px] h-auto object-contain"
+  />
             <p className="text-gray-400 mb-6 max-w-md">
               The most comprehensive drone flight simulator for learning, practicing, 
               and mastering drone piloting skills safely from your device.
