@@ -1,4 +1,5 @@
 import { Scenario } from '../types';
+import { Landmark } from "lucide-react";
 
 const scenarios: Scenario[] = [
   {
@@ -50,8 +51,8 @@ const scenarios: Scenario[] = [
     id: 6,
     name: 'Canal/Bridge/Road & Railway',
     description: 'Comprehensive simulations for inspecting critical infrastructure including canals, bridges, roads, and railway lines, focusing on structural integrity and safety compliance.',
-    icon: 'bridge',
-    image: '/images/scenarios/Roadinspectionzone.jpeg',
+    icon: 'Train',
+    image: '/images/scenarios/Roadinspectionzone.png',
     includedIn: ['pro', 'institution'],
     price: 499,
   },
@@ -59,7 +60,7 @@ const scenarios: Scenario[] = [
     id: 7,
     name: 'City/Asset Mapping',
     description: 'Comprehensive urban drone simulations for mapping city assets, inspecting high-rise structures, navigating complex environments, and supporting smart city planning and services.',
-    icon: 'building-2',
+    icon: 'building',
     image: '/images/scenarios/Urbanplanningzone.jpeg',
     includedIn: ['pro', 'institution'],
     price: 499,

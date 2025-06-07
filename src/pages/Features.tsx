@@ -1,78 +1,163 @@
-
-import Navigation from "@/components/Navigation";
-import Footer from "@/components/Footer";
+import React, { useState, useEffect } from 'react';
+import { ChevronLeft, ChevronRight } from 'lucide-react';
+import Footer from '../components/Footer';
 import { Card, CardContent } from "@/components/ui/card";
+import Navigation from '@/components/Navigation';
 
-const Features = () => {
-  const mainFeatures = [
+
+interface Feature {
+  title: string;
+  description: string;
+  images: string[];
+  details: string[];
+}
+
+const FeaturesPage: React.FC = () => {
+  const [currentImageIndex, setCurrentImageIndex] = useState<{ [key: number]: number }>({});
+
+  const mainFeatures: Feature[] = [
     {
-      title: "Realistic Flight Physics & Environment",
-      description: "Experience authentic drone behavior with our advanced physics engine that simulates real-world conditions including wind resistance, battery drain, and weather effects.",
-      image: "https://images.unsplash.com/photo-1487887235947-a955ef187fcc?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80",
+      title: "RPTO Ground Training (DGCA Compliant)",
+      description: "Train with RPTO-compliant modules as per DGCA norms. Includes syllabus-based missions, geofencing, automation, and emergency drills with RTH, GPS loss, and battery fail scenarios.",
+      images: [
+        "https://images.pexels.com/photos/1732314/pexels-photo-1732314.jpeg?auto=compress&cs=tinysrgb&w=800",
+        "https://images.pexels.com/photos/2582859/pexels-photo-2582859.jpeg?auto=compress&cs=tinysrgb&w=800",
+        "https://images.pexels.com/photos/442589/pexels-photo-442589.jpeg?auto=compress&cs=tinysrgb&w=800"
+      ],
       details: [
-        "Advanced physics simulation",
-        "Weather condition effects",
-        "Realistic battery consumption",
-        "Wind resistance modeling"
+        "DGCA syllabus-aligned scenarios",
+        "Flight automation and waypoint missions",
+        "Geofencing setup and safety boundaries",
+        "Shape drawing for training drills (square, circle, linear)"
       ]
     },
     {
-      title: "Night Flying with Focus Light",
-      description: "Master night operations with our comprehensive night flying module featuring adjustable lighting systems and realistic low-light conditions.",
-      image: "https://images.unsplash.com/photo-1472396961693-142e6e269027?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80",
+      title: "Real-Time Physics Engine & Metrics",
+      description: "Adjust drone speed, control response, and weight dynamically with our real-time physics engine. Visualize altitude, speed, and orientation using in-flight metrics.",
+      images: [
+        "https://images.pexels.com/photos/1087180/pexels-photo-1087180.jpeg?auto=compress&cs=tinysrgb&w=800",
+        "https://images.pexels.com/photos/1087181/pexels-photo-1087181.jpeg?auto=compress&cs=tinysrgb&w=800",
+        "https://images.pexels.com/photos/336232/pexels-photo-336232.jpeg?auto=compress&cs=tinysrgb&w=800"
+      ],
       details: [
-        "Adjustable focus beam intensity",
-        "Realistic night visibility",
-        "LED navigation lights",
-        "Low-light obstacle detection"
+        "Adjustable speed and drag settings",
+        "Live metrics: Altitude, speed, orientation",
+        "Control sensitivity calibration",
+        "Physics-based response to input"
       ]
     },
     {
-      title: "Red/Green Drone Orientation",
-      description: "Never lose track of your drone's direction with our color-coded orientation system that provides clear visual indicators for front and rear positioning.",
-      image: "https://images.unsplash.com/photo-1433086966358-54859d0ed716?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80",
+      title: "Thermal Inspection Integration",
+      description: "Train with thermal cameras in critical scenarios like solar farms, power lines, and building inspections. Toggle thermal view to identify anomalies.",
+      images: [
+        "https://images.pexels.com/photos/2800832/pexels-photo-2800832.jpeg?auto=compress&cs=tinysrgb&w=800",
+        "https://images.pexels.com/photos/1112048/pexels-photo-1112048.jpeg?auto=compress&cs=tinysrgb&w=800",
+        "https://images.pexels.com/photos/1538177/pexels-photo-1538177.jpeg?auto=compress&cs=tinysrgb&w=800"
+      ],
       details: [
-        "Front: Green LED indicators",
-        "Rear: Red LED indicators",
-        "Customizable color schemes",
-        "Enhanced visibility modes"
+        "Toggle between thermal and RGB mode",
+        "High-temp anomaly detection",
+        "Use cases: solar, electrical, building",
+        "Infrared color palette customization"
       ]
     },
     {
-      title: "Manual Geofencing Setup",
-      description: "Create custom flight boundaries with our intuitive geofencing system. Set height and radius parameters to ensure safe and legal operations.",
-      image: "https://images.unsplash.com/photo-1487887235947-a955ef187fcc?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80",
+      title: "Agricultural Drone Spraying",
+      description: "Practice precision drone spraying over farmlands with adjustable nozzle width, droplet size, and flight path settings.",
+      images: [
+        "https://images.pexels.com/photos/2132180/pexels-photo-2132180.jpeg?auto=compress&cs=tinysrgb&w=800",
+        "https://images.pexels.com/photos/442589/pexels-photo-442589.jpeg?auto=compress&cs=tinysrgb&w=800",
+        "https://images.pexels.com/photos/1732314/pexels-photo-1732314.jpeg?auto=compress&cs=tinysrgb&w=800"
+      ],
       details: [
-        "Custom boundary creation",
-        "Height restriction settings",
-        "Radius limitation controls",
-        "Visual boundary indicators"
+        "Field map overlay for crop coverage",
+        "Spray intensity & width adjustment",
+        "Scenario-based agri drone training",
+        "Chemical tank refill simulation"
       ]
     },
     {
-      title: "Smooth RTL with Configurable Height",
-      description: "Automated Return to Launch feature with customizable altitude settings ensures your drone returns safely to its starting point.",
-      image: "https://images.unsplash.com/photo-1472396961693-142e6e269027?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80",
+      title: "Aerial Image Capturing Training",
+      description: "Simulate real-world inspection use cases by capturing aerial photos with framing guides, GPS tagging, and zoom features.",
+      images: [
+        "https://images.pexels.com/photos/207779/pexels-photo-207779.jpeg?auto=compress&cs=tinysrgb&w=800",
+        "https://images.pexels.com/photos/1576332/pexels-photo-1576332.jpeg?auto=compress&cs=tinysrgb&w=800",
+        "https://images.pexels.com/photos/2129796/pexels-photo-2129796.jpeg?auto=compress&cs=tinysrgb&w=800"
+      ],
       details: [
-        "Automated return navigation",
-        "Configurable RTL altitude",
-        "Obstacle avoidance during return",
-        "Emergency activation options"
+        "Manual or automatic image capture",
+        "Zoom, focus, and frame guides",
+        "Capture GPS metadata for images",
+        "Replay captured mission results"
+      ]
+    },
+    {
+      title: "Drawing Flight Patterns & Visual Shapes",
+      description: "Enhance drone control skills by drawing custom flight paths and shapes. Useful for mapping, coverage optimization, and entertainment shows.",
+      images: [
+        "https://images.pexels.com/photos/1087181/pexels-photo-1087181.jpeg?auto=compress&cs=tinysrgb&w=800",
+        "https://images.pexels.com/photos/336232/pexels-photo-336232.jpeg?auto=compress&cs=tinysrgb&w=800",
+        "https://images.pexels.com/photos/1087180/pexels-photo-1087180.jpeg?auto=compress&cs=tinysrgb&w=800"
+      ],
+      details: [
+        "Draw custom shapes in sky",
+        "Practice smooth curve and loop flying",
+        "Visualize path with trails",
+        "Good for team coordination drills"
       ]
     }
   ];
 
+  const additionalFeatures = [
+    { title: "Customizable Control Settings", desc: "Configure RC sensitivity, stick mapping, and command responses to match real-life drones." },
+    { title: "Mobile App for RC", desc: "Control your virtual drone using your mobile device as a simulated RC controller." },
+    { title: "Analytics & Performance Logs", desc: "Track flight hours, efficiency scores, crash logs, and skill improvements." },
+    { title: "Geofencing Limit Alerts", desc: "Create and enforce virtual boundaries for training areas, altitude ceilings, and GPS zones." },
+    { title: "Crash Detection Sensors", desc: "Trigger crash simulations with audio/visual effects and incident summaries for training improvement." },
+    { title: "LED Indicators", desc: "Use RGB indicators for direction, battery levels, or alerts during simulation." }
+  ];
+
+  // Auto-advance carousel with reduced delay
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setCurrentImageIndex(prev => {
+        const newIndex = { ...prev };
+        mainFeatures.forEach((_, featureIndex) => {
+          const currentIndex = newIndex[featureIndex] || 0;
+          newIndex[featureIndex] = (currentIndex + 1) % mainFeatures[featureIndex].images.length;
+        });
+        return newIndex;
+      });
+    }, 2500); // Reduced from 4000ms to 2500ms
+
+    return () => clearInterval(interval);
+  }, [mainFeatures]);
+
+  const nextImage = (featureIndex: number) => {
+    setCurrentImageIndex(prev => ({
+      ...prev,
+      [featureIndex]: ((prev[featureIndex] || 0) + 1) % mainFeatures[featureIndex].images.length
+    }));
+  };
+
+  const prevImage = (featureIndex: number) => {
+    setCurrentImageIndex(prev => ({
+      ...prev,
+      [featureIndex]: ((prev[featureIndex] || 0) - 1 + mainFeatures[featureIndex].images.length) % mainFeatures[featureIndex].images.length
+    }));
+  };
+
   return (
-    <div className="min-h-screen bg-white font-poppins">
+    <div className="min-h-screen bg-white">
       <Navigation />
       
       {/* Hero Section */}
-      <section className="pt-16 bg-gradient-to-br from-blue-50 via-white to-orange-50">
+      <section className="pt-24 bg-gradient-to-br from-blue-50 via-white to-orange-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
-          <div className="text-center animate-fade-in">
+          <div className="text-center">
             <h1 className="text-4xl md:text-6xl font-bold text-gray-900 mb-6">
               Advanced
-              <span className="text-primary"> Features</span>
+              <span className="text-orange-500"> Features</span>
             </h1>
             <p className="text-xl text-gray-600 max-w-3xl mx-auto mb-8">
               Discover the comprehensive set of features that make our drone simulator 
@@ -88,10 +173,9 @@ const Features = () => {
           {mainFeatures.map((feature, index) => (
             <div 
               key={index} 
-              className={`grid lg:grid-cols-2 gap-12 items-center mb-20 animate-fade-in ${
+              className={`grid lg:grid-cols-2 gap-12 items-center mb-20 ${
                 index % 2 === 1 ? 'lg:grid-flow-col-dense' : ''
               }`}
-              style={{animationDelay: `${index * 0.2}s`}}
             >
               {/* Content */}
               <div className={index % 2 === 1 ? 'lg:col-start-2' : ''}>
@@ -105,21 +189,66 @@ const Features = () => {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   {feature.details.map((detail, detailIndex) => (
                     <div key={detailIndex} className="flex items-center space-x-3">
-                      <div className="w-2 h-2 bg-primary rounded-full"></div>
+                      <div className="w-2 h-2 bg-orange-500 rounded-full"></div>
                       <span className="text-gray-700">{detail}</span>
                     </div>
                   ))}
                 </div>
               </div>
 
-              {/* Image */}
+              {/* Image Carousel with Sliding Animation */}
               <div className={index % 2 === 1 ? 'lg:col-start-1 lg:row-start-1' : ''}>
-                <Card className="overflow-hidden shadow-2xl">
-                  <img 
-                    src={feature.image} 
-                    alt={feature.title}
-                    className="w-full h-80 object-cover"
-                  />
+                <Card className="overflow-hidden shadow-2xl relative group">
+                  <div className="relative h-80 overflow-hidden">
+                    {/* Image Container with Sliding Effect */}
+                    <div 
+                      className="flex transition-transform duration-700 ease-in-out h-full"
+                      style={{ 
+                        transform: `translateX(-${(currentImageIndex[index] || 0) * 100}%)`,
+                        width: `${feature.images.length * 100}%`
+                      }}
+                    >
+                      {feature.images.map((image, imgIndex) => (
+                        <div key={imgIndex} className="w-full h-full flex-shrink-0">
+                          <img 
+                            src={image} 
+                            alt={`${feature.title} ${imgIndex + 1}`}
+                            className="w-full h-full object-cover"
+                          />
+                        </div>
+                      ))}
+                    </div>
+                    
+                    {/* Carousel Controls */}
+                    <button
+                      onClick={() => prevImage(index)}
+                      className="absolute left-4 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-black/70 text-white p-2 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-10"
+                    >
+                      <ChevronLeft size={20} />
+                    </button>
+                    
+                    <button
+                      onClick={() => nextImage(index)}
+                      className="absolute right-4 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-black/70 text-white p-2 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-10"
+                    >
+                      <ChevronRight size={20} />
+                    </button>
+                    
+                    {/* Dots Indicator */}
+                    <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex space-x-2 z-10">
+                      {feature.images.map((_, imgIndex) => (
+                        <button
+                          key={imgIndex}
+                          onClick={() => setCurrentImageIndex(prev => ({ ...prev, [index]: imgIndex }))}
+                          className={`w-2 h-2 rounded-full transition-all duration-300 ${
+                            (currentImageIndex[index] || 0) === imgIndex 
+                              ? 'bg-white scale-125' 
+                              : 'bg-white/50 hover:bg-white/75'
+                          }`}
+                        />
+                      ))}
+                    </div>
+                  </div>
                 </Card>
               </div>
             </div>
@@ -130,29 +259,22 @@ const Features = () => {
       {/* Additional Features Grid */}
       <section className="py-20 bg-gray-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-16 animate-fade-in">
+          <div className="text-center mb-16">
             <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-6">
               Additional
-              <span className="text-primary"> Capabilities</span>
+              <span className="text-orange-500"> Capabilities</span>
             </h2>
           </div>
 
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {[
-              { title: "Multi-Camera Views", desc: "Switch between FPV, third-person, and ground observer perspectives" },
-              { title: "Weather Simulation", desc: "Practice flying in various weather conditions and wind patterns" },
-              { title: "Emergency Scenarios", desc: "Train for real-world emergencies and equipment failures" },
-              { title: "Flight Path Recording", desc: "Record and replay your flights for analysis and improvement" },
-              { title: "Customizable Controls", desc: "Adjust sensitivity and control mapping to match your preferences" },
-              { title: "Performance Analytics", desc: "Track your progress with detailed flight statistics and metrics" }
-            ].map((item, index) => (
-              <Card key={index} className="group hover:shadow-xl transition-all duration-300 animate-fade-in">
-                <CardContent className="p-6">
-                  <h3 className="text-xl font-semibold text-gray-900 mb-3 group-hover:text-primary transition-colors">
+            {additionalFeatures.map((item, index) => (
+              <Card key={index} className="group hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1">
+                <div className="p-6">
+                  <h3 className="text-xl font-semibold text-gray-900 mb-3 group-hover:text-orange-500 transition-colors">
                     {item.title}
                   </h3>
                   <p className="text-gray-600">{item.desc}</p>
-                </CardContent>
+                </div>
               </Card>
             ))}
           </div>
@@ -164,4 +286,4 @@ const Features = () => {
   );
 };
 
-export default Features;
+export default FeaturesPage;
