@@ -20,7 +20,7 @@ const FeaturesPage: React.FC = () => {
       title: "RPTO Ground Training (DGCA Compliant)",
       description: "Train with RPTO-compliant modules as per DGCA norms. Includes syllabus-based missions, geofencing, automation, and emergency drills with RTH, GPS loss, and battery fail scenarios.",
       images: [
-        "https://images.pexels.com/photos/1732314/pexels-photo-1732314.jpeg?auto=compress&cs=tinysrgb&w=800",
+        "/images/Feautures/RPTO.jpg",
         "https://images.pexels.com/photos/2582859/pexels-photo-2582859.jpeg?auto=compress&cs=tinysrgb&w=800",
         "https://images.pexels.com/photos/442589/pexels-photo-442589.jpeg?auto=compress&cs=tinysrgb&w=800"
       ],

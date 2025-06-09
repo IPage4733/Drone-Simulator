@@ -12,6 +12,7 @@ import Contact from "./pages/Contact";
 import NotFound from "./pages/NotFound";
 import ProductApp from "../src/pages/products/src/ProductApp"; // ✅ New import
 import { CartProvider } from "../src/pages/products/src/context/CartContext"; // ✅ Add this
+import AdminDash from "./pages/Admindashboard/src/AdminDash";
 const queryClient = new QueryClient();
 
 const App = () => (
@@ -29,6 +30,7 @@ const App = () => (
           <Route path="/contact" element={<Contact />} />
           <Route path="*" element={<NotFound />} />
           <Route path="/product/*" element={<ProductApp />} />
+          <Route path="/Dash/*" element={<AdminDash />} />
         </Routes>
         </CartProvider>
       </BrowserRouter>
