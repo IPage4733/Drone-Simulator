@@ -49,14 +49,17 @@ const Footer = () => {
           <div>
             <h3 className="text-lg font-semibold mb-4">Contact Info</h3>
             <div className="space-y-2 text-gray-400">
-              <p>📧 support@dronesimulator.com</p>
-              <p>📞 +1 (555) 123-4567</p>
-              <p>📍 IPage UM Services Pvt Ltd<br />
+              <p><b>IPage UM Services Pte Ltd</b><br />
+                641A,Punggol drive,<br />
+                Singapore - 821641<br />
+                Phone: +65 9006 2901</p>
+              <p><b>IPage UM Services Pvt Ltd</b><br />
                 5A/6B, White Waters,<br />
                 Timber Lake Colony, Shaikpet,<br />
-                Gachibowli, Hyderabad - 500008<br />
-                India</p>
-            </div>
+                Hyderabad - 500008 India<br />
+                Phone: +91 880 434 9999</p>
+                <p>EMail: bd@dronesimulator.pro</p>
+                          </div>
           </div>
         </div>
 
