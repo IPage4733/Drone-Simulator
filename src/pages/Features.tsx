@@ -19,11 +19,15 @@ const FeaturesPage: React.FC = () => {
     {
       title: "RPTO Ground Training (DGCA Compliant)",
       description: "Train with RPTO-compliant modules as per DGCA norms. Includes syllabus-based missions, geofencing, automation, and emergency drills with RTH, GPS loss, and battery fail scenarios.",
-      images: [
-        "/images/Feautures/RPTO.jpg",
-        "https://images.pexels.com/photos/2582859/pexels-photo-2582859.jpeg?auto=compress&cs=tinysrgb&w=800",
-        "https://images.pexels.com/photos/442589/pexels-photo-442589.jpeg?auto=compress&cs=tinysrgb&w=800"
-      ],
+     images: [
+ "/images/Feautures/1.jpg",
+"/images/Feautures/2.jpg",
+"/images/Feautures/3.jpg",
+"/images/Feautures/4.jpg",
+"/images/Feautures/5.jpg"
+
+],
+
       details: [
         "DGCA syllabus-aligned scenarios",
         "Flight automation and waypoint missions",
@@ -35,9 +39,9 @@ const FeaturesPage: React.FC = () => {
       title: "Real-Time Physics Engine & Metrics",
       description: "Adjust drone speed, control response, and weight dynamically with our real-time physics engine. Visualize altitude, speed, and orientation using in-flight metrics.",
       images: [
-        "https://images.pexels.com/photos/1087180/pexels-photo-1087180.jpeg?auto=compress&cs=tinysrgb&w=800",
-        "https://images.pexels.com/photos/1087181/pexels-photo-1087181.jpeg?auto=compress&cs=tinysrgb&w=800",
-        "https://images.pexels.com/photos/336232/pexels-photo-336232.jpeg?auto=compress&cs=tinysrgb&w=800"
+         "/images/Feautures/Drone_UI_HighClarity.jpg",
+   
+    "/images/Feautures/Drone_Settings_UI.jpg"
       ],
       details: [
         "Adjustable speed and drag settings",
@@ -50,9 +54,10 @@ const FeaturesPage: React.FC = () => {
       title: "Thermal Inspection Integration",
       description: "Train with thermal cameras in critical scenarios like solar farms, power lines, and building inspections. Toggle thermal view to identify anomalies.",
       images: [
-        "https://images.pexels.com/photos/2800832/pexels-photo-2800832.jpeg?auto=compress&cs=tinysrgb&w=800",
-        "https://images.pexels.com/photos/1112048/pexels-photo-1112048.jpeg?auto=compress&cs=tinysrgb&w=800",
-        "https://images.pexels.com/photos/1538177/pexels-photo-1538177.jpeg?auto=compress&cs=tinysrgb&w=800"
+        "/images/Feautures/t1.jpg",
+        "/images/Feautures/t2.jpg",
+        "/images/Feautures/t3.jpg",
+        "/images/Feautures/t4.jpg"
       ],
       details: [
         "Toggle between thermal and RGB mode",
@@ -65,9 +70,11 @@ const FeaturesPage: React.FC = () => {
       title: "Agricultural Drone Spraying",
       description: "Practice precision drone spraying over farmlands with adjustable nozzle width, droplet size, and flight path settings.",
       images: [
-        "https://images.pexels.com/photos/2132180/pexels-photo-2132180.jpeg?auto=compress&cs=tinysrgb&w=800",
-        "https://images.pexels.com/photos/442589/pexels-photo-442589.jpeg?auto=compress&cs=tinysrgb&w=800",
-        "https://images.pexels.com/photos/1732314/pexels-photo-1732314.jpeg?auto=compress&cs=tinysrgb&w=800"
+       "/images/Feautures/a1.jpg",
+        "/images/Feautures/a2.jpg",
+        "/images/Feautures/a3.jpg",
+        "/images/Feautures/a4.jpg",
+        "/images/Feautures/a5.jpg",
       ],
       details: [
         "Field map overlay for crop coverage",
@@ -80,9 +87,11 @@ const FeaturesPage: React.FC = () => {
       title: "Aerial Image Capturing Training",
       description: "Simulate real-world inspection use cases by capturing aerial photos with framing guides, GPS tagging, and zoom features.",
       images: [
-        "https://images.pexels.com/photos/207779/pexels-photo-207779.jpeg?auto=compress&cs=tinysrgb&w=800",
-        "https://images.pexels.com/photos/1576332/pexels-photo-1576332.jpeg?auto=compress&cs=tinysrgb&w=800",
-        "https://images.pexels.com/photos/2129796/pexels-photo-2129796.jpeg?auto=compress&cs=tinysrgb&w=800"
+        "/images/Feautures/ar1.jpg",
+        "/images/Feautures/ar2.jpg",
+        "/images/Feautures/ar3.jpg",
+        "/images/Feautures/ar4.jpg",
+        "/images/Feautures/ar5.jpg",
       ],
       details: [
         "Manual or automatic image capture",
@@ -95,9 +104,11 @@ const FeaturesPage: React.FC = () => {
       title: "Drawing Flight Patterns & Visual Shapes",
       description: "Enhance drone control skills by drawing custom flight paths and shapes. Useful for mapping, coverage optimization, and entertainment shows.",
       images: [
-        "https://images.pexels.com/photos/1087181/pexels-photo-1087181.jpeg?auto=compress&cs=tinysrgb&w=800",
-        "https://images.pexels.com/photos/336232/pexels-photo-336232.jpeg?auto=compress&cs=tinysrgb&w=800",
-        "https://images.pexels.com/photos/1087180/pexels-photo-1087180.jpeg?auto=compress&cs=tinysrgb&w=800"
+        "/images/Feautures/d1.jpg",
+        "/images/Feautures/d2.jpg",
+        "/images/Feautures/d3.jpg",
+        "/images/Feautures/d4.jpg",
+        "/images/Feautures/d5.jpg",
       ],
       details: [
         "Draw custom shapes in sky",
@@ -198,59 +209,55 @@ const FeaturesPage: React.FC = () => {
 
               {/* Image Carousel with Sliding Animation */}
               <div className={index % 2 === 1 ? 'lg:col-start-1 lg:row-start-1' : ''}>
-                <Card className="overflow-hidden shadow-2xl relative group">
-                  <div className="relative h-80 overflow-hidden">
-                    {/* Image Container with Sliding Effect */}
-                    <div 
-                      className="flex transition-transform duration-700 ease-in-out h-full"
-                      style={{ 
-                        transform: `translateX(-${(currentImageIndex[index] || 0) * 100}%)`,
-                        width: `${feature.images.length * 100}%`
-                      }}
-                    >
-                      {feature.images.map((image, imgIndex) => (
-                        <div key={imgIndex} className="w-full h-full flex-shrink-0">
-                          <img 
-                            src={image} 
-                            alt={`${feature.title} ${imgIndex + 1}`}
-                            className="w-full h-full object-cover"
-                          />
-                        </div>
-                      ))}
-                    </div>
-                    
-                    {/* Carousel Controls */}
-                    <button
-                      onClick={() => prevImage(index)}
-                      className="absolute left-4 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-black/70 text-white p-2 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-10"
-                    >
-                      <ChevronLeft size={20} />
-                    </button>
-                    
-                    <button
-                      onClick={() => nextImage(index)}
-                      className="absolute right-4 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-black/70 text-white p-2 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-10"
-                    >
-                      <ChevronRight size={20} />
-                    </button>
-                    
-                    {/* Dots Indicator */}
-                    <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex space-x-2 z-10">
-                      {feature.images.map((_, imgIndex) => (
-                        <button
-                          key={imgIndex}
-                          onClick={() => setCurrentImageIndex(prev => ({ ...prev, [index]: imgIndex }))}
-                          className={`w-2 h-2 rounded-full transition-all duration-300 ${
-                            (currentImageIndex[index] || 0) === imgIndex 
-                              ? 'bg-white scale-125' 
-                              : 'bg-white/50 hover:bg-white/75'
-                          }`}
-                        />
-                      ))}
-                    </div>
-                  </div>
-                </Card>
-              </div>
+  <Card className="overflow-hidden shadow-2xl relative group">
+    <div className="relative w-full aspect-video bg-black">
+      {/* Show one image at a time using opacity */}
+      {feature.images.map((image, imgIndex) => (
+        <img
+          key={imgIndex}
+          src={image}
+          alt={`${feature.title} ${imgIndex + 1}`}
+          className={`absolute inset-0 w-full h-full object-contain transition-opacity duration-700 ${
+            (currentImageIndex[index] || 0) === imgIndex ? 'opacity-100 z-10' : 'opacity-0 z-0'
+          }`}
+        />
+      ))}
+
+      {/* Carousel Controls */}
+      <button
+        onClick={() => prevImage(index)}
+        className="absolute left-4 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-black/70 text-white p-2 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-20"
+      >
+        <ChevronLeft size={20} />
+      </button>
+
+      <button
+        onClick={() => nextImage(index)}
+        className="absolute right-4 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-black/70 text-white p-2 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-20"
+      >
+        <ChevronRight size={20} />
+      </button>
+
+      {/* Dots Indicator */}
+      <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex space-x-2 z-20">
+        {feature.images.map((_, imgIndex) => (
+          <button
+            key={imgIndex}
+            onClick={() =>
+              setCurrentImageIndex((prev) => ({ ...prev, [index]: imgIndex }))
+            }
+            className={`w-2.5 h-2.5 rounded-full ${
+              (currentImageIndex[index] || 0) === imgIndex
+                ? 'bg-white'
+                : 'bg-white/50 hover:bg-white/75'
+            }`}
+          />
+        ))}
+      </div>
+    </div>
+  </Card>
+</div>
+
             </div>
           ))}
         </div>
