@@ -1,12 +1,14 @@
-
 import { useState } from "react";
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { Menu, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { useAuth } from "@/context/AuthContext";
 
 const Navigation = () => {
   const [isOpen, setIsOpen] = useState(false);
   const location = useLocation();
+  const navigate = useNavigate();
+  const { user, logout, isLoading } = useAuth();
 
   const navItems = [
     { name: "Home", path: "/" },
@@ -14,25 +16,40 @@ const Navigation = () => {
     { name: "Tutorials", path: "/tutorials" },
     { name: "Download", path: "/download" },
     { name: "Products", path: "/product" },
-    { name: "Contact", path: "/contact" }
+    { name: "Contact", path: "/contact" },
+    { name: "Profile", path: "/auth/profile" } // ✅ Always visible
   ];
 
   const isActive = (path: string) => location.pathname === path;
 
+  const handleLogout = () => {
+    logout();
+    navigate("/auth/login");
+  };
+
+  const AuthButtons = () => {
+    if (isLoading) return null;
+
+    return user ? (
+      <Button onClick={handleLogout} variant="outline">
+        Logout
+      </Button>
+    ) : (
+      <Link to="/auth/login">
+        <Button className="bg-primary hover:bg-primary/90 text-white">
+          Login
+        </Button>
+      </Link>
+    );
+  };
+
   return (
     <nav className="fixed top-0 w-full bg-white/95 backdrop-blur-sm shadow-lg z-50 font-poppins">
       <div className="max-w-7xl mx-auto px-2 sm:px-4 lg:px-6">
-
         <div className="flex justify-between items-center h-20 md:h-24 py-2">
-          {/* Logo */}
           <Link to="/" className="flex items-center space-x-4">
-  <img
-    src="/images/logo.jpg"
-    alt="DroneSimulator Logo"
-     className="w-[190px] h-auto object-contain"
-  />
-
-</Link>
+            <img src="/images/logo.jpg" alt="Logo" className="w-[190px] h-auto object-contain" />
+          </Link>
 
           {/* Desktop Navigation */}
           <div className="hidden md:flex items-center space-x-8">
@@ -49,18 +66,12 @@ const Navigation = () => {
                 {item.name}
               </Link>
             ))}
-            <Button className="bg-primary hover:bg-primary/90 text-white">
-              Download Now
-            </Button>
+            <AuthButtons />
           </div>
 
-          {/* Mobile menu button */}
+          {/* Mobile Toggle Button */}
           <div className="md:hidden">
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={() => setIsOpen(!isOpen)}
-            >
+            <Button variant="ghost" size="icon" onClick={() => setIsOpen(!isOpen)}>
               {isOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
             </Button>
           </div>
@@ -85,9 +96,7 @@ const Navigation = () => {
                 </Link>
               ))}
               <div className="px-3 py-2">
-                <Button className="w-full bg-primary hover:bg-primary/90 text-white">
-                  Download Now
-                </Button>
+                <AuthButtons />
               </div>
             </div>
           </div>
