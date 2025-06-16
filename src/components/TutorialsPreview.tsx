@@ -1,4 +1,3 @@
-
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
@@ -6,25 +5,25 @@ import { Link } from "react-router-dom";
 const TutorialsPreview = () => {
   const tutorials = [
     {
-      title: "Getting Started - Basic Flight Controls",
+      title: "Crystalball Drone | Smart Missions for Solar, Agri & Urban Zones",
       level: "Beginner",
+      duration: "10 min",
+      video: "https://www.youtube.com/embed/RVQ8oiLejLs",
+      description: "Explore the Crystalball drone performing multi-zone operations across solar fields, farms, and urban infrastructure."
+    },
+    {
+      title: "Agriculture Drone | Precision Farming & RPTO Ground Training",
+      level: "Intermediate",
       duration: "15 min",
-      thumbnail: "https://images.unsplash.com/photo-1487887235947-a955ef187fcc?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80",
-      description: "Learn the fundamentals of drone control and basic flight maneuvers."
+      video: "https://www.youtube.com/embed/cYKk5S0aOGU",
+      description: "Watch precision farming in action as RPTO trainees perform real-time spraying operations using smart agriculture drones."
     },
     {
-      title: "Night Flying & Advanced Lighting",
-      level: "Intermediate", 
-      duration: "20 min",
-      thumbnail: "https://images.unsplash.com/photo-1472396961693-142e6e269027?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80",
-      description: "Master night operations with proper lighting techniques and safety protocols."
-    },
-    {
-      title: "Geofencing & Emergency RTL",
+      title: "DJI Marvic | Urban Mapping & RPTO Missions",
       level: "Advanced",
-      duration: "25 min", 
-      thumbnail: "https://images.unsplash.com/photo-1433086966358-54859d0ed716?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80",
-      description: "Set up safety boundaries and emergency return procedures for professional operations."
+      duration: "18 min",
+      video: "https://www.youtube.com/embed/HyuewgCoSNE",
+      description: "DJI Marvic takes on complex RPTO missions including urban inspections, aerial surveys, and mapping operations."
     }
   ];
 
@@ -44,11 +43,10 @@ const TutorialsPreview = () => {
         <div className="text-center mb-16 animate-fade-in">
           <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-6">
             Learn with Our
-            <span className="text-primary"> Expert Tutorials</span>
+            <span className="text-primary"> Expert Drone Tutorials</span>
           </h2>
           <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-            From basic controls to advanced maneuvers, our comprehensive tutorial 
-            series will take you from beginner to expert pilot.
+            Experience real-world training in mapping, agriculture, and RPTO ops through curated, immersive video tutorials.
           </p>
         </div>
 
@@ -61,12 +59,13 @@ const TutorialsPreview = () => {
               style={{animationDelay: `${index * 0.2}s`}}
             >
               <div className="relative overflow-hidden">
-                <img 
-                  src={tutorial.thumbnail} 
-                  alt={tutorial.title}
-                  className="w-full h-48 object-cover group-hover:scale-110 transition-transform duration-300"
-                />
-                <div className="absolute inset-0 bg-black/20 group-hover:bg-black/30 transition-colors duration-300"></div>
+                <iframe 
+                  src={tutorial.video} 
+                  title={tutorial.title} 
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+                  allowFullScreen
+                  className="w-full h-48"
+                ></iframe>
                 <div className="absolute top-4 left-4">
                   <span className={`px-3 py-1 rounded-full text-xs font-semibold ${getLevelColor(tutorial.level)}`}>
                     {tutorial.level}
@@ -75,16 +74,8 @@ const TutorialsPreview = () => {
                 <div className="absolute bottom-4 right-4 bg-black/70 text-white px-2 py-1 rounded text-sm">
                   {tutorial.duration}
                 </div>
-                {/* Play Button */}
-                <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                  <div className="w-16 h-16 bg-primary rounded-full flex items-center justify-center text-white">
-                    <svg className="w-6 h-6 ml-1" fill="currentColor" viewBox="0 0 20 20">
-                      <path d="M8 5v10l8-5-8-5z"/>
-                    </svg>
-                  </div>
-                </div>
               </div>
-              
+
               <CardContent className="p-6">
                 <h3 className="text-xl font-semibold text-gray-900 mb-3 group-hover:text-primary transition-colors duration-300">
                   {tutorial.title}
