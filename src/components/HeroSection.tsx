@@ -7,25 +7,25 @@ const HeroSection = () => {
     <section className="pt-16 min-h-screen bg-gradient-to-br from-blue-50 via-white to-orange-50 relative overflow-hidden">
       {/* Background Elements */}
       <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1487887235947-a955ef187fcc?ixlib=rb-4.0.3&auto=format&fit=crop&w=2000&q=80')] bg-cover bg-center opacity-10"></div>
-      
+
       {/* Floating Elements */}
       <div className="absolute top-20 left-10 w-20 h-20 bg-primary/20 rounded-full animate-float"></div>
-      <div className="absolute top-40 right-20 w-16 h-16 bg-accent/20 rounded-full animate-float" style={{animationDelay: '1s'}}></div>
-      <div className="absolute bottom-40 left-20 w-12 h-12 bg-primary/30 rounded-full animate-float" style={{animationDelay: '2s'}}></div>
+      <div className="absolute top-40 right-20 w-16 h-16 bg-accent/20 rounded-full animate-float" style={{ animationDelay: '1s' }}></div>
+      <div className="absolute bottom-40 left-20 w-12 h-12 bg-primary/30 rounded-full animate-float" style={{ animationDelay: '2s' }}></div>
 
       <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-20 pb-16">
         <div className="grid lg:grid-cols-2 gap-12 items-center">
           {/* Content */}
           <div className="text-center lg:text-left animate-fade-in">
             <h1 className="text-4xl md:text-6xl font-bold text-gray-900 mb-6 leading-tight">
-              Experience Realistic 
-              <span className="text-primary"> Drone Flight</span> 
+              Experience Realistic
+              <span className="text-primary"> Drone Flight</span>
               <br />from Your Screen!
             </h1>
-            
+
             <p className="text-xl text-gray-600 mb-8 leading-relaxed">
-              Master drone piloting with our advanced simulator featuring realistic physics, 
-              night flying, geofencing, and smooth RTL capabilities. Perfect for beginners 
+              Master drone piloting with our advanced simulator featuring realistic physics,
+              night flying, geofencing, and smooth RTL capabilities. Perfect for beginners
               and professionals alike.
             </p>
 
@@ -36,9 +36,9 @@ const HeroSection = () => {
                 </Button>
               </Link>
               <Link to="/tutorials">
-                <Button 
-                  variant="outline" 
-                  size="lg" 
+                <Button
+                  variant="outline"
+                  size="lg"
                   className="border-primary text-primary hover:bg-primary hover:text-white px-8 py-4 text-lg"
                 >
                   Watch Tutorials
@@ -64,23 +64,24 @@ const HeroSection = () => {
           </div>
 
           {/* Visual */}
-          <div className="relative animate-fade-in" style={{animationDelay: '0.3s'}}>
+          <div className="relative animate-fade-in" style={{ animationDelay: '0.3s' }}>
             <div className="relative">
-              <img 
-                src="https://images.unsplash.com/photo-1487887235947-a955ef187fcc?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80"
+              <img
+                src="/images/Feautures/all.png"
                 alt="Drone Simulator Interface"
                 className="w-full h-auto rounded-2xl shadow-2xl"
               />
+
               <div className="absolute inset-0 bg-gradient-to-tr from-primary/20 to-accent/20 rounded-2xl"></div>
             </div>
-            
+
             {/* Floating UI Elements */}
             <div className="absolute -top-4 -right-4 bg-white rounded-lg shadow-lg p-4 animate-float">
               <div className="text-sm font-semibold text-gray-900">Flight Status</div>
               <div className="text-primary">●  Active</div>
             </div>
-            
-            <div className="absolute -bottom-4 -left-4 bg-white rounded-lg shadow-lg p-4 animate-float" style={{animationDelay: '1.5s'}}>
+
+            <div className="absolute -bottom-4 -left-4 bg-white rounded-lg shadow-lg p-4 animate-float" style={{ animationDelay: '1.5s' }}>
               <div className="text-sm font-semibold text-gray-900">Altitude</div>
               <div className="text-accent font-bold">125.3m</div>
             </div>

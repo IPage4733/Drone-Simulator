@@ -1,4 +1,3 @@
-
 import Navigation from "@/components/Navigation";
 import Footer from "@/components/Footer";
 import { Card, CardContent } from "@/components/ui/card";
@@ -12,72 +11,72 @@ const Tutorials = () => {
       description: "Perfect for first-time drone pilots",
       tutorials: [
         {
-          title: "Introduction to Drone Simulator",
+          title: "High-Tech Farming Drone in Action",
           duration: "10 min",
-          thumbnail: "https://images.unsplash.com/photo-1487887235947-a955ef187fcc?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80",
-          description: "Learn the interface, basic controls, and simulator navigation"
+          video: "https://www.youtube.com/embed/RVQ8oiLejLs",
+          description: "Watch how high-tech farming drones revolutionize agriculture with precision spraying and smart automation."
         },
         {
-          title: "Basic Flight Controls",
-          duration: "15 min", 
-          thumbnail: "https://images.unsplash.com/photo-1472396961693-142e6e269027?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80",
-          description: "Master takeoff, hovering, basic movements, and landing"
+          title: "Agri Mapping Masterclass with DJI Matrice 350 RTK",
+          duration: "15 min",
+          video: "https://www.youtube.com/embed/cYKk5S0aOGU",
+          description: "Learn precision agriculture techniques in this Agri Mapping Masterclass using the DJI Matrice 350 RTK for accurate field insights and data-driven farming."
         },
         {
-          title: "Understanding Drone Orientation",
+          title: "Agriculture Drone in Action | Precision Spraying & Crop Monitoring Demo",
           duration: "12 min",
-          thumbnail: "https://images.unsplash.com/photo-1433086966358-54859d0ed716?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80", 
-          description: "Learn to identify front/rear with color indicators"
+          video: "https://www.youtube.com/embed/xIXtQn9oLgI",
+          description: "See the Agriculture Drone in action as it performs precision spraying and real-time crop monitoring for smarter, efficient farming."
         }
       ]
     },
     {
-      level: "Intermediate", 
+      level: "Intermediate",
       color: "from-yellow-500 to-orange-600",
       description: "Build upon basic skills with advanced techniques",
       tutorials: [
         {
-          title: "Geofencing Setup & Configuration",
+          title: "DJI Marvic in Action | Mapping, Urban Inspections & RPTO Flights",
           duration: "18 min",
-          thumbnail: "https://images.unsplash.com/photo-1487887235947-a955ef187fcc?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80",
-          description: "Set up safety boundaries and height restrictions"
+          video: "https://www.youtube.com/embed/HyuewgCoSNE",
+          description: "Watch the DJI Mavic in action as it handles mapping, urban inspections, and RPTO-compliant training flights with precision and reliability."
         },
         {
-          title: "Night Flying Techniques",
+          title: "Crystalball Model Multi-Zone Smart Drone for Solar, Agri & Urban Missions",
           duration: "22 min",
-          thumbnail: "https://images.unsplash.com/photo-1472396961693-142e6e269027?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80",
-          description: "Master night operations with proper lighting and navigation"
+          video: "https://www.youtube.com/embed/Bu4e5W0thPE",
+          description: "Discover the Crystalball Model, a multi-zone smart drone designed for high-performance solar inspections, precision agriculture, and complex urban missions."
         },
         {
-          title: "Weather Condition Flying",
+          title: "High-Speed Racing Drone | FPV Flight Across RPTO & Defense Zones",
           duration: "20 min",
-          thumbnail: "https://images.unsplash.com/photo-1433086966358-54859d0ed716?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80",
-          description: "Practice flying in various weather scenarios"
+          video: "https://www.youtube.com/embed/DDh0sCOs4nE",
+          description: "Experience the thrill of a high-speed racing drone as it navigates FPV flights across RPTO training courses and simulated defense zones with agility and control."
         }
       ]
     },
     {
       level: "Advanced",
-      color: "from-red-500 to-pink-600", 
+      color: "from-red-500 to-pink-600",
       description: "Master professional-level operations",
       tutorials: [
         {
-          title: "Return to Launch (RTL) Operations",
+          title: "DJI Matrice 350 RTK Multi-Zone Drone for Inspection, Defense & RPTO Training",
           duration: "25 min",
-          thumbnail: "https://images.unsplash.com/photo-1487887235947-a955ef187fcc?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80",
-          description: "Configure and execute automated return procedures"
+          video: "https://www.youtube.com/embed/g1MnCKU8Bg0",
+          description: "CExplore the DJI Matrice 350 RTK, a powerful multi-zone drone built for industrial inspections, defense simulations, and DGCA-compliant RPTO training missions."
         },
         {
-          title: "Emergency Handling Procedures",
+          title: "Agriculture Drone in Action | Precision Farming & RPTO Ground Training",
           duration: "30 min",
-          thumbnail: "https://images.unsplash.com/photo-1472396961693-142e6e269027?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80",
-          description: "Handle equipment failures and emergency situations"
+          video: "https://www.youtube.com/embed/2DlM4dM2GVU",
+          description: "Watch the Agriculture Drone in action as it delivers precision farming solutions and supports RPTO ground training with real-time spraying and flight simulation."
         },
         {
-          title: "Professional Flight Planning",
-          duration: "28 min", 
-          thumbnail: "https://images.unsplash.com/photo-1433086966358-54859d0ed716?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80",
-          description: "Plan complex missions with waypoints and automation"
+          title: "Agriculture Drone in Action | Precision Spraying & Crop Monitoring Demo",
+          duration: "28 min",
+          video: "https://www.youtube.com/embed/xIXtQn9oLgI",
+          description: "Watch the Agriculture Drone in action as it showcases precision spraying and advanced crop monitoring for efficient, data-driven farming."
         }
       ]
     }
@@ -109,7 +108,7 @@ const Tutorials = () => {
   return (
     <div className="min-h-screen bg-white font-poppins">
       <Navigation />
-      
+
       {/* Hero Section */}
       <section className="pt-16 bg-gradient-to-br from-blue-50 via-white to-orange-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
@@ -130,40 +129,26 @@ const Tutorials = () => {
       <section className="py-20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           {tutorialLevels.map((level, levelIndex) => (
-            <div key={levelIndex} className="mb-20 animate-fade-in" style={{animationDelay: `${levelIndex * 0.2}s`}}>
-              {/* Level Header */}
+            <div key={levelIndex} className="mb-20 animate-fade-in" style={{ animationDelay: `${levelIndex * 0.2}s` }}>
               <div className={`bg-gradient-to-r ${level.color} rounded-2xl p-8 mb-8 text-white`}>
                 <h2 className="text-3xl md:text-4xl font-bold mb-4">{level.level} Level</h2>
                 <p className="text-xl opacity-90">{level.description}</p>
               </div>
-
-              {/* Tutorials Grid */}
               <div className="grid md:grid-cols-3 gap-8">
                 {level.tutorials.map((tutorial, tutorialIndex) => (
-                  <Card 
-                    key={tutorialIndex} 
-                    className="group hover:shadow-xl transition-all duration-300 hover:-translate-y-2 overflow-hidden cursor-pointer"
-                  >
+                  <Card key={tutorialIndex} className="group hover:shadow-xl transition-all duration-300 hover:-translate-y-2 overflow-hidden cursor-pointer">
                     <div className="relative overflow-hidden">
-                      <img 
-                        src={tutorial.thumbnail} 
-                        alt={tutorial.title}
-                        className="w-full h-48 object-cover group-hover:scale-110 transition-transform duration-300"
-                      />
-                      <div className="absolute inset-0 bg-black/20 group-hover:bg-black/30 transition-colors duration-300"></div>
+                      <iframe
+                        className="w-full h-48"
+                        src={tutorial.video}
+                        title={tutorial.title}
+                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                        allowFullScreen
+                      ></iframe>
                       <div className="absolute bottom-4 right-4 bg-black/70 text-white px-2 py-1 rounded text-sm">
                         {tutorial.duration}
                       </div>
-                      {/* Play Button */}
-                      <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                        <div className="w-16 h-16 bg-primary rounded-full flex items-center justify-center text-white">
-                          <svg className="w-6 h-6 ml-1" fill="currentColor" viewBox="0 0 20 20">
-                            <path d="M8 5v10l8-5-8-5z"/>
-                          </svg>
-                        </div>
-                      </div>
                     </div>
-                    
                     <CardContent className="p-6">
                       <h3 className="text-xl font-semibold text-gray-900 mb-3 group-hover:text-primary transition-colors duration-300">
                         {tutorial.title}
@@ -195,11 +180,7 @@ const Tutorials = () => {
 
           <Accordion type="single" collapsible className="space-y-4 animate-fade-in">
             {faqs.map((faq, index) => (
-              <AccordionItem 
-                key={index} 
-                value={`item-${index}`} 
-                className="bg-white rounded-lg shadow-sm border-0"
-              >
+              <AccordionItem key={index} value={`item-${index}`} className="bg-white rounded-lg shadow-sm border-0">
                 <AccordionTrigger className="px-6 py-4 text-left hover:no-underline hover:bg-gray-50 rounded-lg">
                   <span className="font-semibold text-gray-900">{faq.question}</span>
                 </AccordionTrigger>
