@@ -18,6 +18,7 @@ const Download = () => {
     city: "",
     state: "",
     purpose: "",
+    country: "",
     termsAccepted: false
   });
   const [isSubmitted, setIsSubmitted] = useState(false);
@@ -31,31 +32,68 @@ const Download = () => {
     }));
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    
-    if (!formData.termsAccepted) {
-      toast({
-        title: "Terms Required",
-        description: "Please accept the terms and conditions to continue.",
-        variant: "destructive"
-      });
-      return;
+const handleSubmit = async (e: React.FormEvent) => {
+  e.preventDefault();
+
+  if (!formData.termsAccepted) {
+    toast({
+      title: "Terms Required",
+      description: "Please accept the terms and conditions to continue.",
+      variant: "destructive"
+    });
+    return;
+  }
+
+  setIsLoading(true);
+
+  // Prepare payload
+  const payload = {
+    email: formData.email,
+    username: formData.name.split(' ')[0] || formData.name, // first name
+    password: `${formData.name.replace(/\s/g, '')}@1234`, // Auto-password
+    password_confirm: `${formData.name.replace(/\s/g, '')}@1234`,
+    full_name: formData.name,
+    phone_number: formData.phone,
+    city: formData.city,
+    state_province: formData.state,
+    country: formData.country,
+    purpose_of_use: formData.purpose.toLowerCase()
+  };
+
+  try {
+    const response = await fetch("https://13.203.213.111.nip.io/api/download-app/", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify(payload)
+    });
+
+    const result = await response.json();
+
+    if (!response.ok) {
+      throw new Error(result.message || "Failed to process your request");
     }
 
-    setIsLoading(true);
+    console.log("Download request successful:", result);
+    setIsSubmitted(true);
+    toast({
+      title: "Download Ready!",
+      description: "Your download link has been generated successfully.",
+    });
 
-    // Simulate API call
-    setTimeout(() => {
-      console.log("Form submitted:", formData);
-      setIsSubmitted(true);
-      setIsLoading(false);
-      toast({
-        title: "Download Ready!",
-        description: "Your download link has been generated successfully.",
-      });
-    }, 2000);
-  };
+  } catch (error: any) {
+    console.error("API Error:", error);
+    toast({
+      title: "Error",
+      description: error.message || "Something went wrong. Please try again.",
+      variant: "destructive"
+    });
+  } finally {
+    setIsLoading(false);
+  }
+};
+
 
   const purposeOptions = [
     "Personal/Hobby Use",
@@ -188,6 +226,17 @@ const Download = () => {
                         className="mt-1"
                       />
                     </div>
+                      <div>
+                      <Label htmlFor="Country">Country *</Label>
+                      <Input
+                        id="Country"
+                        type="text"
+                        required
+                        value={formData.country}
+                        onChange={(e) => handleInputChange("Country", e.target.value)}
+                        className="mt-1"
+                      />
+                    </div>
                     <div>
                       <Label htmlFor="city">City *</Label>
                       <Input
@@ -199,6 +248,7 @@ const Download = () => {
                         className="mt-1"
                       />
                     </div>
+                  
                   </div>
 
                   <div className="grid md:grid-cols-2 gap-4">
