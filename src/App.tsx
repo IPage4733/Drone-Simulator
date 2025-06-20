@@ -16,6 +16,8 @@ import AdminDash from "./pages/Admindashboard/src/AdminDash";
 import AppAuth from "./pages/Login/src/App";
 const queryClient = new QueryClient();
 
+
+
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <TooltipProvider>

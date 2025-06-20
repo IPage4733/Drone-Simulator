@@ -28,22 +28,34 @@ const ForgotPassword: React.FC = () => {
     return Object.keys(newErrors).length === 0
   }
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    
-    if (!validateForm()) return
+ const handleSubmit = async (e: React.FormEvent) => {
+  e.preventDefault()
 
-    setIsLoading(true)
-    try {
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 2000))
-      setIsSubmitted(true)
-    } catch (error) {
-      setErrors({ submit: 'Failed to send reset email. Please try again.' })
-    } finally {
-      setIsLoading(false)
+  if (!validateForm()) return
+
+  setIsLoading(true)
+  try {
+    const response = await fetch('https://13.203.213.111.nip.io/api/forgot-password/', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ email })
+    })
+
+    if (!response.ok) {
+      const errorData = await response.json()
+      throw new Error(errorData.error || 'Failed to send reset email')
     }
+
+    setIsSubmitted(true)
+  } catch (error: any) {
+    setErrors({ submit: error.message || 'Failed to send reset email. Please try again.' })
+  } finally {
+    setIsLoading(false)
   }
+}
+
 
   if (isSubmitted) {
     return (
