@@ -3,7 +3,8 @@ import { Link, useNavigate } from 'react-router-dom'
 import { GoogleLogin } from '@react-oauth/google'
 import { useAuth } from '../context/AuthContext'
 import Logo from '../components/Logo'
-import { jwtDecode } from 'jwt-decode';
+import { jwtDecode } from 'jwt-decode'; // ✅ CORRECT for v4.0.0
+
 interface CustomJwtPayload {
   email: string;
   name?: string;
@@ -100,25 +101,29 @@ const handleGoogleLoginSuccess = async (credentialResponse: any) => {
       body: JSON.stringify({ token: credentialResponse.credential, email, username }),
     });
 
-    const data = await response.json();
+    const result = await response.json();
 
-    if (!response.ok || !data.token) {
-      throw new Error(data.message || 'Social login failed');
+    // ✅ FIX: Access nested data.token
+    if (!response.ok || !result.data?.token) {
+      throw new Error(result.message || 'Social login failed');
     }
 
-    // Store user session
-    sessionStorage.setItem('auth_token', data.token);
-    sessionStorage.setItem('auth_user', JSON.stringify(data.user));
+    const token = result.data.token;
+    const user = result.data.user;
+
+    sessionStorage.setItem('auth_token', token);
+    sessionStorage.setItem('auth_user', JSON.stringify(user));
     sessionStorage.setItem('auth_email', email);
     sessionStorage.setItem('auth_username', username);
 
-    // ✅ Immediately redirect
     navigate('/');
-  } catch {
-    // On error, you can optionally display something. Or silently fail:
-    // setErrors({ submit: 'Social login failed.' });
+  } catch (error) {
+    console.error('Google Login Error:', error);
+    setErrors({ submit: 'Google sign-in failed. Please try again later.' });
   }
 };
+
+
 
 
   return (
