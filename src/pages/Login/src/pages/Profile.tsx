@@ -490,22 +490,40 @@ const Profile: React.FC = () => {
     }
   }
 
-  useEffect(() => {
-    if (currentUser) {
-      const isOtherPurpose = !['personal', 'commercial', 'educational', 'research'].includes(currentUser.purpose_of_use)
-      setFormData({
-        email: currentUser.email,
-        username: currentUser.username,
-        full_name: currentUser.full_name,
-        phone_number: currentUser.phone_number,
-        city: currentUser.city,
-        state_province: currentUser.state_province,
-        country: currentUser.country,
-        purpose_of_use: isOtherPurpose ? 'other' : currentUser.purpose_of_use,
-        purpose_other: isOtherPurpose ? currentUser.purpose_of_use : ''
-      })
+useEffect(() => {
+  // Try to get user from context first
+  let savedUser = user
+
+  // If not available, fallback to sessionStorage
+  if (!savedUser) {
+    const storedUser = sessionStorage.getItem('auth_user')
+    if (storedUser) {
+      try {
+        savedUser = JSON.parse(storedUser)
+      } catch (e) {
+        console.error('Failed to parse auth_user from sessionStorage', e)
+      }
     }
-  }, [currentUser])
+  }
+
+  if (savedUser) {
+    const isOtherPurpose = !['personal', 'commercial', 'educational', 'research'].includes(savedUser.purpose_of_use)
+    setFormData({
+      email: savedUser.email || '',
+      username: savedUser.username || '',
+      full_name: savedUser.full_name || '',
+      phone_number: savedUser.phone_number || '',
+      city: savedUser.city || '',
+      state_province: savedUser.state_province || '',
+      country: savedUser.country || '',
+      purpose_of_use: isOtherPurpose ? 'other' : savedUser.purpose_of_use || '',
+      purpose_other: isOtherPurpose ? savedUser.purpose_of_use : ''
+    })
+
+    // You can also optionally update any displayed mock fields here
+  }
+}, [])
+
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target
