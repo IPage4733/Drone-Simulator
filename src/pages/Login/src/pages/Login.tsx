@@ -3,6 +3,11 @@ import { Link, useNavigate } from 'react-router-dom'
 import { GoogleLogin } from '@react-oauth/google'
 import { useAuth } from '../context/AuthContext'
 import Logo from '../components/Logo'
+import { jwtDecode } from 'jwt-decode';
+interface CustomJwtPayload {
+  email: string;
+  name?: string;
+}
 
 const Login: React.FC = () => {
   const [formData, setFormData] = useState({ email: '', password: '' })
@@ -83,28 +88,38 @@ const handleSubmit = async (e: React.FormEvent) => {
   }
 }
 
-  const handleGoogleLoginSuccess = async (credentialResponse: any) => {
-    try {
-      const response = await fetch('https://13.203.213.111.nip.io/api/social-login/', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-         body: JSON.stringify({
-        email: formData.email.trim(),
-        password: formData.password
-      })
-      })
+const handleGoogleLoginSuccess = async (credentialResponse: any) => {
+  try {
+    const decoded = jwtDecode<CustomJwtPayload>(credentialResponse.credential);
+    const email = decoded.email;
+    const username = decoded.name || email.split('@')[0];
 
-      if (!response.ok) {
-        throw new Error('Google sign-in failed')
-      }
+    const response = await fetch('https://13.203.213.111.nip.io/api/social-login/', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ token: credentialResponse.credential, email, username }),
+    });
 
-      const data = await response.json()
-      localStorage.setItem('token', data.token)
-      navigate('/')
-    } catch (error: any) {
-      setErrors({ submit: error.message || 'Google sign-in failed. Try again.' })
+    const data = await response.json();
+
+    if (!response.ok || !data.token) {
+      throw new Error(data.message || 'Social login failed');
     }
+
+    // Store user session
+    sessionStorage.setItem('auth_token', data.token);
+    sessionStorage.setItem('auth_user', JSON.stringify(data.user));
+    sessionStorage.setItem('auth_email', email);
+    sessionStorage.setItem('auth_username', username);
+
+    // ✅ Immediately redirect
+    navigate('/');
+  } catch {
+    // On error, you can optionally display something. Or silently fail:
+    // setErrors({ submit: 'Social login failed.' });
   }
+};
+
 
   return (
     <div className="auth-card">
