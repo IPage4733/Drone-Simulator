@@ -742,33 +742,7 @@ const Profile: React.FC = () => {
 
 
         {/* Profile Header */}
-        <div style={styles.profileHeader}>
-          <div style={styles.profileHeaderInner}>
-            <div style={styles.profileInfo}>
-              <div style={styles.avatar}>
-                <span style={styles.avatarText}>
-                  {currentUser.full_name.split(' ').map(n => n[0]).join('')}
-                </span>
-              </div>
-              <div>
-                <h1 style={styles.profileName}>{currentUser.full_name}</h1>
-                <p style={styles.profileUsername}>@{currentUser.username}</p>
-                <div style={styles.profileMeta}>
-                  <span style={styles.badge}>
-                    {currentUser.subscription_status.toUpperCase()} Member
-                  </span>
-                  <span style={styles.memberSince}>
-                    Member since {new Date(currentUser.member_since).toLocaleDateString()}
-                  </span>
-                </div>
-              </div>
-            </div>
-            <div style={styles.flightHours}>
-              <div style={styles.flightHoursNumber}>{currentUser.total_flight_hours}h</div>
-              <div style={styles.flightHoursLabel}>Total Flight Time</div>
-            </div>
-          </div>
-        </div>
+        
 
         {/* Stats Cards */}
         <div style={styles.statsGrid}>
