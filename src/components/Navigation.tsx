@@ -25,11 +25,29 @@ const Navigation = () => {
     setIsLoggedIn(!!token);
   }, [location.pathname]);
 
-  const handleLogout = () => {
-    sessionStorage.clear();
-    setIsLoggedIn(false);
-    navigate("/auth/login");
-  };
+const handleLogout = async () => {
+  const token = sessionStorage.getItem('auth_token')
+
+  try {
+    if (token) {
+      await fetch('https://13.203.213.111.nip.io/api/logout/', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Token ${token}`,
+          'Content-Type': 'application/json'
+        }
+      })
+    }
+  } catch (error) {
+    console.error('Logout API failed:', error)
+  } finally {
+    // Clear session and redirect
+    sessionStorage.clear()
+    setIsLoggedIn(false)
+    navigate("/auth/login")
+  }
+}
+
 
   return (
     <nav className="fixed top-0 w-full bg-white/95 backdrop-blur-sm shadow-lg z-50 font-poppins">
