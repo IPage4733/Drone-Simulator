@@ -490,39 +490,39 @@ const Profile: React.FC = () => {
     }
   }
 
-  useEffect(() => {
-    // Try to get user from context first
-    let savedUser = user
+useEffect(() => {
+  // Try to get user from context first
+  let savedUser = user
 
-    // If not available, fallback to sessionStorage
-    if (!savedUser) {
-      const storedUser = sessionStorage.getItem('auth_user')
-      if (storedUser) {
-        try {
-          savedUser = JSON.parse(storedUser)
-        } catch (e) {
-          console.error('Failed to parse auth_user from sessionStorage', e)
-        }
+  // If not available, fallback to sessionStorage
+  if (!savedUser) {
+    const storedUser = sessionStorage.getItem('auth_user')
+    if (storedUser) {
+      try {
+        savedUser = JSON.parse(storedUser)
+      } catch (e) {
+        console.error('Failed to parse auth_user from sessionStorage', e)
       }
     }
+  }
 
-    if (savedUser) {
-      const isOtherPurpose = !['personal', 'commercial', 'educational', 'research'].includes(savedUser.purpose_of_use)
-      setFormData({
-        email: savedUser.email || '',
-        username: savedUser.username || '',
-        full_name: savedUser.full_name || '',
-        phone_number: savedUser.phone_number || '',
-        city: savedUser.city || '',
-        state_province: savedUser.state_province || '',
-        country: savedUser.country || '',
-        purpose_of_use: isOtherPurpose ? 'other' : savedUser.purpose_of_use || '',
-        purpose_other: isOtherPurpose ? savedUser.purpose_of_use : ''
-      })
+  if (savedUser) {
+    const isOtherPurpose = !['personal', 'commercial', 'educational', 'research'].includes(savedUser.purpose_of_use)
+    setFormData({
+      email: savedUser.email || '',
+      username: savedUser.username || '',
+      full_name: savedUser.full_name || '',
+      phone_number: savedUser.phone_number || '',
+      city: savedUser.city || '',
+      state_province: savedUser.state_province || '',
+      country: savedUser.country || '',
+      purpose_of_use: isOtherPurpose ? 'other' : savedUser.purpose_of_use || '',
+      purpose_other: isOtherPurpose ? savedUser.purpose_of_use : ''
+    })
 
-      // You can also optionally update any displayed mock fields here
-    }
-  }, [])
+    // You can also optionally update any displayed mock fields here
+  }
+}, [])
 
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
@@ -584,12 +584,11 @@ const Profile: React.FC = () => {
 
     if (!validateForm()) return
 
-    const tokenInStorage = sessionStorage.getItem('auth_token');
-    if (!isAuthenticated && !tokenInStorage) {
-      setErrors({ submit: 'Please log in to edit your profile.' });
-      return;
+    // Only allow profile updates if user is authenticated
+    if (!isAuthenticated) {
+      setErrors({ submit: 'Please log in to update your profile.' })
+      return
     }
-
 
     setIsLoading(true)
     try {
@@ -739,7 +738,7 @@ const Profile: React.FC = () => {
 
       <div style={styles.mainContent}>
         {/* Demo Notice for non-authenticated users */}
-
+        
 
         {/* Profile Header */}
         <div style={styles.profileHeader}>
@@ -970,14 +969,12 @@ const Profile: React.FC = () => {
                       <button
                         type="button"
                         onClick={() => {
-  const tokenInStorage = sessionStorage.getItem('auth_token');
-  if (!isAuthenticated && !tokenInStorage) {
-    setErrors({ submit: 'Please log in to edit your profile.' });
-    return;
-  }
-  setIsEditing(true);
-}}
-
+                          if (!isAuthenticated) {
+                            setErrors({ submit: 'Please log in to edit your profile.' })
+                            return
+                          }
+                          setIsEditing(true)
+                        }}
                         style={{ ...styles.button, ...styles.buttonPrimary, padding: '0.75rem 1.5rem' }}
                       >
                         Edit Profile
