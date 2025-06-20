@@ -46,12 +46,13 @@ const handleSubmit = async (e: React.FormEvent) => {
 
   setIsLoading(true);
 
-  // Prepare payload
+  const safePassword = `${formData.name.replace(/\s/g, '')}@1234`;
+
   const payload = {
     email: formData.email,
-    username: formData.name.split(' ')[0] || formData.name, // first name
-    password: `${formData.name.replace(/\s/g, '')}@1234`, // Auto-password
-    password_confirm: `${formData.name.replace(/\s/g, '')}@1234`,
+    username: formData.name.split(' ')[0] || formData.name,
+    password: safePassword,
+    password_confirm: safePassword,
     full_name: formData.name,
     phone_number: formData.phone,
     city: formData.city,
@@ -72,27 +73,27 @@ const handleSubmit = async (e: React.FormEvent) => {
     const result = await response.json();
 
     if (!response.ok) {
-      throw new Error(result.message || "Failed to process your request");
+      throw new Error(result.message || "Submission failed");
     }
 
-    console.log("Download request successful:", result);
+    console.log("Success:", result);
     setIsSubmitted(true);
     toast({
       title: "Download Ready!",
       description: "Your download link has been generated successfully.",
     });
-
   } catch (error: any) {
     console.error("API Error:", error);
     toast({
       title: "Error",
-      description: error.message || "Something went wrong. Please try again.",
+      description: error.message || "Something went wrong.",
       variant: "destructive"
     });
   } finally {
     setIsLoading(false);
   }
 };
+
 
 
   const purposeOptions = [
@@ -226,17 +227,6 @@ const handleSubmit = async (e: React.FormEvent) => {
                         className="mt-1"
                       />
                     </div>
-                      <div>
-                      <Label htmlFor="Country">Country *</Label>
-                      <Input
-                        id="Country"
-                        type="text"
-                        required
-                        value={formData.country}
-                        onChange={(e) => handleInputChange("Country", e.target.value)}
-                        className="mt-1"
-                      />
-                    </div>
                     <div>
                       <Label htmlFor="city">City *</Label>
                       <Input
@@ -250,6 +240,17 @@ const handleSubmit = async (e: React.FormEvent) => {
                     </div>
                   
                   </div>
+                  <div>
+  <Label htmlFor="country">Country *</Label>
+  <Input
+    id="country"
+    type="text"
+    required
+    value={formData.country}
+    onChange={(e) => handleInputChange("country", e.target.value)}
+    className="mt-1"
+  />
+</div>
 
                   <div className="grid md:grid-cols-2 gap-4">
                     <div>

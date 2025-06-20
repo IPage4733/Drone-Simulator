@@ -579,37 +579,64 @@ const Profile: React.FC = () => {
     return Object.keys(newErrors).length === 0
   }
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
+const handleSubmit = async (e: React.FormEvent) => {
+  e.preventDefault();
 
-    if (!validateForm()) return
+  if (!validateForm()) return;
 
-    const tokenInStorage = sessionStorage.getItem('auth_token');
-    if (!isAuthenticated && !tokenInStorage) {
-      setErrors({ submit: 'Please log in to edit your profile.' });
-      return;
-    }
-
-
-    setIsLoading(true)
-    try {
-      const submitData = {
-        ...formData,
-        purpose_of_use: formData.purpose_of_use === 'other' ? formData.purpose_other : formData.purpose_of_use
-      }
-      const success = await updateProfile(submitData)
-      if (success) {
-        setSuccessMessage('Profile updated successfully!')
-        setIsEditing(false)
-      } else {
-        setErrors({ submit: 'Failed to update profile. Please try again.' })
-      }
-    } catch (error) {
-      setErrors({ submit: 'Failed to update profile. Please try again.' })
-    } finally {
-      setIsLoading(false)
-    }
+  const tokenInStorage = sessionStorage.getItem('auth_token');
+  if (!isAuthenticated && !tokenInStorage) {
+    setErrors({ submit: 'Please log in to edit your profile.' });
+    return;
   }
+
+  setIsLoading(true);
+
+  const payload = {
+    email: formData.email,
+    username: formData.username,
+    password: `${formData.username}@1234`, // optional logic (you can remove this if not required)
+    password_confirm: `${formData.username}@1234`,
+    full_name: formData.full_name,
+    phone_number: formData.phone_number,
+    city: formData.city,
+    state_province: formData.state_province,
+    country: formData.country,
+    purpose_of_use: formData.purpose_of_use === 'other' ? formData.purpose_other : formData.purpose_of_use
+  };
+
+  try {
+    const response = await fetch('https://13.203.213.111.nip.io/api/update-user-details/', {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${tokenInStorage}`
+      },
+      body: JSON.stringify(payload)
+    });
+
+    const result = await response.json();
+
+    if (!response.ok) {
+      throw new Error(result.message || 'Failed to update profile.');
+    }
+
+    // Update sessionStorage and context if needed
+    sessionStorage.setItem('auth_user', JSON.stringify(result.data));
+    if (updateProfile) {
+      updateProfile(result.data); // if your context accepts and updates with this object
+    }
+
+    setSuccessMessage('Profile updated successfully!');
+    setIsEditing(false);
+  } catch (error: any) {
+    console.error('Update error:', error);
+    setErrors({ submit: error.message || 'Failed to update profile. Please try again.' });
+  } finally {
+    setIsLoading(false);
+  }
+};
+
 
   const handleLogout = () => {
     if (isAuthenticated) {
