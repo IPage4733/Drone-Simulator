@@ -18,15 +18,15 @@ const Navigation = () => {
     { name: "Contact", path: "/contact" },
   ];
 
-  useEffect(() => {
-    const token = localStorage.getItem("token");
-    setIsLoggedIn(!!token);
-  }, [location.pathname]); // update on route change
-
   const isActive = (path: string) => location.pathname === path;
 
+  useEffect(() => {
+    const token = sessionStorage.getItem('auth_token');
+    setIsLoggedIn(!!token);
+  }, [location.pathname]);
+
   const handleLogout = () => {
-    localStorage.removeItem("token");
+    sessionStorage.clear();
     setIsLoggedIn(false);
     navigate("/auth/login");
   };
@@ -37,7 +37,7 @@ const Navigation = () => {
         <div className="flex justify-between items-center h-20 md:h-24 py-2">
           {/* Logo */}
           <Link to="/" className="flex items-center space-x-4">
-            <img src="/images/logo.jpg" alt="DroneSimulator Logo" className="w-[190px] h-auto object-contain" />
+            <img src="/images/logo.jpg" alt="Logo" className="w-[190px] h-auto object-contain" />
           </Link>
 
           {/* Desktop Navigation */}
@@ -56,12 +56,17 @@ const Navigation = () => {
               </Link>
             ))}
 
+            {/* Conditional Auth Buttons */}
             {isLoggedIn ? (
               <>
                 <Link to="/auth/profile" className="text-sm text-primary font-semibold">
                   Profile
                 </Link>
-                <Button variant="ghost" onClick={handleLogout} className="text-red-600 hover:text-red-700">
+                <Button
+                  variant="ghost"
+                  onClick={handleLogout}
+                  className="text-red-600 hover:text-red-700"
+                >
                   Logout
                 </Button>
               </>
