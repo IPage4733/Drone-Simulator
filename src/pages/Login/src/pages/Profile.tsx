@@ -563,7 +563,7 @@ const Profile: React.FC = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    
+
     if (!validateForm()) return
 
     // Only allow profile updates if user is authenticated
@@ -675,7 +675,7 @@ const Profile: React.FC = () => {
             <div style={styles.logoContainer}>
               <div style={styles.logoIcon}>
                 <svg style={{ width: '1.5rem', height: '1.5rem', color: 'white' }} fill="currentColor" viewBox="0 0 24 24">
-                  <path d="M12 2L2 7v10c0 5.55 3.84 9.74 9 11 0 0 1-.37 1-1s-.37-1-1-1c-4.34-1.04-7-4.55-7-9V8.3l7-3.11 7 3.11V17c0 4.45-2.66 7.96-7 9 0 0-1 .37-1 1s1 1 1 1c5.16-1.26 9-5.45 9-11V7l-10-5z"/>
+                  <path d="M12 2L2 7v10c0 5.55 3.84 9.74 9 11 0 0 1-.37 1-1s-.37-1-1-1c-4.34-1.04-7-4.55-7-9V8.3l7-3.11 7 3.11V17c0 4.45-2.66 7.96-7 9 0 0-1 .37-1 1s1 1 1 1c5.16-1.26 9-5.45 9-11V7l-10-5z" />
                 </svg>
               </div>
               <div>
@@ -700,6 +700,7 @@ const Profile: React.FC = () => {
                   Home
                 </Link>
               )}
+
               <button
                 onClick={handleLogout}
                 style={{
@@ -709,27 +710,17 @@ const Profile: React.FC = () => {
                 onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#ea580c'}
                 onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#f97316'}
               >
-                {isAuthenticated ? 'Sign Out' : 'Sign In'}
+                Sign Out
               </button>
             </div>
+
           </div>
         </div>
       </div>
 
       <div style={styles.mainContent}>
         {/* Demo Notice for non-authenticated users */}
-        {!isAuthenticated && (
-          <div style={styles.demoNotice}>
-            <div style={styles.demoNoticeInner}>
-              <svg style={{ width: '1.25rem', height: '1.25rem', color: '#d97706' }} fill="currentColor" viewBox="0 0 20 20">
-                <path fillRule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
-              </svg>
-              <span style={styles.demoNoticeText}>
-                You're viewing a demo profile. <Link to="/login" style={{ color: '#f97316', fontWeight: '600' }}>Sign in</Link> to access your actual profile data.
-              </span>
-            </div>
-          </div>
-        )}
+        
 
         {/* Profile Header */}
         <div style={styles.profileHeader}>
@@ -775,7 +766,7 @@ const Profile: React.FC = () => {
               </div>
             </div>
           </div>
-          
+
           <div style={styles.statCard}>
             <div style={styles.statCardInner}>
               <div>
@@ -828,36 +819,36 @@ const Profile: React.FC = () => {
           <div style={styles.tabsHeader}>
             <nav style={styles.tabsNav}>
               {[
-                { 
-                  id: 'overview', 
-                  name: 'Overview', 
+                {
+                  id: 'overview',
+                  name: 'Overview',
                   icon: (
                     <svg style={{ width: '1.25rem', height: '1.25rem' }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
                     </svg>
                   )
                 },
-                { 
-                  id: 'profile', 
-                  name: 'Profile Settings', 
+                {
+                  id: 'profile',
+                  name: 'Profile Settings',
                   icon: (
                     <svg style={{ width: '1.25rem', height: '1.25rem' }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
                     </svg>
                   )
                 },
-                { 
-                  id: 'purchases', 
-                  name: 'Purchase History', 
+                {
+                  id: 'purchases',
+                  name: 'Purchase History',
                   icon: (
                     <svg style={{ width: '1.25rem', height: '1.25rem' }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 3h2l.4 2M7 13h10l4-8H5.4m0 0L7 13m0 0l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17M17 13v4a2 2 0 01-2 2H9a2 2 0 01-2-2v-4m8 0V9a2 2 0 00-2-2H9a2 2 0 00-2 2v4.01" />
                     </svg>
                   )
                 },
-                { 
-                  id: 'achievements', 
-                  name: 'Achievements', 
+                {
+                  id: 'achievements',
+                  name: 'Achievements',
                   icon: (
                     <svg style={{ width: '1.25rem', height: '1.25rem' }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z" />
@@ -886,7 +877,7 @@ const Profile: React.FC = () => {
               <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
                 <div>
                   <h3 style={{ fontSize: '1.5rem', fontWeight: '700', color: '#111827', marginBottom: '1.5rem' }}>Account Overview</h3>
-                  
+
                   <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(400px, 1fr))', gap: '2rem' }}>
                     {/* Recent Activity */}
                     <div style={{ backgroundColor: '#f9fafb', borderRadius: '0.75rem', padding: '1.5rem' }}>
@@ -1226,7 +1217,7 @@ const Profile: React.FC = () => {
             {activeTab === 'achievements' && (
               <div>
                 <h3 style={{ fontSize: '1.5rem', fontWeight: '700', color: '#111827', marginBottom: '1.5rem' }}>Your Achievements</h3>
-                
+
                 <div style={styles.achievementGrid}>
                   {currentUser.achievements.map((achievement, index) => (
                     <div key={index} style={styles.achievementCard}>
