@@ -240,31 +240,48 @@ const Register: React.FC = () => {
     return Object.keys(newErrors).length === 0
   }
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    
-    if (!validateForm()) return
+const handleSubmit = async (e: React.FormEvent) => {
+  e.preventDefault()
 
-    setIsLoading(true)
-    try {
-      const submitData = {
-        ...formData,
-        phone_number: `${formData.phone_code} ${formData.phone_number}`,
-        purpose_of_use: formData.purpose_of_use === 'other' ? formData.purpose_other : formData.purpose_of_use
-      }
-      const success = await register(submitData)
-      if (success) {
-        navigate('/')
-      } else {
-        setErrors({ submit: 'Registration failed. Please try again.' })
-      }
-    } catch (error) {
-      setErrors({ submit: 'Registration failed. Please try again.' })
-    } finally {
-      setIsLoading(false)
-    }
+  if (!validateForm()) return
+
+  setIsLoading(true)
+
+  const requestBody = {
+    email: formData.email,
+    username: formData.username,
+    password: formData.password,
+    password_confirm: formData.password_confirm,
+    full_name: formData.full_name,
+    phone_number: formData.phone_number,
+    city: formData.city,
+    state_province: formData.state_province,
+    country: formData.country,
+    purpose_of_use: formData.purpose_of_use === 'other' ? formData.purpose_other : formData.purpose_of_use
   }
 
+  try {
+    const response = await fetch('https://13.203.213.111.nip.io/api/register/', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(requestBody)
+    })
+
+    const data = await response.json()
+
+    if (response.ok) {
+      navigate('/') // redirect to home or dashboard
+    } else {
+      setErrors({ submit: data?.error || 'Registration failed. Please try again.' })
+    }
+  } catch (error) {
+    setErrors({ submit: 'An unexpected error occurred. Please try again.' })
+  } finally {
+    setIsLoading(false)
+  }
+}
   return (
     <div className="auth-card" style={{ maxWidth: '600px' }}>
       <Logo />

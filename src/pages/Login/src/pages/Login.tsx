@@ -38,36 +38,50 @@ const Login: React.FC = () => {
     return Object.keys(newErrors).length === 0
   }
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
 
-    if (!validateForm()) return
+const handleSubmit = async (e: React.FormEvent) => {
+  e.preventDefault()
 
-    setIsLoading(true)
-    try {
-      const response = await fetch('https://13.203.213.111.nip.io/api/login/', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          email: formData.email,
-          password: formData.password
-        })
+  if (!validateForm()) return
+
+  setIsLoading(true)
+
+  try {
+    const response = await fetch('https://13.203.213.111.nip.io/api/login/', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        email: formData.email.trim(),
+        password: formData.password
       })
+    })
 
-      if (!response.ok) {
-        const errorData = await response.json()
-        throw new Error(errorData.message || 'Login failed')
-      }
+    const data = await response.json()
 
-      const data = await response.json()
-      localStorage.setItem('token', data.token)
-      navigate('/')
-    } catch (error: any) {
-      setErrors({ submit: error.message || 'Login failed. Please try again.' })
-    } finally {
-      setIsLoading(false)
+    // Log to debug
+    console.log('Login API Response:', data)
+
+    if (response.ok && data.data?.token) {
+      // Store token and user data in sessionStorage
+      sessionStorage.setItem('auth_token', data.data.token)
+      sessionStorage.setItem('auth_user', JSON.stringify(data.data.user))
+      sessionStorage.setItem('auth_email', data.data.user.email)
+
+      navigate('/') // ✅ Redirect to homepage
+    } else {
+      // Show fallback error from backend
+      const errorMsg = data.message || data.error || 'Login failed'
+      setErrors({ submit: errorMsg })
     }
+  } catch (error) {
+    console.error('Login Error:', error)
+    setErrors({ submit: 'Login failed. Please try again later.' })
+  } finally {
+    setIsLoading(false)
   }
+}
 
   const handleGoogleLoginSuccess = async (credentialResponse: any) => {
     try {
