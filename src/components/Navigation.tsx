@@ -1,12 +1,13 @@
-
-import { useState } from "react";
-import { Link, useLocation } from "react-router-dom";
+import { useState, useEffect } from "react";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { Menu, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 const Navigation = () => {
   const [isOpen, setIsOpen] = useState(false);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
   const location = useLocation();
+  const navigate = useNavigate();
 
   const navItems = [
     { name: "Home", path: "/" },
@@ -15,25 +16,29 @@ const Navigation = () => {
     { name: "Download", path: "/download" },
     { name: "Products", path: "/product" },
     { name: "Contact", path: "/contact" },
-    { name: "Profile", path: "/auth/profile"}
   ];
 
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    setIsLoggedIn(!!token);
+  }, [location.pathname]); // update on route change
+
   const isActive = (path: string) => location.pathname === path;
+
+  const handleLogout = () => {
+    localStorage.removeItem("token");
+    setIsLoggedIn(false);
+    navigate("/auth/login");
+  };
 
   return (
     <nav className="fixed top-0 w-full bg-white/95 backdrop-blur-sm shadow-lg z-50 font-poppins">
       <div className="max-w-7xl mx-auto px-2 sm:px-4 lg:px-6">
-
         <div className="flex justify-between items-center h-20 md:h-24 py-2">
           {/* Logo */}
           <Link to="/" className="flex items-center space-x-4">
-  <img
-    src="/images/logo.jpg"
-    alt="DroneSimulator Logo"
-     className="w-[190px] h-auto object-contain"
-  />
-
-</Link>
+            <img src="/images/logo.jpg" alt="DroneSimulator Logo" className="w-[190px] h-auto object-contain" />
+          </Link>
 
           {/* Desktop Navigation */}
           <div className="hidden md:flex items-center space-x-8">
@@ -50,6 +55,22 @@ const Navigation = () => {
                 {item.name}
               </Link>
             ))}
+
+            {isLoggedIn ? (
+              <>
+                <Link to="/auth/profile" className="text-sm text-primary font-semibold">
+                  Profile
+                </Link>
+                <Button variant="ghost" onClick={handleLogout} className="text-red-600 hover:text-red-700">
+                  Logout
+                </Button>
+              </>
+            ) : (
+              <Link to="/auth/login" className="text-sm text-primary font-semibold">
+                Login
+              </Link>
+            )}
+
             <Button className="bg-primary hover:bg-primary/90 text-white">
               Download Now
             </Button>
@@ -57,11 +78,7 @@ const Navigation = () => {
 
           {/* Mobile menu button */}
           <div className="md:hidden">
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={() => setIsOpen(!isOpen)}
-            >
+            <Button variant="ghost" size="icon" onClick={() => setIsOpen(!isOpen)}>
               {isOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
             </Button>
           </div>
@@ -85,6 +102,36 @@ const Navigation = () => {
                   {item.name}
                 </Link>
               ))}
+
+              {isLoggedIn ? (
+                <>
+                  <Link
+                    to="/auth/profile"
+                    className="block px-3 py-2 text-base font-medium text-primary"
+                    onClick={() => setIsOpen(false)}
+                  >
+                    Profile
+                  </Link>
+                  <button
+                    onClick={() => {
+                      handleLogout();
+                      setIsOpen(false);
+                    }}
+                    className="block w-full text-left px-3 py-2 text-base font-medium text-red-600 hover:bg-red-50"
+                  >
+                    Logout
+                  </button>
+                </>
+              ) : (
+                <Link
+                  to="/auth/login"
+                  className="block px-3 py-2 text-base font-medium text-primary"
+                  onClick={() => setIsOpen(false)}
+                >
+                  Login
+                </Link>
+              )}
+
               <div className="px-3 py-2">
                 <Button className="w-full bg-primary hover:bg-primary/90 text-white">
                   Download Now
