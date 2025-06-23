@@ -98,16 +98,24 @@ export const MasterUsers: React.FC = () => {
       return { status: `Due in ${daysUntilPayment} days`, color: 'text-green-600' };
     }
   };
- useEffect(() => {
+useEffect(() => {
   const fetchUsers = async () => {
     try {
+      const token =
+        sessionStorage.getItem('drone_auth_token') ||
+        localStorage.getItem('drone_auth_token');
+
       const [usersRes, transactionsRes] = await Promise.all([
         axiosInstance.get('/get-all-users/'),
-        axiosInstance.get('/stripe/my-transactions/')
+        axiosInstance.get('/stripe/my-transactions/', {
+          headers: {
+            Authorization: `Token ${token}`
+          }
+        }).catch(() => ({ data: [] })) // Fallback for payment failure
       ]);
 
       const userList = usersRes.data.data;
-      const transactions = transactionsRes.data;
+      const transactions = transactionsRes.data || [];
 
       const formattedUsers = userList.map((user: any) => {
         const txn = transactions.find((t: any) => t.email === user.email);
@@ -136,6 +144,7 @@ export const MasterUsers: React.FC = () => {
       setUsers(formattedUsers);
     } catch (error) {
       console.error('Error fetching users or transactions:', error);
+      setUsers([]);
     } finally {
       setLoading(false);
     }
@@ -143,6 +152,7 @@ export const MasterUsers: React.FC = () => {
 
   fetchUsers();
 }, []);
+
 
 
 
