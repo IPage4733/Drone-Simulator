@@ -7,9 +7,45 @@ const MiniCart: React.FC = () => {
   const { items, totalItems, totalPrice, removeItem } = useCart();
   const [isPopupOpen, setIsPopupOpen] = useState(false);
 
-  const handleCheckout = () => {
-    window.location.href = 'product/checkout';
-  };
+const handleCheckout = async () => {
+  if (items.length === 0) return;
+
+  const item = items[0];
+  const stripe_price_id = item.stripe_price_id || 'price_1RcJttCKYG7gRDVPBkHPkocp';
+
+  const token = sessionStorage.getItem('auth_token');
+  if (!token) {
+    alert('Please login and try again.');
+    return;
+  }
+
+  try {
+    const response = await fetch('https://34-93-79-185.nip.io/api/stripe/create-checkout-session/', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Token ${token}`,
+      },
+      body: JSON.stringify({ stripe_price_id }),
+    });
+
+    const data = await response.json();
+
+    console.log('Checkout API Response:', data); // ✅ log full response
+
+    if (response.ok && data.checkout_url) {
+      window.location.href = data.checkout_url;
+    } else {
+      alert(data.message || 'Stripe checkout failed. Check console.');
+    }
+  } catch (err) {
+    console.error('Fetch Error:', err);
+    alert('Something went wrong. Please try again.');
+  }
+};
+
+
+
 
   const handleCartClick = () => {
     if (totalItems > 0) {

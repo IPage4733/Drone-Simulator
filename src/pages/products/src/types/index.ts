@@ -1,4 +1,5 @@
 export interface Drone {
+  stripe_price_id: any;
   id: number;
   name: string;
   description: string;
@@ -8,6 +9,7 @@ export interface Drone {
 }
 
 export interface Scenario {
+  stripe_price_id: any;
   id: number;
   name: string;
   description: string;
@@ -26,9 +28,11 @@ export interface Plan {
   buttonText: string;
   buttonVariant: 'primary' | 'secondary';
   mostPopular: boolean;
+  stripe_price_id: string;
 }
 
 export interface Feature {
+  
   id: number;
   name: string;
   description: string;
@@ -36,11 +40,13 @@ export interface Feature {
 }
 
 export interface CartItem {
+  stripe_price_id?: string; 
   id: string;
   name: string;
   price: number;
   type: 'drone' | 'scenario' | 'plan' | 'addon';
   quantity: number;
+  
 }
 
 export interface CartContextType {

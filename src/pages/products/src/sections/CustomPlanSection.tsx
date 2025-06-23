@@ -50,6 +50,7 @@ const CustomPlanSection: React.FC = () => {
       name: 'All Drones Bundle',
       price: 1999,
       type: 'drone',
+      stripe_price_id: 'price_1RcJttCKYG7gRDVPBkHPkocp'
     });
   };
 
@@ -59,6 +60,9 @@ const CustomPlanSection: React.FC = () => {
       name: 'All Scenarios Bundle',
       price: 1999,
       type: 'scenario',
+      stripe_price_id: 'price_1RcJttCKYG7gRDVPBkHPkocp'
+
+
     });
   };
 
@@ -68,6 +72,7 @@ const CustomPlanSection: React.FC = () => {
       name: addon.name,
       price: addon.price,
       type: 'addon',
+      stripe_price_id: 'price_1RcJttCKYG7gRDVPBkHPkocp'
     });
   };
 
@@ -154,6 +159,8 @@ const CustomPlanSection: React.FC = () => {
                                 name: drone.name,
                                 price: drone.price,
                                 type: 'drone',
+                                stripe_price_id: drone.stripe_price_id, // ✅ Needed for Stripe checkout
+
                               })}
                             >
                               Add
@@ -200,6 +207,8 @@ const CustomPlanSection: React.FC = () => {
                               name: scenario.name,
                               price: scenario.price,
                               type: 'scenario',
+                            stripe_price_id: scenario.stripe_price_id, // ✅ Needed for Stripe checkout
+
                             })}
                           >
                             Add

@@ -16,6 +16,7 @@ const plans: Plan[] = [
     buttonText: 'Start Free',
     buttonVariant: 'secondary',
     mostPopular: false,
+    stripe_price_id: 'price_1RcJttCKYG7gRDVPBkHPkocp'
   },
   {
     id: 'pro',
@@ -32,6 +33,7 @@ const plans: Plan[] = [
     buttonText: 'Add to Cart',
     buttonVariant: 'primary',
     mostPopular: true,
+    stripe_price_id: 'price_1RcJttCKYG7gRDVPBkHPkocp'
   },
   {
     id: 'institution',
@@ -48,6 +50,7 @@ const plans: Plan[] = [
     buttonText: 'Book Demo',
     buttonVariant: 'secondary',
     mostPopular: false,
+    stripe_price_id: 'price_1RcJttCKYG7gRDVPBkHPkocp'
   },
 ];
 
