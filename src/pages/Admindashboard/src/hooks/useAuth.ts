@@ -15,27 +15,46 @@ export const useAuthProvider = (): AuthState => {
   const [user, setUser] = useState<User | null>(null);
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
 
-  const login = useCallback(async (email: string, password: string, role: UserRole): Promise<boolean> => {
-    // Simulate API call
-    await new Promise(resolve => setTimeout(resolve, 1000));
-    
-    // Mock authentication - in production, this would be a real API call
-    if (email && password) {
-      const mockUser: User = {
-        id: `${role}-1`,
-        name: role === 'master' ? 'Master Admin' : 'Admin User',
-        email,
+const login = useCallback(async (email: string, password: string, role: UserRole): Promise<boolean> => {
+  try {
+    const response = await fetch('https://34-93-79-185.nip.io/api/login/', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ email, password }),
+    });
+
+    if (!response.ok) return false;
+
+    const data = await response.json();
+    console.log('Login API response:', data);
+
+    // ✅ Updated: Check message and existence of user
+    if (data?.message === 'Login successful' && data?.data?.user) {
+      const user: User = {
+        id: data.data.user.id?.toString() || `${role}-1`,
+        name: data.data.user.full_name || 'Master Admin',
+        email: data.data.user.email || email,
         role,
-        avatar: `https://images.pexels.com/photos/1040881/pexels-photo-1040881.jpeg?auto=compress&cs=tinysrgb&w=100&h=100&dpr=2`
+        avatar: 'https://images.pexels.com/photos/1040881/pexels-photo-1040881.jpeg?auto=compress&cs=tinysrgb&w=100&h=100&dpr=2'
       };
-      
-      setUser(mockUser);
+
+      setUser(user);
       setIsAuthenticated(true);
-      localStorage.setItem('drone_auth_user', JSON.stringify(mockUser));
+      localStorage.setItem('drone_auth_user', JSON.stringify(user));
+      localStorage.setItem('drone_auth_token', data.token || 'default-token'); // Optional: depends on your API
       return true;
     }
+
     return false;
-  }, []);
+  } catch (error) {
+    console.error('Login failed:', error);
+    return false;
+  }
+}, []);
+
+
 
   const logout = useCallback(() => {
     setUser(null);
