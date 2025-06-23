@@ -103,18 +103,17 @@ useEffect(() => {
     try {
       const token = sessionStorage.getItem('drone_auth_token') || localStorage.getItem('drone_auth_token');
 
-const [usersRes, transactionsRes] = await Promise.all([
-  axiosInstance.get('/get-all-users/'),
-  axiosInstance.get('/stripe/my-transactions/', {
-    headers: {
-      Authorization: `Token ${token}`
-    }
-  })
-]);
-
+      const [usersRes, transactionsRes] = await Promise.all([
+        axiosInstance.get('/get-all-users/'),
+        axios.get('https://34-93-79-185.nip.io/api/stripe/my-transactions/', {
+          headers: {
+            Authorization: `Token ${token}`,
+          },
+        }).catch(() => ({ data: { data: [] } })) // fallback if API fails
+      ]);
 
       const userList = usersRes.data.data;
-      const transactions = transactionsRes.data.data;
+      const transactions = transactionsRes.data.data || [];
 
       const formattedUsers = userList.map((user: any) => {
         const txn = transactions.find((t: any) => t.email === user.email);
@@ -131,16 +130,17 @@ const [usersRes, transactionsRes] = await Promise.all([
           nextPaymentDate: txn?.next_payment_date || null,
           customPlan: txn?.custom_plan || null,
           usage: {
-            simulationsThisMonth: user.statistics.total_scenarios_completed || 0,
-            totalSimulations: user.statistics.total_app_sessions || 0
+            simulationsThisMonth: user.statistics?.total_scenarios_completed || 0,
+            totalSimulations: user.statistics?.total_app_sessions || 0,
           },
-          registrationDate: new Date(user.created_at).toLocaleDateString()
+          registrationDate: new Date(user.created_at).toLocaleDateString(),
         };
       });
 
       setUsers(formattedUsers);
     } catch (error) {
       console.error('Error fetching users or transactions:', error);
+      setUsers([]);
     } finally {
       setLoading(false);
     }
@@ -148,9 +148,7 @@ const [usersRes, transactionsRes] = await Promise.all([
 
   fetchUsers();
 }, []);
-
-
-
+//this is the 
   if (loading) {
     return <div className="text-center py-10 text-gray-500">Loading users...</div>;
   }
