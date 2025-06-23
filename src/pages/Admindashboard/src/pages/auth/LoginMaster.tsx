@@ -1,119 +1,148 @@
-import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { useAuth } from '../../hooks/useAuth';
-import { Shield, Zap, Lock, User } from 'lucide-react';
+  import React, { useState } from 'react';
+  import { useNavigate } from 'react-router-dom';
+  import { Shield, Zap, Lock, User } from 'lucide-react';
 
-export const LoginMaster: React.FC = () => {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState('');
-  
-  const { login } = useAuth();
-  const navigate = useNavigate();
+  export const LoginMaster: React.FC = () => {
+    const [email, setEmail] = useState('');
+    const [password, setPassword] = useState('');
+    const [isLoading, setIsLoading] = useState(false);
+    const [error, setError] = useState('');
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setIsLoading(true);
-    setError('');
+    const navigate = useNavigate();
 
-    try {
-      const success = await login(email, password, 'master');
-      if (success) {
-        navigate('/Dash/master/dashboard');
+const handleSubmit = async (e: React.FormEvent) => {
+  e.preventDefault();
+  setIsLoading(true);
+  setError('');
+
+  try {
+    const response = await fetch('https://34-93-79-185.nip.io/api/login/', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email, password }),
+    });
+
+    const result = await response.json();
+    console.log('🔐 Login API Response:', result);
+
+    if (result.message?.toLowerCase().includes('success')) {
+      const user = result.data.user;
+
+      if (user.email === 'dronesimulatorpro@gmail.com') {
+        user.role = 'master'; // 👈 Manually assign role
+
+        sessionStorage.setItem('token', result.data.token);
+        sessionStorage.setItem('user', JSON.stringify(user));
+
+        console.log('✅ Session storage set:');
+        console.log('Token:', sessionStorage.getItem('token'));
+        console.log('User:', JSON.parse(sessionStorage.getItem('user') || '{}'));
+
+        console.log('🚀 Redirecting to master dashboard...');
+        navigate('/dash/master/dashboard'); // ✅ use lowercase 'master/dashboard'
       } else {
-        setError('Invalid credentials. Please try again.');
+        setError('Access denied. You are not a Super Admin.');
+        sessionStorage.clear();
+        console.log('❌ Access denied. User email not allowed.');
       }
-    } catch (err) {
-      setError('Login failed. Please try again.');
-    } finally {
-      setIsLoading(false);
+    } else {
+      setError('Invalid credentials.');
+      console.log('❌ Invalid credentials.');
     }
-  };
+  } catch (err) {
+    console.error('❌ Login failed:', err);
+    setError('Login failed. Please try again.');
+  } finally {
+    setIsLoading(false);
+  }
+};
 
-  return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-900 via-blue-800 to-indigo-900 flex items-center justify-center p-4">
-      <div className="max-w-md w-full">
-        <div className="bg-white rounded-2xl shadow-2xl overflow-hidden">
-          <div className="bg-gradient-to-r from-blue-600 to-indigo-600 px-8 py-6">
-            <div className="flex items-center justify-center mb-4">
-              <div className="bg-white/20 p-3 rounded-full">
-                <Shield className="w-8 h-8 text-white" />
+
+
+
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-blue-900 via-blue-800 to-indigo-900 flex items-center justify-center p-4">
+        <div className="max-w-md w-full">
+          <div className="bg-white rounded-2xl shadow-2xl overflow-hidden">
+            <div className="bg-gradient-to-r from-blue-600 to-indigo-600 px-8 py-6">
+              <div className="flex items-center justify-center mb-4">
+                <div className="bg-white/20 p-3 rounded-full">
+                  <Shield className="w-8 h-8 text-white" />
+                </div>
               </div>
+              <h1 className="text-2xl font-bold text-white text-center">Master Admin</h1>
+              <p className="text-blue-100 text-center mt-2">Drone Simulator Platform</p>
             </div>
-            <h1 className="text-2xl font-bold text-white text-center">Master Admin</h1>
-            <p className="text-blue-100 text-center mt-2">Drone Simulator Platform</p>
-          </div>
-          
-          <div className="px-8 py-8">
-            <form onSubmit={handleSubmit} className="space-y-6">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Email Address
-                </label>
-                <div className="relative">
-                  <User className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
-                  <input
-                    type="email"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
-                    placeholder="admin@dronesim.com"
-                    required
-                  />
-                </div>
-              </div>
 
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Password
-                </label>
-                <div className="relative">
-                  <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
-                  <input
-                    type="password"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
-                    placeholder="Enter your password"
-                    required
-                  />
+            <div className="px-8 py-8">
+              <form onSubmit={handleSubmit} className="space-y-6">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Email Address
+                  </label>
+                  <div className="relative">
+                    <User className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
+                    <input
+                      type="email"
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                      className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                      placeholder="admin@dronesim.com"
+                      required
+                    />
+                  </div>
                 </div>
-              </div>
 
-              {error && (
-                <div className="bg-red-50 border border-red-200 rounded-lg p-3">
-                  <p className="text-red-600 text-sm">{error}</p>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Password
+                  </label>
+                  <div className="relative">
+                    <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
+                    <input
+                      type="password"
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
+                      className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                      placeholder="Enter your password"
+                      required
+                    />
+                  </div>
                 </div>
-              )}
 
-              <button
-                type="submit"
-                disabled={isLoading}
-                className="w-full bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-semibold py-3 px-4 rounded-lg transition-all duration-200 flex items-center justify-center space-x-2 disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                {isLoading ? (
-                  <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
-                ) : (
-                  <>
-                    <Zap className="w-5 h-5" />
-                    <span>Sign In as Master</span>
-                  </>
+                {error && (
+                  <div className="bg-red-50 border border-red-200 rounded-lg p-3">
+                    <p className="text-red-600 text-sm">{error}</p>
+                  </div>
                 )}
-              </button>
-            </form>
 
-            <div className="mt-6 text-center">
-              <button
-                onClick={() => navigate('/Dash/login-admin')}
-                className="text-blue-600 hover:text-blue-700 text-sm font-medium transition-colors"
-              >
-                Sign in as Admin instead
-              </button>
+                <button
+                  type="submit"
+                  disabled={isLoading}
+                  className="w-full bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-semibold py-3 px-4 rounded-lg transition-all duration-200 flex items-center justify-center space-x-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  {isLoading ? (
+                    <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
+                  ) : (
+                    <>
+                      <Zap className="w-5 h-5" />
+                      <span>Sign In as Master</span>
+                    </>
+                  )}
+                </button>
+              </form>
+
+              <div className="mt-6 text-center">
+                <button
+                  onClick={() => navigate('/Dash/login-admin')}
+                  className="text-blue-600 hover:text-blue-700 text-sm font-medium transition-colors"
+                >
+                  Sign in as Admin instead
+                </button>
+              </div>
             </div>
           </div>
         </div>
       </div>
-    </div>
-  );
-};
+    );
+  };

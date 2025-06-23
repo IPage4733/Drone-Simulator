@@ -14,11 +14,16 @@ export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
 }) => {
   const { isAuthenticated, user } = useAuth();
 
-  if (!isAuthenticated) {
+  // Fallback to sessionStorage if AuthContext is not set yet
+  const storedUser = JSON.parse(sessionStorage.getItem('user') || '{}');
+  const effectiveUser = user || storedUser;
+  const token = sessionStorage.getItem('token');
+
+  if (!isAuthenticated && !token) {
     return <Navigate to="/Dash/login-master" replace />;
   }
 
-  if (requiredRole && user?.role !== requiredRole) {
+  if (requiredRole && effectiveUser?.role !== requiredRole) {
     return <Navigate to="/Dash" replace />;
   }
 
