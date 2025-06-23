@@ -53,27 +53,27 @@ export const MasterUsers: React.FC = () => {
       default: return 'bg-gray-100 text-gray-800';
     }
   };
-const handleDeleteUser = async (email: string) => {
-  const confirmed = window.confirm(`Are you sure you want to delete user: ${email}?`);
-  if (!confirmed) return;
+  const handleDeleteUser = async (email: string) => {
+    const confirmed = window.confirm(`Are you sure you want to delete user: ${email}?`);
+    if (!confirmed) return;
 
-  try {
-    const response = await axiosInstance.delete('/delete-user/', {
-  data: { email }
-});
+    try {
+      const response = await axiosInstance.delete('/delete-user/', {
+        data: { email }
+      });
 
 
-    if (response.data.status === 'success') {
-      alert('User deleted successfully');
-      setUsers(prev => prev.filter(user => user.email !== email));
-    } else {
-      alert('Failed to delete user');
+      if (response.data.status === 'success') {
+        alert('User deleted successfully');
+        setUsers(prev => prev.filter(user => user.email !== email));
+      } else {
+        alert('Failed to delete user');
+      }
+    } catch (error) {
+      console.error('Delete error:', error);
+      alert('Error deleting user');
     }
-  } catch (error) {
-    console.error('Delete error:', error);
-    alert('Error deleting user');
-  }
-};
+  };
 
 
   const formatDate = (dateString?: string) => {
@@ -98,56 +98,56 @@ const handleDeleteUser = async (email: string) => {
       return { status: `Due in ${daysUntilPayment} days`, color: 'text-green-600' };
     }
   };
-useEffect(() => {
-  const fetchUsers = async () => {
-    try {
-      const token = sessionStorage.getItem('drone_auth_token') || localStorage.getItem('drone_auth_token');
+  useEffect(() => {
+    const fetchUsers = async () => {
+      try {
+        const token = sessionStorage.getItem('drone_auth_token') || localStorage.getItem('drone_auth_token');
 
-const [usersRes, transactionsRes] = await Promise.all([
-  axiosInstance.get('/get-all-users/'),
-  axiosInstance.get('/stripe/my-transactions/', {
-    headers: {
-      Authorization: `Token ${token}`
-    }
-  })
-]);
+        const [usersRes, transactionsRes] = await Promise.all([
+          axiosInstance.get('/get-all-users/'),
+          axiosInstance.get('/stripe/my-transactions/', {
+            headers: {
+              Authorization: `Token ${token}`
+            }
+          })
+        ]);
 
 
-      const userList = usersRes.data.data;
-      const transactions = transactionsRes.data.data;
+        const userList = usersRes.data.data;
+        const transactions = transactionsRes.data.data;
 
-      const formattedUsers = userList.map((user: any) => {
-        const txn = transactions.find((t: any) => t.email === user.email);
+        const formattedUsers = userList.map((user: any) => {
+          const txn = transactions.find((t: any) => t.email === user.email);
 
-        return {
-          id: user.user_id,
-          name: user.full_name || user.username || 'N/A',
-          email: user.email,
-          status: user.is_active ? 'Active' : 'Inactive',
-          plan: txn?.plan || 'Free',
-          addOns: txn?.addons || {},
-          paidAmount: txn?.paid_amount || 0,
-          paymentDate: txn?.last_payment_date || null,
-          nextPaymentDate: txn?.next_payment_date || null,
-          customPlan: txn?.custom_plan || null,
-          usage: {
-            simulationsThisMonth: user.statistics.total_scenarios_completed || 0,
-            totalSimulations: user.statistics.total_app_sessions || 0
-          },
-          registrationDate: new Date(user.created_at).toLocaleDateString()
-        };
-      });
+          return {
+            id: user.user_id,
+            name: user.full_name || user.username || 'N/A',
+            email: user.email,
+            status: user.is_active ? 'Active' : 'Inactive',
+            plan: txn?.plan || 'Free',
+            addOns: txn?.addons || {},
+            paidAmount: txn?.paid_amount || 0,
+            paymentDate: txn?.last_payment_date || null,
+            nextPaymentDate: txn?.next_payment_date || null,
+            customPlan: txn?.custom_plan || null,
+            usage: {
+              simulationsThisMonth: user.statistics.total_scenarios_completed || 0,
+              totalSimulations: user.statistics.total_app_sessions || 0
+            },
+            registrationDate: new Date(user.created_at).toLocaleDateString()
+          };
+        });
 
-      setUsers(formattedUsers);
-    } catch (error) {
-      console.error('Error fetching users or transactions:', error);
-    } finally {
-      setLoading(false);
-    }
-  };
+        setUsers(formattedUsers);
+      } catch (error) {
+        console.error('Error fetching users or transactions:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
 
-  fetchUsers();
-}, []);
+    fetchUsers();
+  }, []);
 
 
 
