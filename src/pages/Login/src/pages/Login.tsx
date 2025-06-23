@@ -46,14 +46,14 @@ const Login: React.FC = () => {
 
 
 const handleSubmit = async (e: React.FormEvent) => {
-  e.preventDefault()
+  e.preventDefault();
 
-  if (!validateForm()) return
+  if (!validateForm()) return;
 
-  setIsLoading(true)
+  setIsLoading(true);
 
   try {
-    const response = await fetch('https://13.203.213.111.nip.io/api/login/', {
+    const response = await fetch('https://34-93-79-185.nip.io/api/login/', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
@@ -62,32 +62,38 @@ const handleSubmit = async (e: React.FormEvent) => {
         email: formData.email.trim(),
         password: formData.password
       })
-    })
+    });
 
-    const data = await response.json()
+    const data = await response.json();
 
     // Log to debug
-    console.log('Login API Response:', data)
+    console.log('Login API Response:', data);
 
     if (response.ok && data.data?.token) {
       // Store token and user data in sessionStorage
-      sessionStorage.setItem('auth_token', data.data.token)
-      sessionStorage.setItem('auth_user', JSON.stringify(data.data.user))
-      sessionStorage.setItem('auth_email', data.data.user.email)
+      sessionStorage.setItem('auth_token', data.data.token);
+      sessionStorage.setItem('auth_user', JSON.stringify(data.data.user));
+      sessionStorage.setItem('auth_email', data.data.user.email);
 
-      navigate('/') // ✅ Redirect to homepage
+      // ✅ Conditional redirection based on email
+      if (data.data.user.email === 'dronesimulatorpro@gmail.com') {
+        navigate('/dash/master/dashboard');
+      } else {
+        navigate('/');
+      }
     } else {
       // Show fallback error from backend
-      const errorMsg = data.message || data.error || 'Login failed'
-      setErrors({ submit: errorMsg })
+      const errorMsg = data.message || data.error || 'Login failed';
+      setErrors({ submit: errorMsg });
     }
   } catch (error) {
-    console.error('Login Error:', error)
-    setErrors({ submit: 'Login failed. Please try again later.' })
+    console.error('Login Error:', error);
+    setErrors({ submit: 'Login failed. Please try again later.' });
   } finally {
-    setIsLoading(false)
+    setIsLoading(false);
   }
-}
+};
+
 
 const handleGoogleLoginSuccess = async (credentialResponse: any) => {
   try {
@@ -95,7 +101,7 @@ const handleGoogleLoginSuccess = async (credentialResponse: any) => {
     const email = decoded.email;
     const username = decoded.name || email.split('@')[0];
 
-    const response = await fetch('https://13.203.213.111.nip.io/api/social-login/', {
+    const response = await fetch('https://34-93-79-185.nip.io/api/social-login/', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ token: credentialResponse.credential, email, username }),

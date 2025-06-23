@@ -3,18 +3,71 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { ArrowLeft, Edit, Save, User, Activity, Clock, BarChart3 } from 'lucide-react';
 import { useData } from '../../hooks/useData';
 import { useAuth } from '../../hooks/useAuth';
+import { useEffect } from 'react';
+import axios from 'axios';
 
 export const MasterUserDetail: React.FC = () => {
-  const { id } = useParams<{ id: string }>();
+  const { id: email } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const { users, plans, annotations, updateUser, updateUserPlan, updateUserAddOns } = useData();
   const { user: currentUser } = useAuth();
-  
-  const user = users.find(u => u.id === id);
-  const userAnnotations = annotations.filter(a => a.userId === id);
-  
+
+  const [user, setUser] = useState<any | null>(null);
+  const [loading, setLoading] = useState(true);
+  const userAnnotations = annotations.filter(a => a.userId === user?.id);
+
+
   const [isEditing, setIsEditing] = useState(false);
   const [editData, setEditData] = useState(user || {});
+  useEffect(() => {
+    const fetchUserDetails = async () => {
+      try {
+        const userDetailsRes = await axios.post('https://34-93-79-185.nip.io/api/get-single-user-details/', {
+          email: email
+        });
+
+        if (userDetailsRes.data.status === 'success') {
+          const userData = userDetailsRes.data.data;
+
+          const formatted = {
+            id: userData.user_id,
+            name: userData.full_name || userData.username || 'N/A',
+            email: userData.email,
+            status: userData.is_active ? 'Active' : 'Inactive',
+            plan: 'Free',
+            addOns: {},
+            paidAmount: 0,
+            paymentDate: null,
+            nextPaymentDate: null,
+            customPlan: null,
+            usage: {
+              simulationsThisMonth: userData.statistics.total_scenarios_completed || 0,
+              totalSimulations: userData.statistics.total_app_sessions || 0
+            },
+            registrationDate: new Date(userData.created_at).toLocaleDateString(),
+            lastLogin: userData.last_login_date
+              ? new Date(userData.last_login_date).toLocaleString()
+              : 'N/A',
+            raw: userData
+          };
+
+          setUser(formatted);
+          setEditData(formatted);
+        } else {
+          console.error('Failed to fetch user detail');
+        }
+      } catch (error) {
+        console.error('Error fetching user detail:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchUserDetails();
+  }, [email]);
+
+
+
 
   if (!user) {
     return (
@@ -28,11 +81,11 @@ export const MasterUserDetail: React.FC = () => {
     if (editData.plan !== user.plan) {
       updateUserPlan(user.id, editData.plan, currentUser?.name || 'Master Admin');
     }
-    
+
     if (JSON.stringify(editData.addOns) !== JSON.stringify(user.addOns)) {
       updateUserAddOns(user.id, editData.addOns, currentUser?.name || 'Master Admin');
     }
-    
+
     updateUser(user.id, editData, currentUser?.name || 'Master Admin');
     setIsEditing(false);
   };
@@ -40,7 +93,7 @@ export const MasterUserDetail: React.FC = () => {
   return (
     <div className="space-y-6">
       <div className="flex items-center space-x-4">
-        <button 
+        <button
           onClick={() => navigate('/master/users')}
           className="p-2 rounded-lg hover:bg-gray-100 transition-colors"
         >
@@ -74,11 +127,10 @@ export const MasterUserDetail: React.FC = () => {
               <div>
                 <h3 className="text-xl font-semibold text-gray-900">{user.name}</h3>
                 <p className="text-gray-500">{user.email}</p>
-                <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full mt-1 ${
-                  user.status === 'Active' ? 'bg-green-100 text-green-800' :
-                  user.status === 'Inactive' ? 'bg-gray-100 text-gray-800' :
-                  'bg-red-100 text-red-800'
-                }`}>
+                <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full mt-1 ${user.status === 'Active' ? 'bg-green-100 text-green-800' :
+                    user.status === 'Inactive' ? 'bg-gray-100 text-gray-800' :
+                      'bg-red-100 text-red-800'
+                  }`}>
                   {user.status}
                 </span>
               </div>
@@ -92,9 +144,8 @@ export const MasterUserDetail: React.FC = () => {
                   value={isEditing ? editData.name : user.name}
                   onChange={(e) => setEditData(prev => ({ ...prev, name: e.target.value }))}
                   disabled={!isEditing}
-                  className={`w-full px-3 py-2 border border-gray-300 rounded-lg ${
-                    isEditing ? 'focus:ring-2 focus:ring-blue-500 focus:border-transparent' : 'bg-gray-50'
-                  }`}
+                  className={`w-full px-3 py-2 border border-gray-300 rounded-lg ${isEditing ? 'focus:ring-2 focus:ring-blue-500 focus:border-transparent' : 'bg-gray-50'
+                    }`}
                 />
               </div>
               <div>
@@ -104,9 +155,8 @@ export const MasterUserDetail: React.FC = () => {
                   value={isEditing ? editData.email : user.email}
                   onChange={(e) => setEditData(prev => ({ ...prev, email: e.target.value }))}
                   disabled={!isEditing}
-                  className={`w-full px-3 py-2 border border-gray-300 rounded-lg ${
-                    isEditing ? 'focus:ring-2 focus:ring-blue-500 focus:border-transparent' : 'bg-gray-50'
-                  }`}
+                  className={`w-full px-3 py-2 border border-gray-300 rounded-lg ${isEditing ? 'focus:ring-2 focus:ring-blue-500 focus:border-transparent' : 'bg-gray-50'
+                    }`}
                 />
               </div>
               <div>
@@ -115,9 +165,8 @@ export const MasterUserDetail: React.FC = () => {
                   value={isEditing ? editData.status : user.status}
                   onChange={(e) => setEditData(prev => ({ ...prev, status: e.target.value }))}
                   disabled={!isEditing}
-                  className={`w-full px-3 py-2 border border-gray-300 rounded-lg ${
-                    isEditing ? 'focus:ring-2 focus:ring-blue-500 focus:border-transparent' : 'bg-gray-50'
-                  }`}
+                  className={`w-full px-3 py-2 border border-gray-300 rounded-lg ${isEditing ? 'focus:ring-2 focus:ring-blue-500 focus:border-transparent' : 'bg-gray-50'
+                    }`}
                 >
                   <option value="Active">Active</option>
                   <option value="Inactive">Inactive</option>
@@ -172,7 +221,7 @@ export const MasterUserDetail: React.FC = () => {
         <div className="space-y-6">
           <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
             <h2 className="text-lg font-semibold text-gray-900 mb-4">Subscription Plan</h2>
-            
+
             <div className="space-y-4">
               <div className="p-4 bg-blue-50 border border-blue-200 rounded-lg">
                 <h3 className="font-medium text-blue-900">Current Plan: {user.plan}</h3>
@@ -187,9 +236,8 @@ export const MasterUserDetail: React.FC = () => {
                   value={isEditing ? editData.plan : user.plan}
                   onChange={(e) => setEditData(prev => ({ ...prev, plan: e.target.value }))}
                   disabled={!isEditing}
-                  className={`w-full px-3 py-2 border border-gray-300 rounded-lg ${
-                    isEditing ? 'focus:ring-2 focus:ring-blue-500 focus:border-transparent' : 'bg-gray-50'
-                  }`}
+                  className={`w-full px-3 py-2 border border-gray-300 rounded-lg ${isEditing ? 'focus:ring-2 focus:ring-blue-500 focus:border-transparent' : 'bg-gray-50'
+                    }`}
                 >
                   {plans.map(plan => (
                     <option key={plan.id} value={plan.name}>

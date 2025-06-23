@@ -3,9 +3,13 @@ import { Users as UsersIcon, Search, Filter, Edit, Eye, UserX, Settings, Calenda
 import { useData } from '../../hooks/useData';
 import { EditUserModal } from '../../components/modals/EditUserModal';
 import { useAuth } from '../../hooks/useAuth';
+import { useEffect } from 'react';
+import axios from 'axios';
 
 export const MasterUsers: React.FC = () => {
-  const { users, plans, drones, scenarios, updateUserPlan, updateUserAddOns, updateCustomPlan } = useData();
+  const { plans, drones, scenarios, updateUserPlan, updateUserAddOns, updateCustomPlan } = useData();
+  const [users, setUsers] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
   const { user: currentUser } = useAuth();
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
@@ -14,17 +18,17 @@ export const MasterUsers: React.FC = () => {
 
   const filteredUsers = users.filter(user => {
     const matchesSearch = user.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         user.email.toLowerCase().includes(searchTerm.toLowerCase());
+      user.email.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesStatus = statusFilter === 'all' || user.status === statusFilter;
     const matchesPlan = planFilter === 'all' || user.plan === planFilter;
-    
+
     return matchesSearch && matchesStatus && matchesPlan;
   });
 
   const handleEditUser = (userId: string, newPlan: string, addOns: any, customPlan?: any) => {
     updateUserPlan(userId, newPlan, currentUser?.name || 'Master Admin');
     updateUserAddOns(userId, addOns, currentUser?.name || 'Master Admin');
-    
+
     if (newPlan === 'Custom' && customPlan) {
       updateCustomPlan(userId, customPlan, currentUser?.name || 'Master Admin');
     }
@@ -49,6 +53,27 @@ export const MasterUsers: React.FC = () => {
       default: return 'bg-gray-100 text-gray-800';
     }
   };
+const handleDeleteUser = async (email: string) => {
+  const confirmed = window.confirm(`Are you sure you want to delete user: ${email}?`);
+  if (!confirmed) return;
+
+  try {
+    const response = await axios.delete('https://34-93-79-185.nip.io/api/delete-user/', {
+      data: { email }  // ✅ body goes inside `data` for DELETE requests
+    });
+
+    if (response.data.status === 'success') {
+      alert('User deleted successfully');
+      setUsers(prev => prev.filter(user => user.email !== email));
+    } else {
+      alert('Failed to delete user');
+    }
+  } catch (error) {
+    console.error('Delete error:', error);
+    alert('Error deleting user');
+  }
+};
+
 
   const formatDate = (dateString?: string) => {
     if (!dateString) return 'N/A';
@@ -57,13 +82,13 @@ export const MasterUsers: React.FC = () => {
 
   const getPaymentStatus = (user: any) => {
     if (user.plan === 'Free') return { status: 'Free Plan', color: 'text-gray-500' };
-    
+
     if (!user.nextPaymentDate) return { status: 'No Payment Due', color: 'text-gray-500' };
-    
+
     const nextPayment = new Date(user.nextPaymentDate);
     const today = new Date();
     const daysUntilPayment = Math.ceil((nextPayment.getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
-    
+
     if (daysUntilPayment < 0) {
       return { status: 'Overdue', color: 'text-red-600' };
     } else if (daysUntilPayment <= 7) {
@@ -72,7 +97,55 @@ export const MasterUsers: React.FC = () => {
       return { status: `Due in ${daysUntilPayment} days`, color: 'text-green-600' };
     }
   };
+useEffect(() => {
+  const fetchUsers = async () => {
+    try {
+      const [usersRes, transactionsRes] = await Promise.all([
+        axios.get('https://34-93-79-185.nip.io/api/get-all-users/'),
+        axios.get('https://34-93-79-185.nip.io/api/stripe/my-transactions/')
+      ]);
 
+      const userList = usersRes.data.data;
+      const transactions = transactionsRes.data.data;
+
+      const formattedUsers = userList.map((user: any) => {
+        const txn = transactions.find((t: any) => t.email === user.email);
+
+        return {
+          id: user.user_id,
+          name: user.full_name || user.username || 'N/A',
+          email: user.email,
+          status: user.is_active ? 'Active' : 'Inactive',
+          plan: txn?.plan || 'Free',
+          addOns: txn?.addons || {},
+          paidAmount: txn?.paid_amount || 0,
+          paymentDate: txn?.last_payment_date || null,
+          nextPaymentDate: txn?.next_payment_date || null,
+          customPlan: txn?.custom_plan || null,
+          usage: {
+            simulationsThisMonth: user.statistics.total_scenarios_completed || 0,
+            totalSimulations: user.statistics.total_app_sessions || 0
+          },
+          registrationDate: new Date(user.created_at).toLocaleDateString()
+        };
+      });
+
+      setUsers(formattedUsers);
+    } catch (error) {
+      console.error('Error fetching users or transactions:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  fetchUsers();
+}, []);
+
+
+
+  if (loading) {
+    return <div className="text-center py-10 text-gray-500">Loading users...</div>;
+  }
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
@@ -100,7 +173,7 @@ export const MasterUsers: React.FC = () => {
               />
             </div>
           </div>
-          
+
           <div>
             <select
               value={statusFilter}
@@ -113,7 +186,7 @@ export const MasterUsers: React.FC = () => {
               <option value="Suspended">Suspended</option>
             </select>
           </div>
-          
+
           <div>
             <select
               value={planFilter}
@@ -179,7 +252,7 @@ export const MasterUsers: React.FC = () => {
                         <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${getPlanColor(user.plan)}`}>
                           {user.plan}
                         </span>
-                        
+
                         {user.plan === 'Custom' && user.customPlan ? (
                           <div className="space-y-1">
                             <div className="text-xs text-gray-600">
@@ -193,7 +266,7 @@ export const MasterUsers: React.FC = () => {
                           </div>
                         ) : (
                           <div className="flex flex-wrap gap-1">
-                            {Object.entries(user.addOns).map(([key, value]) => 
+                            {Object.entries(user.addOns).map(([key, value]) =>
                               value && (
                                 <span key={key} className="inline-flex px-1 py-0.5 text-xs bg-green-100 text-green-700 rounded">
                                   {key}
@@ -243,7 +316,7 @@ export const MasterUsers: React.FC = () => {
                     <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                       <div className="flex items-center space-x-2">
                         <button
-                          onClick={() => window.location.href = `/master/users/${user.id}`}
+                          onClick={() => window.location.href = `/dash/master/users/${user.email}`}
                           className="text-blue-600 hover:text-blue-900 transition-colors p-1"
                           title="View Details"
                         >
@@ -273,11 +346,13 @@ export const MasterUsers: React.FC = () => {
                           </button>
                         )}
                         <button
+                          onClick={() => handleDeleteUser(user.email)}
                           className="text-red-600 hover:text-red-900 transition-colors p-1"
-                          title="Suspend User"
+                          title="Delete User"
                         >
                           <UserX className="w-4 h-4" />
                         </button>
+
                       </div>
                     </td>
                   </tr>

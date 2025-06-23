@@ -606,7 +606,7 @@ const handleSubmit = async (e: React.FormEvent) => {
   };
 
   try {
-    const response = await fetch('https://13.203.213.111.nip.io/api/update-user-details/', {
+    const response = await fetch('https://34-93-79-185.nip.io/api/update-user-details/', {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
