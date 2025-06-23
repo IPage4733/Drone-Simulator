@@ -10,6 +10,7 @@ interface PlanCardProps {
 }
 
 const PlanCard: React.FC<PlanCardProps> = ({ plan }) => {
+  if (!plan || typeof plan !== 'object') return null; // ✅ defensive check
   const { addItem } = useCart();
 
   const handleAddToCart = () => {
@@ -19,6 +20,7 @@ const PlanCard: React.FC<PlanCardProps> = ({ plan }) => {
         name: plan.name,
         price: plan.price,
         type: 'plan',
+        stripe_price_id: plan.stripe_price_id, 
       });
     } else if (plan.id === 'institution') {
       // Handle institutional plan booking
