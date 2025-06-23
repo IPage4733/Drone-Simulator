@@ -8,12 +8,11 @@ const axiosInstance = axios.create({
   withCredentials: true // only if backend uses cookies (optional)
 });
 
-// 🔐 Attach latest token dynamically before each request
 axiosInstance.interceptors.request.use(
   (config) => {
-    const token = localStorage.getItem('drone_auth_token');
+    const token = sessionStorage.getItem('drone_auth_token'); // ✅ use sessionStorage
     if (token) {
-      config.headers['Authorization'] = `Bearer ${token}`;
+      config.headers['Authorization'] = `Token ${token}`;
     }
     return config;
   },

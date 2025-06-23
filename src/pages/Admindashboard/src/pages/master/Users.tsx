@@ -53,27 +53,27 @@ export const MasterUsers: React.FC = () => {
       default: return 'bg-gray-100 text-gray-800';
     }
   };
-const handleDeleteUser = async (email: string) => {
-  const confirmed = window.confirm(`Are you sure you want to delete user: ${email}?`);
-  if (!confirmed) return;
+  const handleDeleteUser = async (email: string) => {
+    const confirmed = window.confirm(`Are you sure you want to delete user: ${email}?`);
+    if (!confirmed) return;
 
-  try {
-    const response = await axiosInstance.delete('/delete-user/', {
-  data: { email }
-});
+    try {
+      const response = await axiosInstance.delete('/delete-user/', {
+        data: { email }
+      });
 
 
-    if (response.data.status === 'success') {
-      alert('User deleted successfully');
-      setUsers(prev => prev.filter(user => user.email !== email));
-    } else {
-      alert('Failed to delete user');
+      if (response.data.status === 'success') {
+        alert('User deleted successfully');
+        setUsers(prev => prev.filter(user => user.email !== email));
+      } else {
+        alert('Failed to delete user');
+      }
+    } catch (error) {
+      console.error('Delete error:', error);
+      alert('Error deleting user');
     }
-  } catch (error) {
-    console.error('Delete error:', error);
-    alert('Error deleting user');
-  }
-};
+  };
 
 
   const formatDate = (dateString?: string) => {
@@ -98,23 +98,16 @@ const handleDeleteUser = async (email: string) => {
       return { status: `Due in ${daysUntilPayment} days`, color: 'text-green-600' };
     }
   };
-useEffect(() => {
+ useEffect(() => {
   const fetchUsers = async () => {
     try {
-      const token = sessionStorage.getItem('drone_auth_token') || localStorage.getItem('drone_auth_token');
-
-const [usersRes, transactionsRes] = await Promise.all([
-  axiosInstance.get('/get-all-users/'),
-  axiosInstance.get('/stripe/my-transactions/', {
-    headers: {
-      Authorization: `Token ${token}`
-    }
-  })
-]);
-
+      const [usersRes, transactionsRes] = await Promise.all([
+        axiosInstance.get('/get-all-users/'),
+        axiosInstance.get('/stripe/my-transactions/')
+      ]);
 
       const userList = usersRes.data.data;
-      const transactions = transactionsRes.data.data;
+      const transactions = transactionsRes.data;
 
       const formattedUsers = userList.map((user: any) => {
         const txn = transactions.find((t: any) => t.email === user.email);
@@ -131,10 +124,12 @@ const [usersRes, transactionsRes] = await Promise.all([
           nextPaymentDate: txn?.next_payment_date || null,
           customPlan: txn?.custom_plan || null,
           usage: {
-            simulationsThisMonth: user.statistics.total_scenarios_completed || 0,
-            totalSimulations: user.statistics.total_app_sessions || 0
+            simulationsThisMonth: user.statistics?.total_scenarios_completed || 0,
+            totalSimulations: user.statistics?.total_app_sessions || 0
           },
-          registrationDate: new Date(user.created_at).toLocaleDateString()
+          registrationDate: user.created_at
+            ? new Date(user.created_at).toLocaleDateString()
+            : 'N/A'
         };
       });
 
@@ -148,6 +143,7 @@ const [usersRes, transactionsRes] = await Promise.all([
 
   fetchUsers();
 }, []);
+
 
 
 
