@@ -5,7 +5,7 @@ import { EditUserModal } from '../../components/modals/EditUserModal';
 import { useAuth } from '../../hooks/useAuth';
 import { useEffect } from 'react';
 import axios from 'axios';
-
+import axiosInstance from '@/api/axios';
 export const MasterUsers: React.FC = () => {
   const { plans, drones, scenarios, updateUserPlan, updateUserAddOns, updateCustomPlan } = useData();
   const [users, setUsers] = useState<any[]>([]);
@@ -58,9 +58,10 @@ const handleDeleteUser = async (email: string) => {
   if (!confirmed) return;
 
   try {
-    const response = await axios.delete('https://34-93-79-185.nip.io/api/delete-user/', {
-      data: { email }  // ✅ body goes inside `data` for DELETE requests
-    });
+    const response = await axiosInstance.delete('/delete-user/', {
+  data: { email }
+});
+
 
     if (response.data.status === 'success') {
       alert('User deleted successfully');
@@ -100,10 +101,17 @@ const handleDeleteUser = async (email: string) => {
 useEffect(() => {
   const fetchUsers = async () => {
     try {
-      const [usersRes, transactionsRes] = await Promise.all([
-        axios.get('https://34-93-79-185.nip.io/api/get-all-users/'),
-        axios.get('https://34-93-79-185.nip.io/api/stripe/my-transactions/')
-      ]);
+      const token = sessionStorage.getItem('drone_auth_token') || localStorage.getItem('drone_auth_token');
+
+const [usersRes, transactionsRes] = await Promise.all([
+  axiosInstance.get('/get-all-users/'),
+  axiosInstance.get('/stripe/my-transactions/', {
+    headers: {
+      Authorization: `Token ${token}`
+    }
+  })
+]);
+
 
       const userList = usersRes.data.data;
       const transactions = transactionsRes.data.data;
