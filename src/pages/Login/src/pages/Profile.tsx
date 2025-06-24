@@ -63,10 +63,11 @@ const Profile: React.FC = () => {
       invoice_url: '#'
     }
   ]
-
+const [stripePurchases, setStripePurchases] = useState([]);
   // Use authenticated user data if available, otherwise use mock data
   const currentUser = user || mockUser
-  const currentPurchases = purchases.length > 0 ? purchases : mockPurchases
+  const currentPurchases = stripePurchases.length > 0 ? stripePurchases : mockPurchases;
+
 
   // Inline styles
   const styles = {
@@ -212,12 +213,14 @@ const Profile: React.FC = () => {
     flightHoursLabel: {
       color: '#fed7aa'
     },
-    statsGrid: {
-      display: 'grid',
-      gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))',
-      gap: '1.5rem',
-      marginBottom: '2rem'
-    },
+   statsGrid: {
+  display: 'flex',
+  justifyContent: 'space-between',
+  gap: '1.5rem',
+  flexWrap: 'wrap',
+  marginBottom: '2rem'
+},
+
     statCard: {
       backgroundColor: 'white',
       borderRadius: '0.75rem',
@@ -489,40 +492,37 @@ const Profile: React.FC = () => {
       marginLeft: '0.75rem'
     }
   }
+useEffect(() => {
+  const fetchStripePurchases = async () => {
+    const tokenInStorage = sessionStorage.getItem('auth_token');
+    if (!tokenInStorage) return;
 
-  useEffect(() => {
-    // Try to get user from context first
-    let savedUser = user
+    try {
+      const response = await fetch('https://13.203.213.111.nip.io/api/stripe/my-transactions/', {
+        headers: {
+          Authorization: `Bearer ${tokenInStorage}`,
+        },
+      });
 
-    // If not available, fallback to sessionStorage
-    if (!savedUser) {
-      const storedUser = sessionStorage.getItem('auth_user')
-      if (storedUser) {
-        try {
-          savedUser = JSON.parse(storedUser)
-        } catch (e) {
-          console.error('Failed to parse auth_user from sessionStorage', e)
-        }
-      }
+      const result = await response.json();
+      console.log('Stripe API response:', result); // 👈 Logs full API response
+
+      // Adjust this based on actual structure
+      const extractedData = Array.isArray(result.data)
+        ? result.data
+        : Array.isArray(result)
+          ? result
+          : [];
+
+      setStripePurchases(extractedData);
+    } catch (err) {
+      console.error('Error fetching transactions:', err);
     }
+  };
 
-    if (savedUser) {
-      const isOtherPurpose = !['personal', 'commercial', 'educational', 'research'].includes(savedUser.purpose_of_use)
-      setFormData({
-        email: savedUser.email || '',
-        username: savedUser.username || '',
-        full_name: savedUser.full_name || '',
-        phone_number: savedUser.phone_number || '',
-        city: savedUser.city || '',
-        state_province: savedUser.state_province || '',
-        country: savedUser.country || '',
-        purpose_of_use: isOtherPurpose ? 'other' : savedUser.purpose_of_use || '',
-        purpose_other: isOtherPurpose ? savedUser.purpose_of_use : ''
-      })
+  fetchStripePurchases();
+}, []);
 
-      // You can also optionally update any displayed mock fields here
-    }
-  }, [])
 
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
@@ -713,6 +713,26 @@ const handleSubmit = async (e: React.FormEvent) => {
   }
 
   return (
+    <>
+    <Link
+      to="/"
+      style={{
+        position: 'fixed',
+        top: '1rem',
+        left: '1rem',
+        zIndex: 999,
+        backgroundColor: '#fff7ed',
+        color: '#f97316',
+        fontWeight: '600',
+        textDecoration: 'none',
+        padding: '0.5rem 1rem',
+        border: '1px solid #f97316',
+        borderRadius: '0.5rem',
+        boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)'
+      }}
+    >
+      ← Back to Home
+    </Link>
     <div style={styles.container}>
       {/* Header */}
       <div style={styles.header}>
@@ -780,7 +800,7 @@ const handleSubmit = async (e: React.FormEvent) => {
                 <p style={styles.statValue}>{currentPurchases.length}</p>
               </div>
               <div style={{ ...styles.statIcon, backgroundColor: '#dbeafe' }}>
-                <svg style={{ width: '1.5rem', height: '1.5rem', color: '#2563eb' }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg style={{ width: '1.25rem', height: '1.25rem', color: '#2563eb' }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
                 </svg>
               </div>
@@ -803,19 +823,7 @@ const handleSubmit = async (e: React.FormEvent) => {
             </div>
           </div>
 
-          <div style={styles.statCard}>
-            <div style={styles.statCardInner}>
-              <div>
-                <p style={styles.statLabel}>Achievements</p>
-                <p style={styles.statValue}>{currentUser.achievements.length}</p>
-              </div>
-              <div style={{ ...styles.statIcon, backgroundColor: '#fef3c7' }}>
-                <svg style={{ width: '1.5rem', height: '1.5rem', color: '#d97706' }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z" />
-                </svg>
-              </div>
-            </div>
-          </div>
+         
 
           <div style={styles.statCard}>
             <div style={styles.statCardInner}>
@@ -866,15 +874,7 @@ const handleSubmit = async (e: React.FormEvent) => {
                     </svg>
                   )
                 },
-                {
-                  id: 'achievements',
-                  name: 'Achievements',
-                  icon: (
-                    <svg style={{ width: '1.25rem', height: '1.25rem' }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z" />
-                    </svg>
-                  )
-                }
+               
               ].map((tab) => (
                 <button
                   key={tab.id}
@@ -1272,7 +1272,9 @@ const handleSubmit = async (e: React.FormEvent) => {
           </div>
         </div>
       </div>
+      
     </div>
+      </>
   )
 }
 
