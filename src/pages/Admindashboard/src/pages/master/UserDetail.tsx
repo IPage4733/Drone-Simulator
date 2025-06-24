@@ -29,27 +29,30 @@ export const MasterUserDetail: React.FC = () => {
         if (userDetailsRes.data.status === 'success') {
           const userData = userDetailsRes.data.data;
 
-          const formatted = {
-            id: userData.user_id,
-            name: userData.full_name || userData.username || 'N/A',
-            email: userData.email,
-            status: userData.is_active ? 'Active' : 'Inactive',
-            plan: 'Free',
-            addOns: {},
-            paidAmount: 0,
-            paymentDate: null,
-            nextPaymentDate: null,
-            customPlan: null,
-            usage: {
-              simulationsThisMonth: userData.statistics.total_scenarios_completed || 0,
-              totalSimulations: userData.statistics.total_app_sessions || 0
-            },
-            registrationDate: new Date(userData.created_at).toLocaleDateString(),
-            lastLogin: userData.last_login_date
-              ? new Date(userData.last_login_date).toLocaleString()
-              : 'N/A',
-            raw: userData
-          };
+const formatted = {
+  id: userData.user_id,
+  name: userData.full_name || userData.username || 'N/A',
+  email: userData.email,
+  status: userData.is_active ? 'Active' : 'Inactive',
+  plan: userData.plan?.toLowerCase() || 'trial',
+  planExpiry: userData.plan_expiry_date
+    ? new Date(userData.plan_expiry_date).toLocaleDateString()
+    : 'N/A',
+  addOns: {}, // assuming you fetch these from somewhere else
+  paidAmount: 0,
+  paymentDate: null,
+  nextPaymentDate: null,
+  customPlan: null,
+  usage: {
+    simulationsThisMonth: userData.statistics.total_scenarios_completed || 0,
+    totalSimulations: userData.statistics.total_app_sessions || 0
+  },
+  registrationDate: new Date(userData.created_at).toLocaleDateString(),
+  lastLogin: userData.last_login_date
+    ? new Date(userData.last_login_date).toLocaleString()
+    : 'N/A',
+  raw: userData
+};
 
           setUser(formatted);
           setEditData(formatted);
@@ -77,24 +80,57 @@ export const MasterUserDetail: React.FC = () => {
     );
   }
 
-  const handleSave = () => {
-    if (editData.plan !== user.plan) {
-      updateUserPlan(user.id, editData.plan, currentUser?.name || 'Master Admin');
-    }
+const handleSave = async () => {
+  // Normalize values
+  const is_active = editData.status === 'Active';
+  const sanitizedPlan = editData.plan?.toLowerCase();
+  const formatToIsoDate = (dateString: string) => {
+  const date = new Date(dateString);
+  return date.toISOString().split('.')[0]; // "2027-06-16T00:00:00"
+};
+const formattedExpiry = formatToIsoDate(editData.planExpiry);
 
-    if (JSON.stringify(editData.addOns) !== JSON.stringify(user.addOns)) {
-      updateUserAddOns(user.id, editData.addOns, currentUser?.name || 'Master Admin');
-    }
+  // Call local update functions if there are changes
+  if (editData.plan !== user.plan) {
+    updateUserPlan(user.id, sanitizedPlan, currentUser?.name || 'Master Admin');
+  }
 
-    updateUser(user.id, editData, currentUser?.name || 'Master Admin');
-    setIsEditing(false);
-  };
+  if (JSON.stringify(editData.addOns) !== JSON.stringify(user.addOns)) {
+    updateUserAddOns(user.id, editData.addOns, currentUser?.name || 'Master Admin');
+  }
+
+  try {
+    await axios.put(
+      `https://34-93-79-185.nip.io/api/update-user-details/`,
+      {
+        email: editData.email,
+        full_name: editData.name,
+        plan: sanitizedPlan,
+        plan_expiry_date: formattedExpiry,
+        is_active: is_active,
+      },
+      {
+        headers: {
+          Authorization: `Token ${sessionStorage.getItem("drone_auth_token")}`,
+        },
+      }
+    );
+  } catch (err) {
+    console.error("Error updating user details:", err);
+  }
+
+  updateUser(user.id, editData, currentUser?.name || 'Master Admin');
+  setIsEditing(false);
+};
+
+
+
 
   return (
     <div className="space-y-6">
       <div className="flex items-center space-x-4">
         <button
-          onClick={() => navigate('/master/users')}
+          onClick={() => navigate('/dash/master/users')}
           className="p-2 rounded-lg hover:bg-gray-100 transition-colors"
         >
           <ArrowLeft className="w-5 h-5 text-gray-600" />
@@ -229,22 +265,39 @@ export const MasterUserDetail: React.FC = () => {
                   ${plans.find(p => p.name === user.plan)?.price || 0}/month
                 </p>
               </div>
+<div>
+  <label className="block text-sm font-medium text-gray-700 mb-1">Plan Expiry Date</label>
+  {isEditing ? (
+    <input
+      type="date"
+      value={editData.planExpiry?.split('T')[0]}
+      onChange={(e) =>
+        setEditData((prev) => ({
+          ...prev,
+          planExpiry: e.target.value
+        }))
+      }
+      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+    />
+  ) : (
+    <p className="text-sm text-gray-800">{user.planExpiry || 'N/A'}</p>
+  )}
+</div>
+
 
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">Change Plan</label>
-                <select
-                  value={isEditing ? editData.plan : user.plan}
-                  onChange={(e) => setEditData(prev => ({ ...prev, plan: e.target.value }))}
-                  disabled={!isEditing}
-                  className={`w-full px-3 py-2 border border-gray-300 rounded-lg ${isEditing ? 'focus:ring-2 focus:ring-blue-500 focus:border-transparent' : 'bg-gray-50'
-                    }`}
-                >
-                  {plans.map(plan => (
-                    <option key={plan.id} value={plan.name}>
-                      {plan.name} - ${plan.price}/month
-                    </option>
-                  ))}
-                </select>
+            <select
+  value={isEditing ? editData.plan : user.plan}
+  onChange={(e) => setEditData(prev => ({ ...prev, plan: e.target.value }))}
+  disabled={!isEditing}
+  className={`w-full px-3 py-2 border border-gray-300 rounded-lg ${isEditing ? 'focus:ring-2 focus:ring-blue-500 focus:border-transparent' : 'bg-gray-50'}`}
+>
+  <option value="trial">Trial - $0/month</option>
+  <option value="basic">Basic - $10/month</option>
+  <option value="premium">Premium - $25/month</option>
+</select>
+
               </div>
 
               <div>
