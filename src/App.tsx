@@ -14,6 +14,8 @@ import ProductApp from "../src/pages/products/src/ProductApp"; // ✅ New import
 import { CartProvider } from "../src/pages/products/src/context/CartContext"; // ✅ Add this
 import AdminDash from "./pages/Admindashboard/src/AdminDash";
 import AppAuth from "./pages/Login/src/App";
+import { ToastContainer } from "react-toastify";
+import 'react-toastify/dist/ReactToastify.css';
 const queryClient = new QueryClient();
 
 

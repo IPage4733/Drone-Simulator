@@ -15,13 +15,14 @@ const PlansSection: React.FC = () => {
           </p>
         </div>
         
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-5xl mx-auto">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 max-w-7xl mx-auto">
+
           {plans.map((plan) => (
             <PlanCard key={plan.id} plan={plan} />
           ))}
         </div>
         
-        <div className="mt-16 text-center">
+        {/* <div className="mt-16 text-center">
           <p className="text-xl font-semibold mb-4">Need a custom solution?</p>
           <p className="text-gray-600 max-w-2xl mx-auto mb-6">
             Create your own plan by selecting specific drones, scenarios, and features that match your exact requirements.
@@ -32,7 +33,7 @@ const PlansSection: React.FC = () => {
           >
             Build Your Custom Plan
           </a>
-        </div>
+        </div> */}
       </div>
     </section>
   );

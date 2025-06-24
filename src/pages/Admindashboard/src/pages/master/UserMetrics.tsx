@@ -11,6 +11,8 @@ export const MasterUserMetrics: React.FC = () => {
   const [userInterests, setUserInterests] = useState<any[]>([]);
   const [countryDownloads, setCountryDownloads] = useState<any[]>([]);
   const [totalRevenue, setTotalRevenue] = useState(0);
+  const totalDownloads = countryDownloads.reduce((sum, country) => sum + country.downloads, 0);
+
 
   const scenariosByInterest = {
     'Aerial Photography': [
@@ -75,82 +77,108 @@ export const MasterUserMetrics: React.FC = () => {
     return colors[index % colors.length];
   };
 
-  useEffect(() => {
-    const fetchDownloads = async () => {
-      try {
-        const response = await fetch('https://34-93-79-185.nip.io/api/get-all-downloads/');
-        if (response.ok) {
-          const data = await response.json();
-          const raw = Array.isArray(data.data) ? data.data : [data.data];
-          setDownloadsData(raw);
+useEffect(() => {
+  const fetchDownloads = async () => {
+    try {
+      const response = await fetch('https://34-93-79-185.nip.io/api/get-all-downloads/');
+      if (response.ok) {
+        const data = await response.json();
+        const raw = Array.isArray(data.data) ? data.data : [data.data];
+        setDownloadsData(raw);
 
-          const groupedByCountry = raw.reduce((acc, item) => {
-            const country = item.country || 'Unknown';
-            if (!acc[country]) {
-              acc[country] = {
-                country,
-                users: new Set(),
-                downloads: 0,
-                revenue: 0,
-                flag: '🌐',
-              };
-            }
-            acc[country].downloads += item.download_count || 1;
-            acc[country].users.add(item.email);
-            acc[country].revenue += (item.download_count || 1) * 10;
-            return acc;
-          }, {});
+        const groupedByCountry = raw.reduce((acc, item) => {
+          const rawCountry = item.country || 'Unknown';
+          const country = rawCountry.trim().toLowerCase(); // normalize
+          const displayName = rawCountry.trim().replace(/\b\w/g, char => char.toUpperCase());
 
-          const countries = Object.values(groupedByCountry).map((item: any) => ({
-            ...item,
-            users: item.users.size,
-            growth: '+10%',
-          }));
-          setCountryDownloads(countries);
-
-          const groupedByInterest = raw.reduce((acc, item) => {
-            const interest = item.purpose_of_use || 'Uncategorized';
-            if (!acc[interest]) {
-              acc[interest] = {
-                interest,
-                users: new Set(),
-                downloads: 0,
-                revenue: 0,
-              };
-            }
-            acc[interest].downloads += item.download_count || 1;
-            acc[interest].users.add(item.email);
-            acc[interest].revenue += (item.download_count || 1) * 10;
-            return acc;
-          }, {});
-
-          const interests = Object.values(groupedByInterest).map((item: any) => {
-            const users = item.users.size;
-            const percentage = ((users / raw.length) * 100).toFixed(1);
-            return {
-              interest: item.interest,
-              users,
-              percentage: parseFloat(percentage),
-              revenue: item?.revenue ?? 0,
-              growth: '+10%',
+          if (!acc[country]) {
+            acc[country] = {
+              country: displayName,
+              users: new Set(),
+              downloads: 0,
+              flag: '🌐',
             };
-          });
-          setUserInterests(interests);
+          }
 
-          setTotalRevenue(raw.reduce((acc, item) => acc + (item.download_count || 1) * 10, 0));
-        }
-      } catch (err) {
-        console.error('Failed to fetch download data:', err);
-        setUserInterests([]);
-        setCountryDownloads([]);
-        setTotalRevenue(0);
-      } finally {
-        setLoading(false);
+          acc[country].downloads += item.download_count || 1;
+          acc[country].users.add(item.email);
+          return acc;
+        }, {});
+
+        const currentSnapshot = Object.values(groupedByCountry).map((item: any) => ({
+          country: item.country,
+          downloads: item.downloads,
+          users: item.users.size,
+        }));
+
+        const previousRaw = localStorage.getItem('countryDownloadSnapshot');
+        const previousSnapshot = previousRaw ? JSON.parse(previousRaw) : [];
+
+        // Save current snapshot for next time
+        localStorage.setItem('countryDownloadSnapshot', JSON.stringify(currentSnapshot));
+
+        const countries = currentSnapshot.map((item: any) => {
+          const previous = previousSnapshot.find((p: any) => p.country === item.country);
+          const previousDownloads = previous?.downloads || 0;
+          const growth = previousDownloads > 0
+            ? (((item.downloads - previousDownloads) / previousDownloads) * 100).toFixed(1)
+            : '0.0';
+
+          return {
+            ...item,
+            flag: '🌐',
+            growth: `${growth}%`,
+          };
+        });
+
+        setCountryDownloads(countries);
+        const totalDownloads = countries.reduce((acc, item) => acc + item.downloads, 0);
+        setTotalRevenue(totalDownloads); // Reused as totalDownloads
+
+        // Group by interest
+        const groupedByInterest = raw.reduce((acc, item) => {
+          const interest = item.purpose_of_use || 'Uncategorized';
+          if (!acc[interest]) {
+            acc[interest] = {
+              interest,
+              users: new Set(),
+              downloads: 0,
+              revenue: 0,
+            };
+          }
+          acc[interest].downloads += item.download_count || 1;
+          acc[interest].users.add(item.email);
+          acc[interest].revenue += (item.download_count || 1) * 10;
+          return acc;
+        }, {});
+
+        const interests = Object.values(groupedByInterest).map((item: any) => {
+          const users = item.users.size;
+          const percentage = ((users / raw.length) * 100).toFixed(1);
+          return {
+            interest: item.interest,
+            users,
+            percentage: parseFloat(percentage),
+            revenue: item?.revenue ?? 0,
+            growth: '+10%', // You can enhance this too
+          };
+        });
+
+        setUserInterests(interests);
       }
-    };
+    } catch (err) {
+      console.error('Failed to fetch download data:', err);
+      setUserInterests([]);
+      setCountryDownloads([]);
+      setTotalRevenue(0);
+    } finally {
+      setLoading(false);
+    }
+  };
 
-    fetchDownloads();
-  }, []);
+  fetchDownloads();
+}, []);
+
 
   const totalCountryRevenue = totalRevenue;
 
@@ -295,7 +323,7 @@ export const MasterUserMetrics: React.FC = () => {
           </div>
         </div>
 
-        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+        {/* <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm font-medium text-gray-600">Total Revenue</p>
@@ -308,7 +336,7 @@ export const MasterUserMetrics: React.FC = () => {
               <Zap className="w-6 h-6 text-green-600" />
             </div>
           </div>
-        </div>
+        </div> */}
       </div>
 
       {/* User Interests & Revenue Section */}
@@ -316,10 +344,10 @@ export const MasterUserMetrics: React.FC = () => {
         <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
           <div className="flex items-center justify-between mb-6">
             <h2 className="text-lg font-semibold text-gray-900">Interest-Based Revenue Analysis</h2>
-            <div className="flex items-center space-x-2 text-sm text-green-600">
+            {/* <div className="flex items-center space-x-2 text-sm text-green-600">
               <TrendingUp className="w-4 h-4" />
               <span>${totalRevenue.toLocaleString()} total</span>
-            </div>
+            </div> */}
           </div>
 
           <div className="space-y-4">
@@ -330,10 +358,10 @@ export const MasterUserMetrics: React.FC = () => {
                     <div className={`w-3 h-3 rounded-full ${getInterestColor(index)}`}></div>
                     <span className="text-sm font-medium text-gray-900">{interest.interest}</span>
                   </div>
-                  <div className="text-right">
+                  {/* <div className="text-right">
                     <span className="text-sm font-semibold text-gray-900">${interest.revenue}</span>
                     <span className="text-xs text-green-600 ml-2">{interest.growth}</span>
-                  </div>
+                  </div> */}
                 </div>
                 <div className="w-full bg-gray-200 rounded-full h-2">
                   <div
@@ -351,9 +379,9 @@ export const MasterUserMetrics: React.FC = () => {
         </div>
 
         {/* Revenue by Scenarios */}
-        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+        {/* <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
           <h2 className="text-lg font-semibold text-gray-900 mb-6">Top Revenue Scenarios by Interest</h2>
-          
+
           <div className="space-y-6">
             {Object.entries(scenariosByInterest).slice(0, 3).map(([interest, scenarios]) => (
               <div key={interest} className="border-b border-gray-200 pb-4 last:border-b-0">
@@ -381,17 +409,17 @@ export const MasterUserMetrics: React.FC = () => {
               </div>
             ))}
           </div>
-        </div>
+        </div> */}
       </div>
 
       {/* Country-Based Revenue & Downloads */}
       <div className="bg-white rounded-xl shadow-sm border border-gray-200">
         <div className="p-6 border-b border-gray-200">
           <div className="flex items-center justify-between">
-            <h2 className="text-lg font-semibold text-gray-900">Geographic Revenue Distribution</h2>
+            <h2 className="text-lg font-semibold text-gray-900">Geographic Download Distribution</h2>
             <div className="flex items-center space-x-2 text-sm text-gray-500">
               <MapPin className="w-4 h-4" />
-              <span>Revenue by country</span>
+              <span>Downloads by country</span>
             </div>
           </div>
         </div>
@@ -403,18 +431,18 @@ export const MasterUserMetrics: React.FC = () => {
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Country
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                {/* <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Revenue
-                </th>
+                </th> */}
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Downloads
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Active Users
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                {/* <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Avg. Revenue/User
-                </th>
+                </th> */}
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Growth
                 </th>
@@ -425,9 +453,8 @@ export const MasterUserMetrics: React.FC = () => {
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
               {countryDownloads.map((country, index) => {
-                const marketShare = ((country.revenue / totalCountryRevenue) * 100).toFixed(1);
-                const avgRevenuePerUser = (country.revenue / country.users).toFixed(0);
-                
+               const marketShare = (country.downloads / totalDownloads) * 100;
+
                 return (
                   <tr key={country.country} className="hover:bg-gray-50 transition-colors">
                     <td className="px-6 py-4 whitespace-nowrap">
@@ -439,20 +466,20 @@ export const MasterUserMetrics: React.FC = () => {
                         </div>
                       </div>
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
+                    {/* <td className="px-6 py-4 whitespace-nowrap">
                       <div className="text-sm font-semibold text-green-600">
                         ${country.revenue.toLocaleString()}
                       </div>
-                    </td>
+                    </td> */}
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div className="text-sm text-gray-900">{country.downloads.toLocaleString()}</div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div className="text-sm text-gray-900">{country.users.toLocaleString()}</div>
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
+                    {/* <td className="px-6 py-4 whitespace-nowrap">
                       <div className="text-sm font-medium text-gray-900">${avgRevenuePerUser}</div>
-                    </td>
+                    </td> */}
                     <td className="px-6 py-4 whitespace-nowrap">
                       <span className="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-green-100 text-green-800">
                         {country.growth}
@@ -478,7 +505,7 @@ export const MasterUserMetrics: React.FC = () => {
       </div>
 
       {/* Master Insights Dashboard */}
-      <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
+      {/* <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
         <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
           <h3 className="text-lg font-semibold text-gray-900 mb-4">Highest Revenue Region</h3>
           <div className="text-center">
@@ -534,7 +561,7 @@ export const MasterUserMetrics: React.FC = () => {
             <div className="text-sm text-gray-500 mt-1">Inspection category</div>
           </div>
         </div>
-      </div>
+      </div> */}
     </div>
   );
 };

@@ -18,17 +18,32 @@ const plans: Plan[] = [
     mostPopular: false,
     stripe_price_id: 'price_1RcJttCKYG7gRDVPBkHPkocp'
   },
-  {
-    id: 'pro',
-    name: 'Pro Plan',
-    price: 2999,
-    billing: 'per year',
+    {
+    id: 'Student',
+    name: 'Student Plan',
+    price: 9.99,
+    billing: 'USD per year',
     features: [
       'Access to ALL drones',
       'ALL scenarios included',
       'Free, Drawing & Automation modes',
       'Digital Certificate',
-      'Analytics available (+₹799/year)',
+    ],
+    buttonText: 'Add to Cart',
+    buttonVariant: 'primary',
+    mostPopular: true,
+    stripe_price_id: 'price_1RcJttCKYG7gRDVPBkHPkocp'
+  },
+  {
+    id: 'pro',
+    name: 'Pro Plan',
+    price: 34.99,
+    billing: 'USD per year',
+    features: [
+      'Access to ALL drones',
+      'ALL scenarios included',
+      'Free, Drawing & Automation modes',
+      'Digital Certificate',
     ],
     buttonText: 'Add to Cart',
     buttonVariant: 'primary',
@@ -38,8 +53,8 @@ const plans: Plan[] = [
   {
     id: 'institution',
     name: 'Institution Plan',
-    price: 29000,
-    billing: 'per year',
+    price: 29000 ,
+    billing: ' USD per year',
     features: [
       '30 user accounts',
       'ALL features included',
@@ -47,7 +62,7 @@ const plans: Plan[] = [
       'Bulk Certificate Generation',
       'Analytics Included',
     ],
-    buttonText: 'Book Demo',
+    buttonText: 'Contact Us',
     buttonVariant: 'secondary',
     mostPopular: false,
     stripe_price_id: 'price_1RcJttCKYG7gRDVPBkHPkocp'

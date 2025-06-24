@@ -4,6 +4,7 @@ import { Plan } from '../types';
 import Card from './Card';
 import Button from './Button';
 import { useCart } from '../context/CartContext';
+import { toast } from 'react-toastify';
 
 interface PlanCardProps {
   plan: Plan;
@@ -13,23 +14,51 @@ const PlanCard: React.FC<PlanCardProps> = ({ plan }) => {
   if (!plan || typeof plan !== 'object') return null; // ✅ defensive check
   const { addItem } = useCart();
 
-  const handleAddToCart = () => {
-    if (plan.id !== 'free' && plan.id !== 'institution') {
-      addItem({
-        id: plan.id,
-        name: plan.name,
-        price: plan.price,
-        type: 'plan',
-        stripe_price_id: plan.stripe_price_id, 
+const handleAddToCart = () => {
+  const userEmail = sessionStorage.getItem('auth_email');
+
+  if (!userEmail) {
+    toast.warning('⚠️ Please log in and try again.', {
+      position: 'top-center',
+    });
+    return;
+  }
+
+  if (plan.id === 'Student') {
+    const isEducational = /(@edu\.|\.edu$|@students?\.|\.ac(\.|$))/i.test(userEmail);
+
+    if (!isEducational) {
+      toast.error('🎓 You must use an educational or academic (.edu or .ac) email to access the Student Plan.', {
+        position: 'top-center',
       });
-    } else if (plan.id === 'institution') {
-      // Handle institutional plan booking
-      window.location.href = '/contact';
-    } else {
-      // Handle free plan
-      window.location.href = '/register';
+      return;
     }
-  };
+  }
+
+  if (plan.id === 'institution') {
+    window.location.href = '/contact';
+    return;
+  }
+
+  if (plan.id === 'free') {
+    window.location.href = '/register';
+    return;
+  }
+
+  addItem({
+    id: plan.id,
+    name: plan.name,
+    price: plan.price,
+    type: 'plan',
+    stripe_price_id: plan.stripe_price_id,
+  });
+
+  toast.success('✅ Plan added to cart!', {
+    position: 'top-center',
+  });
+};
+
+
 
   return (
     <Card highlighted={plan.mostPopular} className="h-full flex flex-col">
@@ -40,10 +69,12 @@ const PlanCard: React.FC<PlanCardProps> = ({ plan }) => {
       )}
       <div className="p-6 flex flex-col h-full">
         <h3 className="text-xl font-bold mb-2">{plan.name}</h3>
-        <div className="mb-4">
-          <span className="text-3xl font-bold">₹{plan.price}</span>
-          <span className="text-gray-500 ml-1">{plan.billing}</span>
-        </div>
+        {plan.id !== 'institution' && (
+          <div className="mb-4">
+            <span className="text-3xl font-bold">${plan.price}</span>
+            <span className="text-gray-500 ml-1">{plan.billing}</span>
+          </div>
+        )}
         <ul className="mb-6 flex-grow">
           {plan.features.map((feature, index) => (
             <li key={index} className="flex items-start mb-3">
@@ -52,7 +83,7 @@ const PlanCard: React.FC<PlanCardProps> = ({ plan }) => {
             </li>
           ))}
         </ul>
-        <Button 
+        <Button
           variant={plan.buttonVariant}
           onClick={handleAddToCart}
           fullWidth

@@ -98,8 +98,8 @@ const CheckoutPage: React.FC = () => {
                         </div>
                       </div>
                       <div className="text-right">
-                        <div className="font-semibold">₹{item.price * item.quantity}</div>
-                        <div className="text-sm text-gray-500">₹{item.price} each</div>
+                        <div className="font-semibold">${item.price * item.quantity}</div>
+                        <div className="text-sm text-gray-500">${item.price} each</div>
                       </div>
                     </div>
                   ))}
@@ -108,17 +108,17 @@ const CheckoutPage: React.FC = () => {
                 <div className="border-t border-gray-200 pt-4 space-y-2">
                   <div className="flex justify-between text-gray-600">
                     <span>Subtotal</span>
-                    <span>₹{totalPrice}</span>
+                    <span>${totalPrice}</span>
                   </div>
                   {formData.autoRenew && (
                     <div className="flex justify-between text-green-600">
                       <span>Auto-renewal Discount (10%)</span>
-                      <span>-₹{(totalPrice * 0.1).toFixed(2)}</span>
+                      <span>-${(totalPrice * 0.1).toFixed(2)}</span>
                     </div>
                   )}
                   <div className="flex justify-between font-bold text-lg pt-2 border-t border-gray-200">
                     <span>Total</span>
-                    <span>₹{discountedTotal.toFixed(2)}</span>
+                    <span>${discountedTotal.toFixed(2)}</span>
                   </div>
                 </div>
               </div>
@@ -228,7 +228,7 @@ const CheckoutPage: React.FC = () => {
                   size="lg"
                   disabled={items.length === 0}
                 >
-                  Pay ₹{discountedTotal.toFixed(2)}
+                  Pay ${discountedTotal.toFixed(2)}
                 </Button>
               </form>
             </div>

@@ -132,7 +132,7 @@ const CustomPlanSection: React.FC = () => {
                     size="sm"
                     onClick={handleAllDrones}
                   >
-                    Add All Drones (₹1,999)
+                    Add All Drones ($1,999)
                   </Button>
                 </div>
                 
@@ -150,7 +150,7 @@ const CustomPlanSection: React.FC = () => {
                           <h4 className="font-medium">{drone.name}</h4>
                           <p className="text-sm text-gray-500 mb-2">{drone.description.slice(0, 60)}...</p>
                           <div className="flex justify-between items-center">
-                            <span className="text-orange-500 font-semibold">₹{drone.price}</span>
+                            <span className="text-orange-500 font-semibold">${drone.price}</span>
                             <Button 
                               variant="outline" 
                               size="sm"
@@ -182,7 +182,7 @@ const CustomPlanSection: React.FC = () => {
                     size="sm"
                     onClick={handleAllScenarios}
                   >
-                    Add All Scenarios (₹1,999)
+                    Add All Scenarios ($1,999)
                   </Button>
                 </div>
                 
@@ -198,7 +198,7 @@ const CustomPlanSection: React.FC = () => {
                         <h4 className="font-medium">{scenario.name}</h4>
                         <p className="text-sm text-gray-500 mb-2">{scenario.description.slice(0, 60)}...</p>
                         <div className="flex justify-between items-center">
-                          <span className="text-orange-500 font-semibold">₹{scenario.price}</span>
+                          <span className="text-orange-500 font-semibold">${scenario.price}</span>
                           <Button 
                             variant="outline" 
                             size="sm"
@@ -230,7 +230,7 @@ const CustomPlanSection: React.FC = () => {
                       <h4 className="font-medium mb-2">{addon.name}</h4>
                       <p className="text-sm text-gray-500 mb-4">{addon.description}</p>
                       <div className="flex justify-between items-center">
-                        <span className="text-orange-500 font-semibold">₹{addon.price}</span>
+                        <span className="text-orange-500 font-semibold">${addon.price}</span>
                         <Button 
                           variant="outline" 
                           size="sm"
