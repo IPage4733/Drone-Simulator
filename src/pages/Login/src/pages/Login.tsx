@@ -1,13 +1,14 @@
 import React, { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { GoogleLogin } from '@react-oauth/google'
+import { jwtDecode } from 'jwt-decode'
 import { useAuth } from '../context/AuthContext'
+import Navigation from '@/components/Navigation'
 import Logo from '../components/Logo'
-import { jwtDecode } from 'jwt-decode'; // ✅ CORRECT for v4.0.0
 
 interface CustomJwtPayload {
-  email: string;
-  name?: string;
+  email: string
+  name?: string
 }
 
 const Login: React.FC = () => {
@@ -27,181 +28,167 @@ const Login: React.FC = () => {
 
   const validateForm = () => {
     const newErrors: { [key: string]: string } = {}
-
-    if (!formData.email) {
-      newErrors.email = 'Email is required'
-    } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
-      newErrors.email = 'Email is invalid'
-    }
-
-    if (!formData.password) {
-      newErrors.password = 'Password is required'
-    } else if (formData.password.length < 6) {
-      newErrors.password = 'Password must be at least 6 characters'
-    }
-
+    if (!formData.email) newErrors.email = 'Email is required'
+    else if (!/\S+@\S+\.\S+/.test(formData.email)) newErrors.email = 'Email is invalid'
+    if (!formData.password) newErrors.password = 'Password is required'
+    else if (formData.password.length < 6) newErrors.password = 'Password must be at least 6 characters'
     setErrors(newErrors)
     return Object.keys(newErrors).length === 0
   }
 
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault()
+    if (!validateForm()) return
+    setIsLoading(true)
 
-const handleSubmit = async (e: React.FormEvent) => {
-  e.preventDefault();
-
-  if (!validateForm()) return;
-
-  setIsLoading(true);
-
-  try {
-    const response = await fetch('https://34-93-79-185.nip.io/api/login/', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({
-        email: formData.email.trim(),
-        password: formData.password
+    try {
+      const response = await fetch('https://34-93-79-185.nip.io/api/login/', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          email: formData.email.trim(),
+          password: formData.password
+        })
       })
-    });
 
-    const data = await response.json();
-
-    // Log to debug
-    console.log('Login API Response:', data);
-
-    if (response.ok && data.data?.token) {
-      // Store token and user data in sessionStorage
-      sessionStorage.setItem('auth_token', data.data.token);
-      sessionStorage.setItem('auth_user', JSON.stringify(data.data.user));
-      sessionStorage.setItem('auth_email', data.data.user.email);
-
-      // ✅ Conditional redirection based on email
-      if (data.data.user.email === 'dronesimulatorpro@gmail.com') {
-        navigate('/dash/master/dashboard');
+      const data = await response.json()
+      if (response.ok && data.data?.token) {
+        sessionStorage.setItem('auth_token', data.data.token)
+        sessionStorage.setItem('auth_user', JSON.stringify(data.data.user))
+        sessionStorage.setItem('auth_email', data.data.user.email)
+        if (data.data.user.email === 'dronesimulatorpro@gmail.com') {
+          navigate('/dash/master/dashboard')
+        } else {
+          navigate('/')
+        }
       } else {
-        navigate('/');
+        setErrors({ submit: data.message || data.error || 'Login failed' })
       }
-    } else {
-      // Show fallback error from backend
-      const errorMsg = data.message || data.error || 'Login failed';
-      setErrors({ submit: errorMsg });
+    } catch (error) {
+      console.error('Login Error:', error)
+      setErrors({ submit: 'Login failed. Please try again later.' })
+    } finally {
+      setIsLoading(false)
     }
-  } catch (error) {
-    console.error('Login Error:', error);
-    setErrors({ submit: 'Login failed. Please try again later.' });
-  } finally {
-    setIsLoading(false);
   }
-};
 
+  const handleGoogleLoginSuccess = async (credentialResponse: any) => {
+    try {
+      const decoded = jwtDecode<CustomJwtPayload>(credentialResponse.credential)
+      const email = decoded.email
+      const username = decoded.name || email.split('@')[0]
 
-const handleGoogleLoginSuccess = async (credentialResponse: any) => {
-  try {
-    const decoded = jwtDecode<CustomJwtPayload>(credentialResponse.credential);
-    const email = decoded.email;
-    const username = decoded.name || email.split('@')[0];
+      const response = await fetch('https://34-93-79-185.nip.io/api/social-login/', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ token: credentialResponse.credential, email, username })
+      })
 
-    const response = await fetch('https://34-93-79-185.nip.io/api/social-login/', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ token: credentialResponse.credential, email, username }),
-    });
+      const result = await response.json()
+      if (!response.ok || !result.data?.token) throw new Error(result.message || 'Social login failed')
 
-    const result = await response.json();
+      sessionStorage.setItem('auth_token', result.data.token)
+      sessionStorage.setItem('auth_user', JSON.stringify(result.data.user))
+      sessionStorage.setItem('auth_email', email)
+      sessionStorage.setItem('auth_username', username)
 
-    // ✅ FIX: Access nested data.token
-    if (!response.ok || !result.data?.token) {
-      throw new Error(result.message || 'Social login failed');
+      navigate('/')
+    } catch (error) {
+      console.error('Google Login Error:', error)
+      setErrors({ submit: 'Google sign-in failed. Please try again later.' })
     }
-
-    const token = result.data.token;
-    const user = result.data.user;
-
-    sessionStorage.setItem('auth_token', token);
-    sessionStorage.setItem('auth_user', JSON.stringify(user));
-    sessionStorage.setItem('auth_email', email);
-    sessionStorage.setItem('auth_username', username);
-
-    navigate('/');
-  } catch (error) {
-    console.error('Google Login Error:', error);
-    setErrors({ submit: 'Google sign-in failed. Please try again later.' });
   }
-};
-
-
-
 
   return (
-    <div className="auth-card">
-      <Logo />
+    <>
+      <Navigation />
 
-      <div className="text-center mb-8">
-        <h2 className="text-3xl font-bold text-gray-900 mb-2">Welcome Back</h2>
-        <p className="text-gray-600">Sign in to your account to continue</p>
-      </div>
+      <div
+        className="min-h-[calc(100vh-80px)] w-full bg-cover bg-center bg-no-repeat flex items-center justify-end px-4 md:pr-24 mt-20"
+        style={{ backgroundImage: "url('/images/l1.png')" }}
+      >
 
-      <form onSubmit={handleSubmit} className="space-y-6">
-        <div className="form-group">
-          <label htmlFor="email" className="form-label">Email Address</label>
-          <input
-            type="email"
-            id="email"
-            name="email"
-            value={formData.email}
-            onChange={handleChange}
-            className={`form-input ${errors.email ? 'border-red-500' : ''}`}
-            placeholder="Enter your email"
-          />
-          {errors.email && <p className="form-error">{errors.email}</p>}
-        </div>
 
-        <div className="form-group">
-          <label htmlFor="password" className="form-label">Password</label>
-          <input
-            type="password"
-            id="password"
-            name="password"
-            value={formData.password}
-            onChange={handleChange}
-            className={`form-input ${errors.password ? 'border-red-500' : ''}`}
-            placeholder="Enter your password"
-          />
-          {errors.password && <p className="form-error">{errors.password}</p>}
-        </div>
+        <div className="bg-white rounded-lg shadow-md px-4 py-5 w-full max-w-xs text-xs">
+<img
+  src="/images/logo.jpg"
+  alt="Drone Simulator Logo"
+  className="w-64 mx-auto mb-3"
+/>
 
-        {errors.submit && <p className="form-error text-center">{errors.submit}</p>}
 
-        <button type="submit" disabled={isLoading} className="btn-primary">
-          {isLoading ? 'Signing in...' : 'Sign In'}
-        </button>
-      </form>
+          <div className="text-center mb-3">
+            <h2 className="text-base font-semibold text-gray-900 mb-1">Welcome Back</h2>
+            <p className="text-[11px] text-gray-500">Sign in to continue</p>
+          </div>
 
-      <div className="mt-6 text-center">
-        <p className="text-gray-400 mb-3">or</p>
-        <div className="flex justify-center">
-          <GoogleLogin
-            onSuccess={handleGoogleLoginSuccess}
-            onError={() => setErrors({ submit: 'Google sign-in was cancelled or failed.' })}
-          />
-        </div>
-      </div>
+          <form onSubmit={handleSubmit} className="space-y-2">
+            <div>
+              <label htmlFor="email" className="block text-[11px] font-medium text-gray-700 mb-1">Email</label>
+              <input
+                type="email"
+                id="email"
+                name="email"
+                value={formData.email}
+                onChange={handleChange}
+                className={`form-input text-[12px] px-2 py-1 w-full ${errors.email ? 'border-red-500' : ''}`}
+                placeholder="Enter email"
+              />
+              {errors.email && <p className="text-red-500 mt-1">{errors.email}</p>}
+            </div>
 
-      <div className="mt-6 text-center space-y-4">
-        <Link to="/auth/forgot-password" className="text-orange-500 hover:text-orange-600 font-medium">
-          Forgot your password?
-        </Link>
+            <div>
+              <label htmlFor="password" className="block text-[11px] font-medium text-gray-700 mb-1">Password</label>
+              <input
+                type="password"
+                id="password"
+                name="password"
+                value={formData.password}
+                onChange={handleChange}
+                className={`form-input text-[12px] px-2 py-1 w-full ${errors.password ? 'border-red-500' : ''}`}
+                placeholder="Enter password"
+              />
+              {errors.password && <p className="text-red-500 mt-1">{errors.password}</p>}
+            </div>
 
-        <div className="pt-4 border-t border-gray-200">
-          <p className="text-gray-600">
-            Don't have an account?{' '}
-            <Link to="/auth/register" className="text-orange-500 hover:text-orange-600 font-medium">
-              Sign up
+            {errors.submit && <p className="text-red-500 text-center mt-1">{errors.submit}</p>}
+
+            <button
+              type="submit"
+              disabled={isLoading}
+              className="btn-primary w-full text-[13px] py-1 mt-1"
+            >
+              {isLoading ? 'Signing in...' : 'Sign In'}
+            </button>
+          </form>
+
+          <div className="mt-4 text-center">
+            <p className="text-[11px] text-gray-400 mb-1">or</p>
+            <div className="flex justify-center">
+              <GoogleLogin
+                onSuccess={handleGoogleLoginSuccess}
+                onError={() => setErrors({ submit: 'Google sign-in was cancelled or failed.' })}
+              />
+            </div>
+          </div>
+
+          <div className="mt-4 text-center text-[11px]">
+            <Link to="/auth/forgot-password" className="text-orange-500 hover:text-orange-600 font-medium">
+              Forgot password?
             </Link>
-          </p>
+
+            <div className="pt-3 border-t border-gray-200 mt-3">
+              <p className="text-gray-600">
+                Don't have an account?{' '}
+                <Link to="/auth/register" className="text-orange-500 hover:text-orange-600 font-medium">
+                  Sign up
+                </Link>
+              </p>
+            </div>
+          </div>
         </div>
       </div>
-    </div>
+    </>
   )
 }
 

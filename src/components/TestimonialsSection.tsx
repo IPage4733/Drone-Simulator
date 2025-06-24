@@ -100,7 +100,7 @@ const TestimonialsSection = () => {
         {/* Stats */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-8 mt-16 pt-8 border-t border-gray-200 animate-fade-in">
           <div className="text-center">
-            <div className="text-3xl md:text-4xl font-bold text-primary mb-2">10K+</div>
+            <div className="text-3xl md:text-4xl font-bold text-primary mb-2">2K+</div>
             <div className="text-gray-600">Happy Pilots</div>
           </div>
           <div className="text-center">
@@ -108,7 +108,7 @@ const TestimonialsSection = () => {
             <div className="text-gray-600">Average Rating</div>
           </div>
           <div className="text-center">
-            <div className="text-3xl md:text-4xl font-bold text-primary mb-2">1M+</div>
+            <div className="text-3xl md:text-4xl font-bold text-primary mb-2">2k+</div>
             <div className="text-gray-600">Flight Hours</div>
           </div>
           <div className="text-center">

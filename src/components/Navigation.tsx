@@ -11,10 +11,11 @@ const Navigation = () => {
 
   const navItems = [
     { name: "Home", path: "/" },
+    { name: "Products", path: "/product" },
     { name: "Features", path: "/features" },
     // { name: "Tutorials", path: "/tutorials" },
-    { name: "Download", path: "/download" },
-    { name: "Products", path: "/product" },
+    // { name: "Download", path: "/download" },
+    
     { name: "Contact", path: "/contact" },
   ];
 
@@ -55,7 +56,7 @@ const handleLogout = async () => {
         <div className="flex justify-between items-center h-20 md:h-24 py-2">
           {/* Logo */}
           <Link to="/" className="flex items-center space-x-4">
-            <img src="/images/logo.png" alt="Logo" className="w-[190px] h-auto object-contain" />
+            <img src="/images/logo.jpg" alt="Logo" className="w-[190px] h-auto object-contain" />
           </Link>
 
           {/* Desktop Navigation */}
@@ -94,9 +95,11 @@ const handleLogout = async () => {
               </Link>
             )}
 
-            <Button className="bg-primary hover:bg-primary/90 text-white">
-              Download Now
-            </Button>
+            <Link to="/download">
+  <Button className="bg-primary hover:bg-primary/90 text-white">
+    Download Now
+  </Button>
+</Link>
           </div>
 
           {/* Mobile menu button */}

@@ -164,8 +164,10 @@ const handleSubmit = async (e: React.FormEvent) => {
       <Navigation />
       
       {/* Hero Section */}
-      <section className="pt-16 bg-gradient-to-br from-blue-50 via-white to-orange-50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
+<section className="mt-[80px] pt-4 pb-0 bg-gradient-to-br from-blue-50 via-white to-orange-50">
+  <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-0">
+
+
           <div className="text-center animate-fade-in">
             <h1 className="text-4xl md:text-6xl font-bold text-gray-900 mb-6">
               Download
@@ -180,7 +182,8 @@ const handleSubmit = async (e: React.FormEvent) => {
       </section>
 
       {/* Download Form */}
-      <section className="py-20">
+      <section className="py-10 mt-[-2rem]">
+
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid lg:grid-cols-2 gap-12 items-start">
             {/* Form */}
@@ -319,14 +322,14 @@ const handleSubmit = async (e: React.FormEvent) => {
                       <div className="w-2 h-2 bg-primary rounded-full"></div>
                       <span>Installation guide and quick start tutorial</span>
                     </li>
-                    <li className="flex items-center space-x-3">
+                    {/* <li className="flex items-center space-x-3">
                       <div className="w-2 h-2 bg-primary rounded-full"></div>
                       <span>Access to all simulation features</span>
                     </li>
                     <li className="flex items-center space-x-3">
                       <div className="w-2 h-2 bg-primary rounded-full"></div>
                       <span>Free updates and support</span>
-                    </li>
+                    </li> */}
                   </ul>
                 </CardContent>
               </Card>
@@ -338,7 +341,7 @@ const handleSubmit = async (e: React.FormEvent) => {
                     <p><strong>OS:</strong> Android 6.0 or higher</p>
                     <p><strong>RAM:</strong> 3GB minimum, 4GB recommended</p>
                     <p><strong>Storage:</strong> 500MB free space</p>
-                    <p><strong>GPU:</strong> OpenGL ES 3.0 support</p>
+                    {/* <p><strong>GPU:</strong> OpenGL ES 3.0 support</p> */}
                   </div>
                 </CardContent>
               </Card>
@@ -347,8 +350,7 @@ const handleSubmit = async (e: React.FormEvent) => {
                 <CardContent className="p-8">
                   <h3 className="text-2xl font-bold mb-4">🔒 Your Privacy Matters</h3>
                   <p className="opacity-90">
-                    Your information is encrypted and securely stored. We never share 
-                    your data with third parties and you can opt out at any time.
+                   Your data is encrypted, securely stored, never shared, and you can opt out anytime.
                   </p>
                 </CardContent>
               </Card>
