@@ -111,7 +111,7 @@ const handleCheckout = async () => {
                         <h4 className="font-semibold text-gray-800">{item.name}</h4>
                         <p className="text-sm text-gray-500 capitalize">{item.type}</p>
                         <div className="flex items-center mt-1">
-                          <span className="text-orange-500 font-semibold">₹{item.price}</span>
+                          <span className="text-orange-500 font-semibold">${item.price}</span>
                           {item.quantity > 1 && (
                             <span className="ml-2 text-gray-500 text-sm">× {item.quantity}</span>
                           )}
@@ -139,7 +139,7 @@ const handleCheckout = async () => {
               <div className="border-t border-gray-200 p-6 flex-shrink-0 bg-white">
                 <div className="flex justify-between items-center mb-4">
                   <span className="text-lg font-semibold text-gray-800">Total:</span>
-                  <span className="text-xl font-bold text-orange-500">₹{totalPrice}</span>
+                  <span className="text-xl font-bold text-orange-500">${totalPrice}</span>
                 </div>
                 
                 <div className="flex space-x-3">

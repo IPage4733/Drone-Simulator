@@ -4,6 +4,8 @@ import HomePage from './pages/HomePage';
 import CheckoutPage from './pages/CheckoutPage';
 import Footer from '@/components/Footer';
 import MiniCart from './components/MiniCart';
+import { ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 const ProductApp = () => {
   return (
@@ -12,6 +14,7 @@ const ProductApp = () => {
         <Route path="/" element={<HomePage />} />
         <Route path="/checkout" element={<CheckoutPage />} />
       </Routes>
+      <ToastContainer position="top-center" autoClose={3000} />
       <Footer />
       <MiniCart />
     </div>

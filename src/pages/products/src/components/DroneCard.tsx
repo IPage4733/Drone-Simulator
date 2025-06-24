@@ -48,7 +48,7 @@ const DroneCard: React.FC<DroneCardProps> = ({ drone }) => {
           ) : drone.includedIn.includes('pro') ? (
             <Badge variant="primary">Pro</Badge>
           ) : (
-            <span className="text-xl font-bold text-white">₹{drone.price}</span>
+            <span className="text-xl font-bold text-white">${drone.price}</span>
           )}
         </div>
       </div>

@@ -23,7 +23,7 @@ const DronesSection: React.FC = () => {
         
         <div className="mt-12 text-center">
           <p className="text-gray-500 mb-2">Want to add all drones to your custom plan?</p>
-          <p className="text-lg font-semibold text-orange-500">Get all drones for just ₹1,999</p>
+          <p className="text-lg font-semibold text-orange-500">Get all drones for just $1,999</p>
         </div>
       </div>
     </section>

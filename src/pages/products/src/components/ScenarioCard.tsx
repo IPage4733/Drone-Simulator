@@ -54,7 +54,7 @@ const ScenarioCard: React.FC<ScenarioCardProps> = ({ scenario }) => {
           ) : scenario.includedIn.includes('pro') ? (
             <Badge variant="primary">Pro</Badge>
           ) : (
-            <span className="text-xl font-bold text-white">₹{scenario.price}</span>
+            <span className="text-xl font-bold text-white">${scenario.price}</span>
           )}
         </div>
       </div>

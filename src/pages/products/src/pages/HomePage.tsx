@@ -13,10 +13,10 @@ const HomePage: React.FC = () => {
     <main>
       <Navigation />
       <HeroSection />
-      <DronesSection />
-      <ScenariosSection />
+      {/* <DronesSection /> */}
+      {/* <ScenariosSection /> */}
       <PlansSection />
-      <CustomPlanSection />
+      {/* <CustomPlanSection /> */}
       <FeaturesSection />
       <CTASection />
     </main>
