@@ -11,7 +11,7 @@ const FeaturesSection: React.FC = () => {
         Key <span className="text-orange-500">Features</span>
       </h2>
       <p className="text-gray-600 max-w-2xl mx-auto">
-        Discover what makes IPage Drone Simulator the leading choice for drone pilots across India.
+        Discover what makes IPage Drone Simulator the leading choice for drone pilots across world.
       </p>
     </div>
 

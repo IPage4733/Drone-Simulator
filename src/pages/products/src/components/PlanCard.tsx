@@ -1,97 +1,242 @@
-import React from 'react';
-import { CheckCircle } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { CheckCircle, X, GraduationCap, BookOpen, Users, Mail, Plane, Airplay, Satellite } from 'lucide-react';
 import { Plan } from '../types';
 import Card from './Card';
 import Button from './Button';
 import { useCart } from '../context/CartContext';
-import { toast } from 'react-toastify';
 
 interface PlanCardProps {
   plan: Plan;
 }
 
 const PlanCard: React.FC<PlanCardProps> = ({ plan }) => {
-  if (!plan || typeof plan !== 'object') return null; // ✅ defensive check
+  if (!plan || typeof plan !== 'object') return null;
   const { addItem } = useCart();
 
-const handleAddToCart = () => {
-  const userEmail = sessionStorage.getItem('auth_email');
+  const [showModal, setShowModal] = useState(false);
+  const [modalMode, setModalMode] = useState<'login' | 'verify'>('login');
+  const [studentEmail, setStudentEmail] = useState('');
+  const [error, setError] = useState('');
 
-  if (!userEmail) {
-    toast.warning('⚠️ Please log in and try again.', {
-      position: 'top-center',
-    });
-    return;
-  }
-
-  if (plan.id === 'Student') {
-    const isEducational = /(@edu\.|\.edu$|@students?\.|\.ac(\.|$))/i.test(userEmail);
-
+  const handleVerifyStudentEmail = () => {
+    const isEducational = /@[\w.-]+\.(edu|ac)(\.[a-z]{2,})?$|\.university$/i.test(studentEmail);
     if (!isEducational) {
-      toast.error('🎓 You must use an educational or academic (.edu or .ac) email to access the Student Plan.', {
-        position: 'top-center',
-      });
+      setError('Please enter a valid college/institute email.');
       return;
     }
-  }
+    setError('Verification link has been sent to your email.');
+  };
 
-  if (plan.id === 'institution') {
-    window.location.href = '/contact';
-    return;
-  }
+  const handleAddToCart = () => {
+    const userEmail = sessionStorage.getItem('auth_email');
 
-  if (plan.id === 'free') {
-    window.location.href = '/register';
-    return;
-  }
+    if (!userEmail) {
+      setModalMode('login');
+      setShowModal(true);
+      return;
+    }
 
-  addItem({
-    id: plan.id,
-    name: plan.name,
-    price: plan.price,
-    type: 'plan',
-    stripe_price_id: plan.stripe_price_id,
-  });
+    if (plan.id === 'Student') {
+      const isEducational = /@[\w.-]+\.(edu|ac)(\.[a-z]{2,})?$|\.university$/i.test(userEmail);
+      if (!isEducational) {
+        setModalMode('verify');
+        setShowModal(true);
+        return;
+      }
+    }
 
-  toast.success('✅ Plan added to cart!', {
-    position: 'top-center',
-  });
-};
+    if (plan.id === 'institution') {
+      window.location.href = '/contact';
+      return;
+    }
 
+    if (plan.id === 'free') {
+      window.location.href = '/auth/register';
+      return;
+    }
 
+    addItem({
+      id: plan.id,
+      name: plan.name,
+      price: plan.price,
+      type: 'plan',
+      stripe_price_id: plan.stripe_price_id,
+    });
+  };
+
+  useEffect(() => {
+    const userEmail = sessionStorage.getItem('auth_email');
+    const pendingPlanId = sessionStorage.getItem('pendingPlanId');
+    if (userEmail && pendingPlanId === plan.id) {
+      if (plan.id === 'Student') {
+        setModalMode('verify');
+        setShowModal(true);
+      } else {
+        handleAddToCart();
+      }
+      sessionStorage.removeItem('pendingPlanId');
+    }
+  }, []);
 
   return (
-    <Card highlighted={plan.mostPopular} className="h-full flex flex-col">
-      {plan.mostPopular && (
-        <div className="bg-orange-500 text-white py-1 px-4 text-center text-sm font-semibold">
-          Most Popular
-        </div>
-      )}
-      <div className="p-6 flex flex-col h-full">
-        <h3 className="text-xl font-bold mb-2">{plan.name}</h3>
-        {plan.id !== 'institution' && (
-          <div className="mb-4">
-            <span className="text-3xl font-bold">${plan.price}</span>
-            <span className="text-gray-500 ml-1">{plan.billing}</span>
+    <>
+      <Card highlighted={plan.mostPopular} className="h-full flex flex-col">
+        {plan.mostPopular && (
+          <div className="bg-orange-500 text-white py-1 px-4 text-center text-sm font-semibold">
+            Most Popular
           </div>
         )}
-        <ul className="mb-6 flex-grow">
-          {plan.features.map((feature, index) => (
-            <li key={index} className="flex items-start mb-3">
-              <CheckCircle size={18} className="text-orange-500 mr-2 flex-shrink-0 mt-0.5" />
-              <span className="text-gray-700">{feature}</span>
-            </li>
-          ))}
-        </ul>
-        <Button
-          variant={plan.buttonVariant}
-          onClick={handleAddToCart}
-          fullWidth
-        >
-          {plan.buttonText}
-        </Button>
-      </div>
-    </Card>
+        <div className="p-6 flex flex-col h-full">
+          <h3 className="text-xl font-bold mb-2">{plan.name}</h3>
+          {plan.id !== 'institution' && (
+            <div className="mb-4">
+              <span className="text-3xl font-bold">${plan.price}</span>
+              <span className="text-gray-500 ml-1">{plan.billing}</span>
+            </div>
+          )}
+          <ul className="mb-6 flex-grow">
+            {plan.features.map((feature, index) => (
+              <li key={index} className="flex items-start mb-3">
+                <CheckCircle size={18} className="text-orange-500 mr-2 flex-shrink-0 mt-0.5" />
+                <span className="text-gray-700">{feature}</span>
+              </li>
+            ))}
+          </ul>
+          <Button variant={plan.buttonVariant} onClick={handleAddToCart} fullWidth>
+            {plan.buttonText}
+          </Button>
+        </div>
+      </Card>
+
+      {showModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-60 px-4">
+          <div className="relative w-full max-w-3xl h-[350px] bg-gradient-to-br from-orange-400 via-orange-500 to-red-500 rounded-xl shadow-2xl overflow-hidden flex">
+            {/* Left visual */}
+            <div className="w-1/2 flex flex-col justify-center items-center text-white px-4 relative">
+              {plan.id === 'Student' ? (
+                <div className="relative w-full flex flex-col items-center">
+                  <img
+                    src="/images/student-banner.jpeg"
+                    alt="Student"
+                    className="w-70 h-40 object-contain mb-4 rounded-xl"
+                  />
+                  <div className="space-y-2 z-10">
+                    <div className="bg-white bg-opacity-20 backdrop-blur-sm rounded-lg px-4 py-1 flex items-center space-x-2">
+                      <CheckCircle size={16} />
+                      <span className="text-sm">Quick Verification</span>
+                    </div>
+                    <div className="bg-white bg-opacity-20 backdrop-blur-sm rounded-lg px-4 py-1 flex items-center space-x-2">
+                      <GraduationCap size={16} />
+                      <span className="text-sm">Student Discount</span>
+                    </div>
+                  </div>
+                </div>
+              ) : (
+                <div className="relative w-full flex flex-col items-center">
+                  <img
+                    src="/images/drone-user.png"
+                    alt="User"
+                    className="w-70 h-40 object-contain mb-4 rounded-xl"
+                  />
+                  <div className="space-y-2 z-10">
+                    <div className="bg-white bg-opacity-20 backdrop-blur-sm rounded-lg px-4 py-1 flex items-center space-x-2">
+                      <Airplay size={16} />
+                      <span className="text-sm">Simulation Access</span>
+                    </div>
+                    <div className="bg-white bg-opacity-20 backdrop-blur-sm rounded-lg px-4 py-1 flex items-center space-x-2">
+                      <Satellite size={16} />
+                      <span className="text-sm">Advanced Features</span>
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {/* Right form */}
+            <div className="w-1/2 text-white px-6 py-6 relative">
+              <button
+                onClick={() => setShowModal(false)}
+                className="absolute top-3 right-3 text-white hover:text-gray-200"
+              >
+                <X size={20} />
+              </button>
+              <h2 className="text-2xl font-bold mb-2">
+                {modalMode === 'login'
+                  ? plan.id === 'Student'
+                    ? 'Access Student Benefits'
+                    : 'Access Drone Features'
+                  : 'Verify Student Status'}
+              </h2>
+              <p className="text-sm text-white text-opacity-80 mb-4">
+                {modalMode === 'login'
+                  ? plan.id === 'Student'
+                    ? 'Login using your .edu or institute email.'
+                    : 'Login to unlock advanced drone simulation, analytics, and training modules.'
+                  : 'Enter your educational email to verify and unlock discounts. Accepted domains: .edu, .ac.in, .university'}
+              </p>
+
+              {modalMode === 'login' ? (
+                <div className="space-y-2">
+                  <button
+                    onClick={() => (window.location.href = '/auth/login')}
+                    className="w-full bg-orange-700 hover:bg-orange-800 text-white font-semibold py-2 rounded-md text-sm transition-colors duration-200"
+                  >
+                    Login
+                  </button>
+                  <button
+                    onClick={() => (window.location.href = '/auth/register')}
+                    className="w-full bg-white bg-opacity-30 hover:bg-opacity-50 text-white font-semibold py-2 rounded-md text-sm transition-colors duration-200 border border-white border-opacity-20"
+                  >
+                    Sign Up
+                  </button>
+                </div>
+              ) : (
+                <>
+                  <div className="relative mb-6">
+                    <input
+                      type="email"
+                      placeholder="Enter your college email (e.g. john@abc.edu)"
+                      value={studentEmail}
+                      onChange={(e) => setStudentEmail(e.target.value)}
+                      className="w-full px-4 py-2 rounded-md text-gray-800 placeholder-gray-500 text-sm"
+                    />
+                    <Mail size={16} className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+                  </div>
+                  {error && (
+                    <div
+                      className={`flex items-start space-x-2 backdrop-blur-md border rounded-xl p-3 text-sm shadow-lg ${
+                        error.includes('Verification')
+                          ? 'bg-white/20 border-green-300 text-green-100'
+                          : 'bg-white/30 border-red-300 text-red-800'
+                      }`}
+                    >
+                      {error.includes('Verification') ? (
+                        <CheckCircle size={18} className="mt-0.5 text-green-100" />
+                      ) : (
+                        <X size={18} className="mt-0.5 text-red-600" />
+                      )}
+                      <span className="font-medium leading-snug">{error}</span>
+                    </div>
+                  )}
+                  <button
+                    onClick={handleVerifyStudentEmail}
+                    className="w-full mt-3 bg-orange-700 hover:bg-orange-800 text-white font-semibold py-2 rounded-md text-sm transition-colors duration-200"
+                  >
+                    Send Verification Code
+                  </button>
+                </>
+              )}
+              <p className="text-xs mt-4 text-white text-opacity-75">
+                We'll send a verification link to confirm your student status.
+              </p>
+              <p className="text-xs text-white text-opacity-50 mt-2">
+                Terms & Conditions apply.
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
+    </>
   );
 };
 
