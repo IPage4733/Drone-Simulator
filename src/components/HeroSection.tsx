@@ -47,20 +47,7 @@ const HeroSection = () => {
             </div>
 
             {/* Stats */}
-            <div className="grid grid-cols-3 gap-8 mt-12 pt-8 border-t border-gray-200">
-              <div className="text-center">
-                <div className="text-3xl font-bold text-primary">10K+</div>
-                <div className="text-gray-600">Downloads</div>
-              </div>
-              <div className="text-center">
-                <div className="text-3xl font-bold text-primary">4.8</div>
-                <div className="text-gray-600">Rating</div>
-              </div>
-              <div className="text-center">
-                <div className="text-3xl font-bold text-primary">24/7</div>
-                <div className="text-gray-600">Support</div>
-              </div>
-            </div>
+
           </div>
 
           {/* Visual */}
@@ -87,6 +74,20 @@ const HeroSection = () => {
             </div>
           </div>
         </div>
+          <div className="max-w-3xl mx-auto grid grid-cols-3 gap-8 text-center mt-12 pt-8 border-t border-gray-200">
+  <div>
+    <div className="text-3xl font-bold text-primary">2K+</div>
+    <div className="text-gray-600">Downloads</div>
+  </div>
+  <div>
+    <div className="text-3xl font-bold text-primary">4.8</div>
+    <div className="text-gray-600">Rating</div>
+  </div>
+  <div>
+    <div className="text-3xl font-bold text-primary">24/7</div>
+    <div className="text-gray-600">Support</div>
+  </div>
+</div>
       </div>
     </section>
   );

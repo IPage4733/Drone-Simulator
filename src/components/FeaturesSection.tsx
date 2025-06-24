@@ -6,37 +6,39 @@ const FeaturesSection = () => {
     {
       title: "Realistic Flight Physics",
       description: "Experience authentic drone behavior with realistic physics engine and environmental factors.",
-      icon: "🚁",
+      icon: "/images/s1.png",
       color: "from-blue-500 to-primary"
     },
+
     {
-      title: "Night Flying Mode",
-      description: "Master night operations with advanced lighting systems and focus beam functionality.",
-      icon: "🌙",
-      color: "from-purple-500 to-blue-500"
+      title: "Real-Time Scenarios",
+      description: "Experience real-world drone operations in dynamic environments like rescue, delivery, and inspection missions.",
+      icon: "/images/s2.png",
+      color: "from-green-500 to-blue-500"
     },
+
     {
       title: "Color-coded Orientation",
       description: "Red and green visual indicators help you maintain perfect drone orientation during flight.",
-      icon: "🎯",
+      icon: "/images/s3.png",
       color: "from-primary to-accent"
     },
     {
       title: "Manual Geofencing",
       description: "Set custom flight boundaries with adjustable height and radius parameters for safe operations.",
-      icon: "📍",
+      icon: "/images/s4.png",
       color: "from-green-500 to-primary"
     },
     {
       title: "Smooth RTL Function",
       description: "Automated Return to Launch with configurable altitude settings for emergency situations.",
-      icon: "🏠",
+      icon: "/images/s5.png",
       color: "from-accent to-yellow-500"
     },
     {
       title: "Advanced Controls",
       description: "Professional-grade control interface with customizable sensitivity and response settings.",
-      icon: "🎮",
+      icon: "/images/s6.png",
       color: "from-red-500 to-primary"
     }
   ];
@@ -51,35 +53,42 @@ const FeaturesSection = () => {
             <span className="text-primary"> Simulator</span>
           </h2>
           <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-            Experience the most comprehensive drone simulation with features designed 
+            Experience the most comprehensive drone simulation with features designed
             for both learning and professional training.
           </p>
         </div>
 
         {/* Features Grid */}
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {features.map((feature, index) => (
-            <Card 
-              key={index} 
-              className="group hover:shadow-xl transition-all duration-300 hover:-translate-y-2 animate-fade-in border-0 shadow-lg"
-              style={{animationDelay: `${index * 0.1}s`}}
-            >
-              <CardContent className="p-8">
-                <div className={`w-16 h-16 rounded-xl bg-gradient-to-r ${feature.color} flex items-center justify-center text-2xl mb-6 group-hover:scale-110 transition-transform duration-300`}>
-                  {feature.icon}
-                </div>
-                
-                <h3 className="text-xl font-semibold text-gray-900 mb-4 group-hover:text-primary transition-colors duration-300">
-                  {feature.title}
-                </h3>
-                
-                <p className="text-gray-600 leading-relaxed">
-                  {feature.description}
-                </p>
-              </CardContent>
-            </Card>
-          ))}
-        </div>
+     <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+  {features.map((feature, idx) => (
+    <div key={idx} className="p-6 rounded-xl bg-white shadow-md">
+      
+      {/* Icon and Title in a row */}
+      <div className="flex items-center mb-2">
+        {typeof feature.icon === "string" &&
+        (feature.icon.endsWith(".png") || feature.icon.endsWith(".ico")) ? (
+          <img
+            src={feature.icon}
+            alt={feature.title}
+            className="w-10 h-10 mr-3"
+          />
+        ) : (
+          <div className="text-3xl mr-3">{feature.icon}</div>
+        )}
+        <h3 className="text-xl font-semibold text-black">
+          {feature.title}
+        </h3>
+      </div>
+
+      {/* Description */}
+      <p className="text-gray-800 text-sm">{feature.description}</p>
+    </div>
+  ))}
+</div>
+
+
+
+
 
         {/* CTA Section */}
         <div className="text-center mt-16 animate-fade-in">

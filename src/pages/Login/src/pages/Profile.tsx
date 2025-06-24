@@ -800,7 +800,7 @@ const handleSubmit = async (e: React.FormEvent) => {
                 <p style={styles.statValue}>{currentPurchases.length}</p>
               </div>
               <div style={{ ...styles.statIcon, backgroundColor: '#dbeafe' }}>
-                <svg style={{ width: '1.25rem', height: '1.25rem', color: '#2563eb' }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg style={{ width: '1rem', height: '1rem', color: '#2563eb' }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
                 </svg>
               </div>
@@ -816,7 +816,7 @@ const handleSubmit = async (e: React.FormEvent) => {
                 </p>
               </div>
               <div style={{ ...styles.statIcon, backgroundColor: '#dcfce7' }}>
-                <svg style={{ width: '1.5rem', height: '1.5rem', color: '#16a34a' }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg style={{ width: '1rem', height: '1rem', color: '#16a34a' }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1" />
                 </svg>
               </div>
@@ -834,7 +834,7 @@ const handleSubmit = async (e: React.FormEvent) => {
                 </p>
               </div>
               <div style={{ ...styles.statIcon, backgroundColor: '#fed7aa' }}>
-                <svg style={{ width: '1.5rem', height: '1.5rem', color: '#ea580c' }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg style={{ width: '1rem', height: '1rem', color: '#ea580c' }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
               </div>
