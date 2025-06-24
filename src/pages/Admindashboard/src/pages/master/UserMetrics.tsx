@@ -1,39 +1,17 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { BarChart3, Globe, TrendingUp, Users, Filter, Download, Eye, MapPin, Target, Zap } from 'lucide-react';
-import { useData } from '../../hooks/useData';
+import axios from 'axios';
 
 export const MasterUserMetrics: React.FC = () => {
-  const { users } = useData();
   const [dateFilter, setDateFilter] = useState('month');
   const [interestFilter, setInterestFilter] = useState('all');
   const [countryFilter, setCountryFilter] = useState('all');
+  const [downloadsData, setDownloadsData] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [userInterests, setUserInterests] = useState<any[]>([]);
+  const [countryDownloads, setCountryDownloads] = useState<any[]>([]);
+  const [totalRevenue, setTotalRevenue] = useState(0);
 
-  // Mock user interests data
-  const userInterests = [
-    { interest: 'Aerial Photography', users: 342, percentage: 28.5, growth: '+12%', revenue: 9834 },
-    { interest: 'Racing & Sports', users: 298, percentage: 24.8, growth: '+8%', revenue: 8542 },
-    { interest: 'Commercial Inspection', users: 245, percentage: 20.4, growth: '+15%', revenue: 12250 },
-    { interest: 'Search & Rescue', users: 156, percentage: 13.0, growth: '+22%', revenue: 7800 },
-    { interest: 'Agriculture', users: 89, percentage: 7.4, growth: '+18%', revenue: 4450 },
-    { interest: 'Mapping & Surveying', users: 67, percentage: 5.6, growth: '+9%', revenue: 3350 },
-    { interest: 'Entertainment', users: 23, percentage: 1.9, growth: '+5%', revenue: 690 }
-  ];
-
-  // Mock country-based downloads data
-  const countryDownloads = [
-    { country: 'United States', downloads: 4567, users: 342, flag: '🇺🇸', growth: '+12%', revenue: 15234 },
-    { country: 'United Kingdom', downloads: 2890, users: 245, flag: '🇬🇧', growth: '+8%', revenue: 10890 },
-    { country: 'Germany', downloads: 2456, users: 198, flag: '🇩🇪', growth: '+15%', revenue: 8976 },
-    { country: 'Canada', downloads: 1987, users: 156, flag: '🇨🇦', growth: '+10%', revenue: 7234 },
-    { country: 'Australia', downloads: 1654, users: 134, flag: '🇦🇺', growth: '+18%', revenue: 6012 },
-    { country: 'France', downloads: 1432, users: 112, flag: '🇫🇷', growth: '+7%', revenue: 5234 },
-    { country: 'Japan', downloads: 1298, users: 98, flag: '🇯🇵', growth: '+22%', revenue: 4890 },
-    { country: 'Netherlands', downloads: 987, users: 87, flag: '🇳🇱', growth: '+14%', revenue: 3456 },
-    { country: 'Sweden', downloads: 756, users: 67, flag: '🇸🇪', growth: '+9%', revenue: 2890 },
-    { country: 'Brazil', downloads: 654, users: 54, flag: '🇧🇷', growth: '+25%', revenue: 2134 }
-  ];
-
-  // Mock popular scenarios by interest
   const scenariosByInterest = {
     'Aerial Photography': [
       { scenario: 'Golden Hour Landscapes', downloads: 1234, revenue: 3702 },
@@ -59,7 +37,7 @@ export const MasterUserMetrics: React.FC = () => {
       interest.interest,
       interest.users,
       '-',
-      `$${interest.revenue}`,
+      `$${interest?.revenue ?? 0}`,
       interest.growth
     ]);
     const countryData = countryDownloads.map(country => [
@@ -67,7 +45,7 @@ export const MasterUserMetrics: React.FC = () => {
       country.country,
       country.users,
       country.downloads,
-      `$${country.revenue}`,
+      `$${country?.revenue ?? 0}`,
       country.growth
     ]);
 
@@ -97,8 +75,88 @@ export const MasterUserMetrics: React.FC = () => {
     return colors[index % colors.length];
   };
 
-  const totalRevenue = userInterests.reduce((sum, interest) => sum + interest.revenue, 0);
-  const totalCountryRevenue = countryDownloads.reduce((sum, country) => sum + country.revenue, 0);
+  useEffect(() => {
+    const fetchDownloads = async () => {
+      try {
+        const response = await fetch('https://34-93-79-185.nip.io/api/get-all-downloads/');
+        if (response.ok) {
+          const data = await response.json();
+          const raw = Array.isArray(data.data) ? data.data : [data.data];
+          setDownloadsData(raw);
+
+          const groupedByCountry = raw.reduce((acc, item) => {
+            const country = item.country || 'Unknown';
+            if (!acc[country]) {
+              acc[country] = {
+                country,
+                users: new Set(),
+                downloads: 0,
+                revenue: 0,
+                flag: '🌐',
+              };
+            }
+            acc[country].downloads += item.download_count || 1;
+            acc[country].users.add(item.email);
+            acc[country].revenue += (item.download_count || 1) * 10;
+            return acc;
+          }, {});
+
+          const countries = Object.values(groupedByCountry).map((item: any) => ({
+            ...item,
+            users: item.users.size,
+            growth: '+10%',
+          }));
+          setCountryDownloads(countries);
+
+          const groupedByInterest = raw.reduce((acc, item) => {
+            const interest = item.purpose_of_use || 'Uncategorized';
+            if (!acc[interest]) {
+              acc[interest] = {
+                interest,
+                users: new Set(),
+                downloads: 0,
+                revenue: 0,
+              };
+            }
+            acc[interest].downloads += item.download_count || 1;
+            acc[interest].users.add(item.email);
+            acc[interest].revenue += (item.download_count || 1) * 10;
+            return acc;
+          }, {});
+
+          const interests = Object.values(groupedByInterest).map((item: any) => {
+            const users = item.users.size;
+            const percentage = ((users / raw.length) * 100).toFixed(1);
+            return {
+              interest: item.interest,
+              users,
+              percentage: parseFloat(percentage),
+              revenue: item?.revenue ?? 0,
+              growth: '+10%',
+            };
+          });
+          setUserInterests(interests);
+
+          setTotalRevenue(raw.reduce((acc, item) => acc + (item.download_count || 1) * 10, 0));
+        }
+      } catch (err) {
+        console.error('Failed to fetch download data:', err);
+        setUserInterests([]);
+        setCountryDownloads([]);
+        setTotalRevenue(0);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchDownloads();
+  }, []);
+
+  const totalCountryRevenue = totalRevenue;
+
+  if (loading) {
+    return <div className="text-center py-10 text-gray-500">Loading analytics...</div>;
+  }
 
   return (
     <div className="space-y-6">
@@ -426,8 +484,12 @@ export const MasterUserMetrics: React.FC = () => {
           <div className="text-center">
             <div className="text-4xl mb-2">🇺🇸</div>
             <div className="text-xl font-bold text-gray-900">United States</div>
-            <div className="text-sm text-green-600 mt-1">${countryDownloads[0].revenue.toLocaleString()}</div>
-            <div className="text-sm text-gray-500 mt-1">{countryDownloads[0].downloads.toLocaleString()} downloads</div>
+             <div className="text-sm text-green-600 mt-1">
+        ${countryDownloads?.[0]?.revenue ? countryDownloads[0].revenue.toLocaleString() : '0'}
+      </div>
+             <div className="text-sm text-gray-500 mt-1">
+        {countryDownloads?.[0]?.downloads ? `${countryDownloads[0].downloads.toLocaleString()} downloads` : '0 downloads'}
+      </div>
           </div>
         </div>
 
@@ -437,7 +499,9 @@ export const MasterUserMetrics: React.FC = () => {
             <div className="text-4xl mb-2">🇧🇷</div>
             <div className="text-xl font-bold text-gray-900">Brazil</div>
             <div className="text-sm text-green-600 mt-1">+25% growth</div>
-            <div className="text-sm text-gray-500 mt-1">${countryDownloads[9].revenue.toLocaleString()} revenue</div>
+            <div className="text-sm text-gray-500 mt-1">
+        ${countryDownloads?.[9]?.revenue ? countryDownloads[9].revenue.toLocaleString() : '0'} revenue
+      </div>
           </div>
         </div>
 
@@ -446,8 +510,16 @@ export const MasterUserMetrics: React.FC = () => {
           <div className="text-center">
             <div className="text-4xl mb-2">📸</div>
             <div className="text-xl font-bold text-gray-900">Aerial Photography</div>
-            <div className="text-sm text-green-600 mt-1">${userInterests[0].revenue.toLocaleString()}</div>
-            <div className="text-sm text-gray-500 mt-1">{userInterests[0].users} users</div>
+            {userInterests[0] && (
+  <>
+    <div className="text-sm text-green-600 mt-1">
+      ${userInterests[0].revenue.toLocaleString()}
+    </div>
+    <div className="text-sm text-gray-500 mt-1">
+      {userInterests[0].users} users
+    </div>
+  </>
+)}
           </div>
         </div>
 
@@ -456,7 +528,9 @@ export const MasterUserMetrics: React.FC = () => {
           <div className="text-center">
             <div className="text-4xl mb-2">🏭</div>
             <div className="text-xl font-bold text-gray-900">Commercial</div>
-            <div className="text-sm text-green-600 mt-1">${(userInterests[2].revenue / userInterests[2].users).toFixed(0)}/user</div>
+             <div className="text-sm text-green-600 mt-1">
+        ${(userInterests?.[2]?.revenue && userInterests?.[2]?.users) ? (userInterests[2].revenue / userInterests[2].users).toFixed(0) : '0'}/user
+      </div>
             <div className="text-sm text-gray-500 mt-1">Inspection category</div>
           </div>
         </div>
