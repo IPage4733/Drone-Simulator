@@ -24,6 +24,25 @@ const Download = () => {
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast();
+const handleDownload = () => {
+  // First file (EXE)
+  const exeLink = document.createElement('a');
+  exeLink.href = "https://storage.cloud.google.com/ipagedronesimulator/IPAGE%20Drone%20Simulator%20Beta%20v1.0.exe?authuser=8";
+  exeLink.download = "IPAGE_Drone_Simulator.exe";
+  document.body.appendChild(exeLink);
+  exeLink.click();
+  document.body.removeChild(exeLink);
+
+  // Wait 2 seconds, then download the second file (APK)
+  setTimeout(() => {
+    const apkLink = document.createElement('a');
+    apkLink.href = "https://storage.cloud.google.com/ipagedronesimulator/IPAGE%20DroneMobileController%20Beta%20v1.apk?authuser=8";
+    apkLink.download = "IPAGE_DroneMobileController.apk";
+    document.body.appendChild(apkLink);
+    apkLink.click();
+    document.body.removeChild(apkLink);
+  }, 2000);
+};
 
   const handleInputChange = (field: string, value: string | boolean) => {
     setFormData(prev => ({
@@ -127,14 +146,18 @@ const handleSubmit = async (e: React.FormEvent) => {
             </p>
 
             <Card className="bg-gradient-to-r from-primary to-accent text-white mb-8">
-              <CardContent className="p-8">
-                <h3 className="text-2xl font-bold mb-4">Download Your APK</h3>
-                <p className="mb-6 opacity-90">Click the button below to start downloading the DroneSimulator APK file.</p>
-                <Button className="bg-white text-primary hover:bg-gray-100 font-semibold px-8 py-3">
-                  Download APK (25.4 MB)
-                </Button>
-              </CardContent>
-            </Card>
+  <CardContent className="p-8">
+    <h3 className="text-2xl font-bold mb-4">Download Your Software</h3>
+    <p className="mb-6 opacity-90">Click the button below to download the IPAGE Drone Simulator and Mobile Controller.</p>
+<Button 
+  onClick={handleDownload}
+  className="bg-white text-primary hover:bg-gray-100 font-semibold px-8 py-3"
+>
+  Download Software
+</Button>
+
+  </CardContent>
+</Card>
 
             <div className="bg-blue-50 rounded-lg p-6 text-left">
               <h4 className="font-semibold text-gray-900 mb-4">Next Steps:</h4>
