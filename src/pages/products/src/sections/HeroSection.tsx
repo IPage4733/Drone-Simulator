@@ -23,7 +23,7 @@ const HeroSection: React.FC = () => {
           </h1>
           
           <h2 className="text-xl md:text-2xl mb-8 text-gray-200">
-            India's most versatile drone simulator – Real drones. Real scenarios. Real learning.
+            World's most versatile drone simulator – Real drones. Real scenarios. Real learning.
           </h2>
           
           <div className="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4">
