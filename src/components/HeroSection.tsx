@@ -35,7 +35,7 @@ const HeroSection = () => {
                   Download Now
                 </Button>
               </Link>
-              <Link to="/tutorials">
+              {/* <Link to="/tutorials">
                 <Button
                   variant="outline"
                   size="lg"
@@ -43,13 +43,13 @@ const HeroSection = () => {
                 >
                   Watch Tutorials
                 </Button>
-              </Link>
+              </Link> */}
             </div>
 
             {/* Stats */}
             <div className="grid grid-cols-3 gap-8 mt-12 pt-8 border-t border-gray-200">
               <div className="text-center">
-                <div className="text-3xl font-bold text-primary">50K+</div>
+                <div className="text-3xl font-bold text-primary">10K+</div>
                 <div className="text-gray-600">Downloads</div>
               </div>
               <div className="text-center">
@@ -67,7 +67,7 @@ const HeroSection = () => {
           <div className="relative animate-fade-in" style={{ animationDelay: '0.3s' }}>
             <div className="relative">
               <img
-                src="/images/Feautures/all.png"
+                src="/images/Feautures/home.png"
                 alt="Drone Simulator Interface"
                 className="w-full h-auto rounded-2xl shadow-2xl"
               />

@@ -157,16 +157,17 @@ const Register: React.FC = () => {
   const [isLoading, setIsLoading] = useState(false)
   const { register } = useAuth()
   const navigate = useNavigate()
+  const [showVerificationPopup, setShowVerificationPopup] = useState(false);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target
-    
+
     // Handle country selection
     if (name === 'country_code') {
       const selectedCountry = countries.find(c => c.code === value)
       if (selectedCountry) {
-        setFormData(prev => ({ 
-          ...prev, 
+        setFormData(prev => ({
+          ...prev,
           [name]: value,
           country: selectedCountry.name,
           phone_code: selectedCountry.phone
@@ -175,7 +176,7 @@ const Register: React.FC = () => {
     } else {
       setFormData(prev => ({ ...prev, [name]: value }))
     }
-    
+
     if (errors[name]) {
       setErrors(prev => ({ ...prev, [name]: '' }))
     }
@@ -240,52 +241,78 @@ const Register: React.FC = () => {
     return Object.keys(newErrors).length === 0
   }
 
-const handleSubmit = async (e: React.FormEvent) => {
-  e.preventDefault()
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault()
 
-  if (!validateForm()) return
+    if (!validateForm()) return
 
-  setIsLoading(true)
+    setIsLoading(true)
 
-  const requestBody = {
-    email: formData.email,
-    username: formData.username,
-    password: formData.password,
-    password_confirm: formData.password_confirm,
-    full_name: formData.full_name,
-    phone_number: formData.phone_number,
-    city: formData.city,
-    state_province: formData.state_province,
-    country: formData.country,
-    purpose_of_use: formData.purpose_of_use === 'other' ? formData.purpose_other : formData.purpose_of_use
-  }
-
-  try {
-    const response = await fetch('https://34-93-79-185.nip.io/api/register/', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify(requestBody)
-    })
-
-    const data = await response.json()
-
-    if (response.ok) {
-      navigate('/') // redirect to home or dashboard
-    } else {
-      setErrors({ submit: data?.error || 'Registration failed. Please try again.' })
+    const requestBody = {
+      email: formData.email,
+      username: formData.username,
+      password: formData.password,
+      password_confirm: formData.password_confirm,
+      full_name: formData.full_name,
+      phone_number: formData.phone_number,
+      city: formData.city,
+      state_province: formData.state_province,
+      country: formData.country,
+      purpose_of_use: formData.purpose_of_use === 'other' ? formData.purpose_other : formData.purpose_of_use
     }
-  } catch (error) {
-    setErrors({ submit: 'An unexpected error occurred. Please try again.' })
-  } finally {
-    setIsLoading(false)
+
+    try {
+      const response = await fetch('https://34-93-79-185.nip.io/api/register/', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(requestBody)
+      })
+
+      const data = await response.json()
+
+      if (response.ok) {
+        setShowVerificationPopup(true); // ✅ Only show popup
+      }
+      else {
+        setErrors({ submit: data?.error || 'Registration failed. Please try again.' })
+      }
+
+    } catch (error) {
+      setErrors({ submit: 'An unexpected error occurred. Please try again.' })
+    } finally {
+      setIsLoading(false)
+    }
   }
-}
+ 
+
+  
+
   return (
+     <>
+    {showVerificationPopup && (
+      <div className="fixed inset-0 z-50 bg-black bg-opacity-40 flex items-center justify-center">
+        <div className="bg-white rounded-lg shadow-lg p-6 max-w-sm w-full text-center">
+          <h3 className="text-lg font-semibold text-green-700 mb-2">Email Verification Sent</h3>
+          <p className="text-gray-700">
+            Your email is not verified. A new verification link has been sent to your email address.
+          </p>
+          <button
+            className="mt-4 px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700"
+            onClick={() => {
+              setShowVerificationPopup(false);
+              navigate('/'); // Redirect after clicking OK
+            }}
+          >
+            OK
+          </button>
+        </div>
+      </div>
+    )}
     <div className="auth-card" style={{ maxWidth: '600px' }}>
       <Logo />
-      
+
       <div className="text-center mb-8">
         <h2 className="text-3xl font-bold text-gray-900 mb-2">Create Account</h2>
         <p className="text-gray-600">Join our drone simulation platform</p>
@@ -488,7 +515,8 @@ const handleSubmit = async (e: React.FormEvent) => {
         </p>
       </div>
     </div>
-  )
+    </>
+  );
 }
 
 export default Register
