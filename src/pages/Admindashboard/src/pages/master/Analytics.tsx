@@ -1,10 +1,11 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { BarChart3, TrendingUp, Users, DollarSign, Award, Target, Filter, Download, Calendar, Eye } from 'lucide-react';
 import { useData } from '../../hooks/useData';
 import { CustomDateFilter } from '../../components/common/CustomDateFilter';
 
 export const MasterAnalytics: React.FC = () => {
-  const { users, plans, drones, scenarios, incomeRecords } = useData();
+const { users, plans, drones, scenarios } = useData();
+const [transactions, setTransactions] = useState<any[]>([]);
   const [dateFilter, setDateFilter] = useState('month');
   const [categoryFilter, setCategoryFilter] = useState('all');
   const [customDateRange, setCustomDateRange] = useState<{ start: string; end: string } | null>(null);
@@ -12,27 +13,42 @@ export const MasterAnalytics: React.FC = () => {
   const handleDateFilterChange = (value: string, customRange?: { start: string; end: string }) => {
     setDateFilter(value);
     if (customRange) {
-      setCustomDateRange(customRange);
+      setCustomDateRange(customRange);  
     } else {
       setCustomDateRange(null);
     }
   };
 
   // Calculate plan popularity
-  const planAnalytics = plans.map(plan => {
-    const planUsers = users.filter(u => u.plan === plan.name);
-    const revenue = planUsers.reduce((sum, user) => sum + (user.paidAmount || 0), 0);
-    const growthRate = Math.random() * 20 + 5; // Mock growth rate
-    
-    return {
-      ...plan,
-      userCount: planUsers.length,
-      revenue,
-      growthRate: growthRate.toFixed(1),
-      conversionRate: ((planUsers.length / users.length) * 100).toFixed(1),
-      avgRevenuePerUser: planUsers.length > 0 ? (revenue / planUsers.length).toFixed(0) : '0'
-    };
-  }).sort((a, b) => b.userCount - a.userCount);
+const premiumTransactions = transactions.filter(
+  txn =>
+    txn.plan_name_display?.toLowerCase() === 'premium' &&
+    txn.payment_status_display?.toLowerCase() === 'succeeded'
+);
+
+const premiumUserEmails = new Set(premiumTransactions.map(txn => txn.user_email?.toLowerCase()));
+
+const premiumUserCount = users.filter(user =>
+  premiumUserEmails.has(user.email?.toLowerCase())
+).length;
+
+const premiumRevenue = premiumTransactions.reduce(
+  (sum, txn) => sum + (parseFloat(txn.amount) || 0),
+  0
+);
+
+const premiumGrowthRate = (() => {
+  if (premiumTransactions.length < 2) return '—';
+  const sorted = premiumTransactions.sort(
+    (a, b) => new Date(a.payment_date).getTime() - new Date(b.payment_date).getTime()
+  );
+  const first = parseFloat(sorted[0].amount) || 0;
+  const last = parseFloat(sorted[sorted.length - 1].amount) || 0;
+  const growth = first === 0 ? 100 : ((last - first) / first) * 100;
+  return `${growth.toFixed(1)}%`;
+})();
+
+
 
   // Calculate drone popularity (from custom plans)
   const droneAnalytics = drones.map(drone => {
@@ -67,7 +83,7 @@ export const MasterAnalytics: React.FC = () => {
   }).sort((a, b) => b.usageCount - a.usageCount);
 
   // Calculate totals
-  const totalRevenue = incomeRecords.reduce((sum, record) => sum + record.amount, 0);
+ const totalRevenue = transactions.reduce((sum, txn) => sum + parseFloat(txn.amount), 0);
   const totalCustomPlanUsers = users.filter(u => u.plan === 'Custom').length;
   const avgCustomPlanValue = totalCustomPlanUsers > 0 
     ? users.filter(u => u.plan === 'Custom').reduce((sum, u) => sum + (u.paidAmount || 0), 0) / totalCustomPlanUsers 
@@ -75,7 +91,7 @@ export const MasterAnalytics: React.FC = () => {
 
   const exportAnalytics = () => {
     const data = {
-      plans: planAnalytics,
+
       drones: droneAnalytics,
       scenarios: scenarioAnalytics,
       summary: {
@@ -86,12 +102,12 @@ export const MasterAnalytics: React.FC = () => {
       }
     };
 
-    const csvContent = [
-      ['Type', 'Name', 'Users/Usage', 'Revenue', 'Growth/Popularity', 'Additional Metric'],
-      ...planAnalytics.map(p => ['Plan', p.name, p.userCount, `$${p.revenue}`, `${p.growthRate}%`, `${p.conversionRate}% conversion`]),
-      ...droneAnalytics.map(d => ['Drone', d.name, d.usageCount, `$${d.revenue}`, d.popularityScore, `${d.marketShare}% market share`]),
-      ...scenarioAnalytics.map(s => ['Scenario', s.name, s.usageCount, `$${s.revenue}`, s.popularityScore, `${s.completionRate}% completion`])
-    ].map(row => row.map(field => `"${field}"`).join(',')).join('\n');
+const csvContent = [
+  ['Type', 'Name', 'Users/Usage', 'Revenue', 'Growth/Popularity', 'Additional Metric'],
+  ['Plan', 'Premium', premiumUserCount, `$${premiumRevenue}`, 'N/A', 'N/A']
+].map(row => row.map(field => `"${field}"`).join(',')).join('\n');
+
+
 
     const blob = new Blob([csvContent], { type: 'text/csv' });
     const url = window.URL.createObjectURL(blob);
@@ -101,7 +117,31 @@ export const MasterAnalytics: React.FC = () => {
     a.click();
     window.URL.revokeObjectURL(url);
   };
+useEffect(() => {
+  const token = sessionStorage.getItem('drone_auth_token');
+  if (!token) return;
 
+  const fetchPremiumData = async () => {
+    try {
+      const res = await fetch('https://34-93-79-185.nip.io/api/stripe/transactions/?plan_name=premium', {
+        headers: { Authorization: `Token ${token}` }
+      });
+
+      const data = await res.json();
+
+      // ✅ FIX: Get count from the response
+      const count = data.count || 0;
+      const totalRevenue = data.results?.reduce((sum, txn) => sum + parseFloat(txn.amount || 0), 0) || 0;
+
+      premiumUserCount(count);         // <-- ✅ Now this is correct
+      premiumRevenue(totalRevenue);    // <-- Already correct
+    } catch (err) {
+      console.error('Error fetching premium plan data:', err);
+    }
+  };
+
+  fetchPremiumData();
+}, []);
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
@@ -175,89 +215,55 @@ export const MasterAnalytics: React.FC = () => {
           </div>
         </div>
 
-        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm font-medium text-gray-600">Top Plan</p>
-              <p className="text-2xl font-bold text-gray-900 mt-2">{planAnalytics[0]?.name}</p>
-              <p className="text-sm text-yellow-600 mt-1">{planAnalytics[0]?.userCount} users</p>
-            </div>
-            <div className="bg-yellow-50 p-3 rounded-lg">
-              <Award className="w-6 h-6 text-yellow-600" />
-            </div>
-          </div>
-        </div>
+<div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+  <div className="flex items-center justify-between">
+    <div>
+      <p className="text-sm font-medium text-gray-600">Top Plan</p>
+      <p className="text-2xl font-bold text-gray-900 mt-2">Premium</p>
+      <p className="text-sm text-yellow-600 mt-1">{premiumUserCount} users</p>
+    </div>
+    <div className="bg-yellow-50 p-3 rounded-lg">
+      <Award className="w-6 h-6 text-yellow-600" />
+    </div>
+  </div>
+</div>
+
       </div>
 
       {/* Plan Analytics */}
-      <div className="bg-white rounded-xl shadow-sm border border-gray-200">
-        <div className="p-6 border-b border-gray-200">
-          <h2 className="text-lg font-semibold text-gray-900">Plan Performance Analytics</h2>
-          <p className="text-sm text-gray-500 mt-1">Detailed breakdown of subscription plan performance</p>
-        </div>
-        <div className="overflow-x-auto">
-          <table className="min-w-full divide-y divide-gray-200">
-            <thead className="bg-gray-50">
-              <tr>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Plan</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Users</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Revenue</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Growth Rate</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Conversion</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ARPU</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Market Share</th>
-              </tr>
-            </thead>
-            <tbody className="bg-white divide-y divide-gray-200">
-              {planAnalytics.map((plan, index) => (
-                <tr key={plan.id} className="hover:bg-gray-50 transition-colors">
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="flex items-center">
-                      <div className="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center mr-3">
-                        <span className="text-sm font-bold text-blue-600">#{index + 1}</span>
-                      </div>
-                      <div>
-                        <div className="text-sm font-medium text-gray-900">{plan.name}</div>
-                        <div className="text-sm text-gray-500">${plan.price}/month</div>
-                      </div>
-                    </div>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="text-sm font-semibold text-gray-900">{plan.userCount}</div>
-                    <div className="text-sm text-gray-500">users</div>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="text-sm font-semibold text-green-600">${plan.revenue.toLocaleString()}</div>
-                    <div className="text-sm text-gray-500">total</div>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <span className="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-green-100 text-green-800">
-                      +{plan.growthRate}%
-                    </span>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="text-sm text-gray-900">{plan.conversionRate}%</div>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="text-sm font-medium text-gray-900">${plan.avgRevenuePerUser}</div>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="flex items-center">
-                      <div className="w-16 bg-gray-200 rounded-full h-2 mr-2">
-                        <div
-                          className="bg-blue-600 h-2 rounded-full"
-                          style={{ width: `${plan.conversionRate}%` }}
-                        ></div>
-                      </div>
-                      <span className="text-sm text-gray-900">{plan.conversionRate}%</span>
-                    </div>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      </div>
+{/* Plan Performance Analytics Section */}
+<div className="bg-white rounded-xl shadow-sm border border-gray-200 mt-6">
+  <div className="p-6 border-b border-gray-200">
+    <h2 className="text-lg font-semibold text-gray-900">Plan Performance Analytics</h2>
+    <p className="text-sm text-gray-500">Detailed breakdown of subscription plan performance</p>
+  </div>
+
+  <div className="overflow-x-auto">
+    <table className="min-w-full divide-y divide-gray-200">
+      <thead className="bg-gray-50">
+        <tr>
+          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Plan</th>
+          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Users</th>
+          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Revenue</th>
+          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Growth Rate</th>
+        </tr>
+      </thead>
+      <tbody className="bg-white divide-y divide-gray-200">
+  <tr className="hover:bg-gray-50 transition-colors">
+    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">Premium</td>
+    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700">{premiumUserCount}</td>
+    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 font-semibold">
+      ${premiumRevenue.toFixed(2)}
+    </td>
+    <td className="px-6 py-4 whitespace-nowrap text-sm text-green-600 font-medium">
+      {premiumGrowthRate}
+    </td>
+  </tr>
+</tbody>
+    </table>
+  </div>
+</div>
+
 
       {/* Drone & Scenario Analytics */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
@@ -330,33 +336,33 @@ export const MasterAnalytics: React.FC = () => {
           </div>
         </div>
         
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <div className="text-center">
-            <div className="text-3xl font-bold text-blue-600 mb-2">
-              ${planAnalytics.reduce((sum, p) => sum + p.revenue, 0).toLocaleString()}
-            </div>
-            <p className="text-sm text-gray-600">Standard Plans Revenue</p>
-            <p className="text-xs text-gray-500 mt-1">
-              {((planAnalytics.reduce((sum, p) => sum + p.revenue, 0) / totalRevenue) * 100).toFixed(1)}% of total
-            </p>
-          </div>
-          
-          <div className="text-center">
-            <div className="text-3xl font-bold text-green-600 mb-2">
-              ${droneAnalytics.reduce((sum, d) => sum + d.revenue, 0).toLocaleString()}
-            </div>
-            <p className="text-sm text-gray-600">Drone Revenue</p>
-            <p className="text-xs text-gray-500 mt-1">From custom plans</p>
-          </div>
-          
-          <div className="text-center">
-            <div className="text-3xl font-bold text-purple-600 mb-2">
-              ${scenarioAnalytics.reduce((sum, s) => sum + s.revenue, 0).toLocaleString()}
-            </div>
-            <p className="text-sm text-gray-600">Scenario Revenue</p>
-            <p className="text-xs text-gray-500 mt-1">From custom plans</p>
-          </div>
-        </div>
+<div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+  {/* Premium Revenue */}
+  <div className="text-center">
+    <div className="text-3xl font-bold text-blue-600 mb-2">
+      ${premiumRevenue.toLocaleString()}
+    </div>
+    <p className="text-sm text-gray-600">Premium Plan Revenue</p>
+    <p className="text-xs text-gray-500 mt-1">
+      {((premiumRevenue / totalRevenue) * 100 || 0).toFixed(1)}% of total
+    </p>
+  </div>
+
+  {/* Placeholder for Drone Revenue */}
+  <div className="text-center">
+    <div className="text-3xl font-bold text-green-600 mb-2">$0</div>
+    <p className="text-sm text-gray-600">Drone Revenue</p>
+    <p className="text-xs text-gray-500 mt-1">From custom plans</p>
+  </div>
+
+  {/* Placeholder for Scenario Revenue */}
+  <div className="text-center">
+    <div className="text-3xl font-bold text-purple-600 mb-2">$0</div>
+    <p className="text-sm text-gray-600">Scenario Revenue</p>
+    <p className="text-xs text-gray-500 mt-1">From custom plans</p>
+  </div>
+</div>
+
       </div>
     </div>
   );

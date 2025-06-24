@@ -25,14 +25,56 @@ export const MasterUsers: React.FC = () => {
     return matchesSearch && matchesStatus && matchesPlan;
   });
 
-  const handleEditUser = (userId: string, newPlan: string, addOns: any, customPlan?: any) => {
+const handleEditUser = async (
+  userId: string,
+  newPlan: string,
+  addOns: any,
+  customPlan?: any
+) => {
+  const userToUpdate = users.find(u => u.id === userId);
+  if (!userToUpdate) return;
+
+  const updatePayload = {
+    email: userToUpdate.email,
+    username: userToUpdate.name,
+    full_name: userToUpdate.name,
+    password: 'TempPass@123',  // or fetch if user provides it
+    password_confirm: 'TempPass@123',
+    phone_number: userToUpdate.phone_number || '',
+    city: userToUpdate.city || '',
+    state_province: userToUpdate.state_province || '',
+    country: userToUpdate.country || '',
+    purpose_of_use: userToUpdate.purpose_of_use || '',
+    plan:
+    newPlan === 'Demo' ? 'trial' :
+    newPlan === 'Free' ? 'basic' :
+    newPlan === 'Premium' ? 'premium' :
+    newPlan.toLowerCase(),
+  };
+
+  try {
+    const token = sessionStorage.getItem('drone_auth_token') || '';
+    await axios.put('https://34-93-79-185.nip.io/api/update-user-details/', updatePayload, {
+      headers: {
+        Authorization: `Token ${token}`,
+      },
+    });
+
+    // Locally update user state
     updateUserPlan(userId, newPlan, currentUser?.name || 'Master Admin');
     updateUserAddOns(userId, addOns, currentUser?.name || 'Master Admin');
 
     if (newPlan === 'Custom' && customPlan) {
       updateCustomPlan(userId, customPlan, currentUser?.name || 'Master Admin');
     }
-  };
+
+    alert('User plan updated successfully!');
+  } catch (error) {
+    console.error('Error updating user:', error);
+    alert('Failed to update user plan.');
+  }
+};
+
 
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -101,38 +143,69 @@ const handleDeleteUser = async (email: string) => {
 useEffect(() => {
   const fetchUsers = async () => {
     try {
-      const token = sessionStorage.getItem('drone_auth_token') || localStorage.getItem('drone_auth_token');
+      const token =
+        sessionStorage.getItem('drone_auth_token') ||
+        localStorage.getItem('drone_auth_token');
 
       const [usersRes, transactionsRes] = await Promise.all([
         axiosInstance.get('/get-all-users/'),
-        axios.get('https://34-93-79-185.nip.io/api/stripe/my-transactions/', {
+        axios.get('https://34-93-79-185.nip.io/api/stripe/transactions/', {
           headers: {
             Authorization: `Token ${token}`,
           },
-        }).catch(() => ({ data: { data: [] } })) // fallback if API fails
+        }).catch(() => ({ data: { results: [] } })) // fallback if Stripe API fails
       ]);
 
       const userList = usersRes.data.data;
-      const transactions = transactionsRes.data.data || [];
+      const transactions = transactionsRes.data.results || [];
+
+      const normalizeEmail = (email: string) => (email || '').trim().toLowerCase();
 
       const formattedUsers = userList.map((user: any) => {
-        const txn = transactions.find((t: any) => t.email === user.email);
+        const txn = transactions.find(
+          (t: any) => normalizeEmail(t.user_email) === normalizeEmail(user.email)
+        );
+
+        if (!txn) {
+          console.warn(`No matching transaction for ${user.email}`);
+        }
 
         return {
           id: user.user_id,
           name: user.full_name || user.username || 'N/A',
           email: user.email,
           status: user.is_active ? 'Active' : 'Inactive',
-          plan: txn?.plan || 'Free',
-          addOns: txn?.addons || {},
-          paidAmount: txn?.paid_amount || 0,
-          paymentDate: txn?.last_payment_date || null,
-          nextPaymentDate: txn?.next_payment_date || null,
-          customPlan: txn?.custom_plan || null,
+
+          // Updated plan logic with fallback
+          plan: (() => {
+            if (txn?.plan_name_display) {
+              switch (txn.plan_name_display.toLowerCase()) {
+                case 'trial': return 'Demo';
+                case 'basic': return 'Free';
+                case 'premium': return 'Premium';
+                default: return txn.plan_name_display;
+              }
+            } else {
+              switch ((user.plan || '').toLowerCase()) {
+                case 'trial': return 'Demo';
+                case 'premium': return 'Premium';
+                case 'basic': return 'Free';
+                default: return user.plan || 'Free';
+              }
+            }
+          })(),
+
+          paidAmount: txn ? parseFloat(txn.amount) : 0,
+          paymentDate: txn?.payment_date || null,
+          nextPaymentDate: txn?.plan_expiry_date || user.plan_expiry_date || null,
+          addOns: {}, // No add-ons in your sample response
+          customPlan: null, // Assume not applicable in Stripe flow
+
           usage: {
             simulationsThisMonth: user.statistics?.total_scenarios_completed || 0,
             totalSimulations: user.statistics?.total_app_sessions || 0,
           },
+
           registrationDate: new Date(user.created_at).toLocaleDateString(),
         };
       });
@@ -148,6 +221,9 @@ useEffect(() => {
 
   fetchUsers();
 }, []);
+
+
+
 //this is the 
   if (loading) {
     return <div className="text-center py-10 text-gray-500">Loading users...</div>;
@@ -193,17 +269,17 @@ useEffect(() => {
             </select>
           </div>
 
-          <div>
-            <select
-              value={planFilter}
-              onChange={(e) => setPlanFilter(e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-            >
-              <option value="all">All Plans</option>
-              {plans.map(plan => (
-                <option key={plan.id} value={plan.name}>{plan.name}</option>
-              ))}
-            </select>
+           <div>
+<select
+  value={planFilter}
+  onChange={(e) => setPlanFilter(e.target.value)}
+  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+>
+  <option value="all">All Plans</option>
+  <option value="Demo">Demo</option>
+  <option value="Free">Free</option>
+  <option value="Premium">Premium</option>
+</select>
           </div>
         </div>
       </div>
@@ -291,8 +367,8 @@ useEffect(() => {
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div className="space-y-1">
                         <div className="text-sm font-semibold text-green-600">
-                          ${user.paidAmount || 0}/month
-                        </div>
+  {user.paidAmount ? `$${user.paidAmount}/month` : 'Free Plan'}
+</div>
                         {user.paymentDate && (
                           <div className="text-xs text-gray-500">
                             Last: {formatDate(user.paymentDate)}

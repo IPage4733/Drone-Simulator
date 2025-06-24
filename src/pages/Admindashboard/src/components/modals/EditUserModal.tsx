@@ -84,9 +84,14 @@ export const EditUserModal: React.FC<EditUserModalProps> = ({
                 onChange={(e) => setSelectedPlan(e.target.value)}
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               >
-                {plans.map(plan => (
-                  <option key={plan} value={plan}>{plan}</option>
-                ))}
+               {[
+  { label: 'Demo', value: 'trial' },
+  { label: 'Free', value: 'basic' },
+  { label: 'Premium', value: 'premium' },
+  { label: 'Custom', value: 'custom' },
+].map(({ label, value }) => (
+  <option key={value} value={value}>{label}</option>
+))}
               </select>
             </div>
 
