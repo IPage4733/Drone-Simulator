@@ -160,7 +160,7 @@ export const MasterDashboard: React.FC = () => {
 
           <div className="mt-6 pt-4 border-t border-gray-200">
             <div className="flex justify-between text-sm">
-              <span className="text-gray-600">Total Active Users</span>
+              <span className="text-gray-600">Total Users</span>
               <span className="font-semibold text-gray-900">{activeUsers}</span>
             </div>
           </div>
