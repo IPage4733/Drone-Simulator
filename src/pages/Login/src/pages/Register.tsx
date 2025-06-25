@@ -312,7 +312,7 @@ const Register: React.FC = () => {
         <div className="w-full max-w-sm bg-white shadow-lg rounded-xl px-6 py-8 text-sm">
 
           <img
-            src="/images/logo.jpg"
+            src="/images/logonew.png"
             alt="Drone Simulator Logo"
             className="w-40 mx-auto mb-3"
           />
