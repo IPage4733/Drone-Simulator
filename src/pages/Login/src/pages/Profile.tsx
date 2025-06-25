@@ -841,22 +841,22 @@ const Profile: React.FC = () => {
           {/* Profile Header */}
 
 
-        {/* Stats Cards */}
-        <div style={styles.statsGrid}>
-          <div style={styles.statCard}>
-            <div style={styles.statCardInner}>
-              <div>
-                <p style={styles.statLabel}>Total Purchases</p>
-                <p style={styles.statValue}>{currentPurchases.length}</p>
-              </div>
-              <div style={{ ...styles.statIcon, backgroundColor: '#dbeafe' }}>
-                <svg style={{ width: '1rem', height: '1rem', color: '#2563eb' }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
-                </svg>
-
-
+          {/* Stats Cards */}
+          <div style={styles.statsGrid}>
+            <div style={styles.statCard}>
+              <div style={styles.statCardInner}>
+                <div>
+                  <p style={styles.statLabel}>Total Purchases</p>
+                  <p style={styles.statValue}>{currentPurchases.length}</p>
+                </div>
+                <div style={{ ...styles.statIcon, backgroundColor: '#dbeafe' }}>
+                  <svg style={{ width: '1.25rem', height: '1.25rem', color: '#2563eb' }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
+                  </svg>
+                </div>
               </div>
             </div>
+
             <div style={styles.statCard}>
               <div style={styles.statCardInner}>
                 <div>
@@ -872,6 +872,8 @@ const Profile: React.FC = () => {
                 </div>
               </div>
             </div>
+
+
 
             {/* <div style={styles.statCard}>
               {/* <div style={styles.statCardInner}>
