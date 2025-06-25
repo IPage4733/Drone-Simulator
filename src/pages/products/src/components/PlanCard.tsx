@@ -1,5 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import { CheckCircle, X, GraduationCap, BookOpen, Users, Mail, Plane, Airplay, Satellite } from 'lucide-react';
+import {
+  CheckCircle,
+  X,
+  GraduationCap,
+  Airplay,
+  Satellite,
+  Mail
+} from 'lucide-react';
 import { Plan } from '../types';
 import Card from './Card';
 import Button from './Button';
@@ -14,7 +21,7 @@ const PlanCard: React.FC<PlanCardProps> = ({ plan }) => {
   const { addItem } = useCart();
 
   const [showModal, setShowModal] = useState(false);
-  const [modalMode, setModalMode] = useState<'login' | 'verify'>('login');
+  const [modalMode, setModalMode] = useState<'login' | 'verify' | 'restricted'>('login');
   const [studentEmail, setStudentEmail] = useState('');
   const [error, setError] = useState('');
 
@@ -39,7 +46,7 @@ const PlanCard: React.FC<PlanCardProps> = ({ plan }) => {
     if (plan.id === 'Student') {
       const isEducational = /@[\w.-]+\.(edu|ac)(\.[a-z]{2,})?$|\.university$/i.test(userEmail);
       if (!isEducational) {
-        setModalMode('verify');
+        setModalMode('restricted');
         setShowModal(true);
         return;
       }
@@ -69,8 +76,14 @@ const PlanCard: React.FC<PlanCardProps> = ({ plan }) => {
     const pendingPlanId = sessionStorage.getItem('pendingPlanId');
     if (userEmail && pendingPlanId === plan.id) {
       if (plan.id === 'Student') {
-        setModalMode('verify');
-        setShowModal(true);
+        const isEducational = /@[\w.-]+\.(edu|ac)(\.[a-z]{2,})?$|\.university$/i.test(userEmail);
+        if (!isEducational) {
+          setModalMode('restricted');
+          setShowModal(true);
+        } else {
+          setModalMode('verify');
+          setShowModal(true);
+        }
       } else {
         handleAddToCart();
       }
@@ -111,7 +124,7 @@ const PlanCard: React.FC<PlanCardProps> = ({ plan }) => {
       {showModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-60 px-4">
           <div className="relative w-full max-w-3xl h-[350px] bg-gradient-to-br from-orange-400 via-orange-500 to-red-500 rounded-xl shadow-2xl overflow-hidden flex">
-            {/* Left visual */}
+            {/* Left Section */}
             <div className="w-1/2 flex flex-col justify-center items-center text-white px-4 relative">
               {plan.id === 'Student' ? (
                 <div className="relative w-full flex flex-col items-center">
@@ -152,7 +165,7 @@ const PlanCard: React.FC<PlanCardProps> = ({ plan }) => {
               )}
             </div>
 
-            {/* Right form */}
+            {/* Right Section */}
             <div className="w-1/2 text-white px-6 py-6 relative">
               <button
                 onClick={() => setShowModal(false)}
@@ -160,38 +173,40 @@ const PlanCard: React.FC<PlanCardProps> = ({ plan }) => {
               >
                 <X size={20} />
               </button>
-              <h2 className="text-2xl font-bold mb-2">
-                {modalMode === 'login'
-                  ? plan.id === 'Student'
-                    ? 'Access Student Benefits'
-                    : 'Access Drone Features'
-                  : 'Verify Student Status'}
-              </h2>
-              <p className="text-sm text-white text-opacity-80 mb-4">
-                {modalMode === 'login'
-                  ? plan.id === 'Student'
-                    ? 'Login using your .edu or institute email.'
-                    : 'Login to unlock advanced drone simulation, analytics, and training modules.'
-                  : 'Enter your educational email to verify and unlock discounts. Accepted domains: .edu, .ac.in, .university'}
-              </p>
 
-              {modalMode === 'login' ? (
-                <div className="space-y-2">
-                  <button
-                    onClick={() => (window.location.href = '/auth/login')}
-                    className="w-full bg-orange-700 hover:bg-orange-800 text-white font-semibold py-2 rounded-md text-sm transition-colors duration-200"
-                  >
-                    Login
-                  </button>
-                  <button
-                    onClick={() => (window.location.href = '/auth/register')}
-                    className="w-full bg-white bg-opacity-30 hover:bg-opacity-50 text-white font-semibold py-2 rounded-md text-sm transition-colors duration-200 border border-white border-opacity-20"
-                  >
-                    Sign Up
-                  </button>
-                </div>
-              ) : (
+              {modalMode === 'login' && (
                 <>
+                  <h2 className="text-2xl font-bold mb-2">
+                    {plan.id === 'Student' ? 'Access Student Benefits' : 'Access Drone Features'}
+                  </h2>
+                  <p className="text-sm text-white text-opacity-80 mb-4">
+                    {plan.id === 'Student'
+                      ? 'Login using your .edu or institute email.'
+                      : 'Login to unlock advanced drone simulation, analytics, and training modules.'}
+                  </p>
+                  <div className="space-y-2">
+                    <button
+                      onClick={() => (window.location.href = '/auth/login')}
+                      className="w-full bg-orange-700 hover:bg-orange-800 text-white font-semibold py-2 rounded-md text-sm"
+                    >
+                      Login
+                    </button>
+                    <button
+                      onClick={() => (window.location.href = '/auth/register')}
+                      className="w-full bg-white bg-opacity-30 hover:bg-opacity-50 text-white font-semibold py-2 rounded-md text-sm border border-white border-opacity-20"
+                    >
+                      Sign Up
+                    </button>
+                  </div>
+                </>
+              )}
+
+              {modalMode === 'verify' && (
+                <>
+                  <h2 className="text-2xl font-bold mb-2">Verify Student Status</h2>
+                  <p className="text-sm text-white text-opacity-80 mb-4">
+                    Enter your educational email to verify and unlock discounts. Accepted domains: .edu, .ac.in, .university
+                  </p>
                   <div className="relative mb-6">
                     <input
                       type="email"
@@ -203,13 +218,11 @@ const PlanCard: React.FC<PlanCardProps> = ({ plan }) => {
                     <Mail size={16} className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
                   </div>
                   {error && (
-                    <div
-                      className={`flex items-start space-x-2 backdrop-blur-md border rounded-xl p-3 text-sm shadow-lg ${
-                        error.includes('Verification')
-                          ? 'bg-white/20 border-green-300 text-green-100'
-                          : 'bg-white/30 border-red-300 text-red-800'
-                      }`}
-                    >
+                    <div className={`flex items-start space-x-2 backdrop-blur-md border rounded-xl p-3 text-sm shadow-lg ${
+                      error.includes('Verification')
+                        ? 'bg-white/20 border-green-300 text-green-100'
+                        : 'bg-white/30 border-red-300 text-red-800'
+                    }`}>
                       {error.includes('Verification') ? (
                         <CheckCircle size={18} className="mt-0.5 text-green-100" />
                       ) : (
@@ -220,16 +233,35 @@ const PlanCard: React.FC<PlanCardProps> = ({ plan }) => {
                   )}
                   <button
                     onClick={handleVerifyStudentEmail}
-                    className="w-full mt-3 bg-orange-700 hover:bg-orange-800 text-white font-semibold py-2 rounded-md text-sm transition-colors duration-200"
+                    className="w-full mt-3 bg-orange-700 hover:bg-orange-800 text-white font-semibold py-2 rounded-md text-sm"
                   >
                     Send Verification Code
                   </button>
+                  <p className="text-xs mt-4 text-white text-opacity-75">
+                    We'll send a verification link to confirm your student status.
+                  </p>
                 </>
               )}
-              <p className="text-xs mt-4 text-white text-opacity-75">
-                We'll send a verification link to confirm your student status.
-              </p>
-              <p className="text-xs text-white text-opacity-50 mt-2">
+
+              {modalMode === 'restricted' && (
+                <>
+                  <h2 className="text-2xl font-bold mb-2">Student Plan Restricted</h2>
+                  <p className="text-sm text-white text-opacity-80 mb-4">
+                    This plan is only available for verified students with .edu or .ac email addresses.
+                  </p>
+                  <button
+                    onClick={() => {
+                      sessionStorage.clear();
+                      window.location.href = '/auth/studentregister';
+                    }}
+                    className="w-full bg-white bg-opacity-30 hover:bg-opacity-50 text-white font-semibold py-2 rounded-md text-sm border border-white border-opacity-20"
+                  >
+                    Register as Student
+                  </button>
+                </>
+              )}
+
+              <p className="text-xs text-white text-opacity-50 mt-4">
                 Terms & Conditions apply.
               </p>
             </div>
