@@ -56,19 +56,17 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
         <div className="flex flex-col h-full">
           {/* Header */}
           <div className="flex items-center justify-between p-6 border-b border-gray-200">
-            <div className="flex items-center space-x-3">
+            <div className="flex flex-col items-center space-y-2">
               <img
-                src="/images/logonew.png"
-                alt={user?.name || 'User'}
-                className="w-16 h-16 rounded-full object-cover"
+                src="/images/1.png"
+                alt="Drone Simulator Logo"
+                className="w-64 mx-auto mb-1"
               />
-              <div>
-
-                <p className="text-xs text-gray-500">
-                  {user?.role === 'master' ? 'Master Admin' : 'Admin Panel'}
-                </p>
-              </div>
+              <p className="text-xs text-gray-500">
+                {user?.role === 'master' ? 'Master Admin' : 'Admin Panel'}
+              </p>
             </div>
+
             <button
               onClick={onClose}
               className="lg:hidden p-2 rounded-lg hover:bg-gray-100 transition-colors"
