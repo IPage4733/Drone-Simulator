@@ -371,7 +371,7 @@ useEffect(() => {
                 </div>
                 <div className="flex justify-between text-xs text-gray-500">
                   <span>{interest.users} users ({interest.percentage}%)</span>
-                  <span>Avg: ${(interest.revenue / interest.users).toFixed(0)}/user</span>
+                 
                 </div>
               </div>
             ))}
@@ -443,9 +443,9 @@ useEffect(() => {
                 {/* <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Avg. Revenue/User
                 </th> */}
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                {/* <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Growth
-                </th>
+                </th> */}
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Market Share
                 </th>
@@ -480,11 +480,11 @@ useEffect(() => {
                     {/* <td className="px-6 py-4 whitespace-nowrap">
                       <div className="text-sm font-medium text-gray-900">${avgRevenuePerUser}</div>
                     </td> */}
-                    <td className="px-6 py-4 whitespace-nowrap">
+                    {/* <td className="px-6 py-4 whitespace-nowrap">
                       <span className="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-green-100 text-green-800">
                         {country.growth}
                       </span>
-                    </td>
+                    </td> */}
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div className="flex items-center">
                         <div className="w-16 bg-gray-200 rounded-full h-2 mr-2">

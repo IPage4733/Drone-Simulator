@@ -10,13 +10,13 @@ interface SidebarProps {
 
 export const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
   const { user } = useAuth();
-  
+
   const masterAdminNavItems = [
     { path: '/Dash/master/dashboard', label: 'Dashboard', icon: LayoutDashboard },
     { path: '/Dash/master/users', label: 'Registered Users', icon: Users },
-    { path: '/Dash/master/plans', label: 'Subscription Plans', icon: CreditCard },
-    { path: '/Dash/master/products', label: 'Products', icon: Package },
-    { path: '/Dash/master/annotations', label: 'Change Logs', icon: FileText },
+    // { path: '/Dash/master/plans', label: 'Subscription Plans', icon: CreditCard },
+    // { path: '/Dash/master/products', label: 'Products', icon: Package },
+    // { path: '/Dash/master/annotations', label: 'Change Logs', icon: FileText },
     { path: '/Dash/master/employees', label: 'Employee Management', icon: UserCog },
     { path: '/Dash/master/income', label: 'Income Reports', icon: TrendingUp },
     { path: '/Dash/master/metrics', label: 'User Metrics', icon: BarChart3 },
@@ -41,12 +41,12 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
     <>
       {/* Mobile overlay */}
       {isOpen && (
-        <div 
+        <div
           className="fixed inset-0 bg-black/50 z-40 lg:hidden"
           onClick={onClose}
         />
       )}
-      
+
       {/* Sidebar */}
       <div className={`
         fixed top-0 left-0 h-full w-64 bg-white shadow-xl z-50 transform transition-transform duration-200 ease-in-out
@@ -57,11 +57,13 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
           {/* Header */}
           <div className="flex items-center justify-between p-6 border-b border-gray-200">
             <div className="flex items-center space-x-3">
-              <div className="bg-gradient-to-r from-blue-600 to-indigo-600 p-2 rounded-lg">
-                <Drone className="w-6 h-6 text-white" />
-              </div>
+              <img
+                src="/images/logonew.png"
+                alt={user?.name || 'User'}
+                className="w-16 h-16 rounded-full object-cover"
+              />
               <div>
-                <h1 className="text-lg font-bold text-gray-900">DroneSim</h1>
+
                 <p className="text-xs text-gray-500">
                   {user?.role === 'master' ? 'Master Admin' : 'Admin Panel'}
                 </p>
@@ -84,8 +86,8 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
                 onClick={() => window.innerWidth < 1024 && onClose()}
                 className={({ isActive }) => `
                   flex items-center space-x-3 px-4 py-3 rounded-lg transition-all duration-150
-                  ${isActive 
-                    ? 'bg-gradient-to-r from-blue-50 to-indigo-50 text-blue-700 border-r-2 border-blue-600' 
+                  ${isActive
+                    ? 'bg-gradient-to-r from-blue-50 to-indigo-50 text-blue-700 border-r-2 border-blue-600'
                     : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
                   }
                 `}
@@ -104,9 +106,9 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
           <div className="border-t border-gray-200 p-4">
             <div className="flex items-center space-x-3">
               <img
-                src={user?.avatar || `https://images.pexels.com/photos/1040881/pexels-photo-1040881.jpeg?auto=compress&cs=tinysrgb&w=100&h=100&dpr=2`}
-                alt={user?.name}
-                className="w-10 h-10 rounded-full object-cover"
+                src="/images/smalllogo.png"
+                alt={user?.name || 'User'}
+                className="w-16 h-16 rounded-full object-cover"
               />
               <div className="flex-1 min-w-0">
                 <p className="text-sm font-medium text-gray-900 truncate">
