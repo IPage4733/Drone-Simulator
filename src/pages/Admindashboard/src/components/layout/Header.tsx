@@ -39,11 +39,10 @@ export const Header: React.FC<HeaderProps> = ({ onMenuClick }) => {
 
           <div className="flex items-center space-x-3">
             <img
-  src="/images/smalllogo.png"
-  alt={user?.name || 'User'}
-  className="w-16 h-16 rounded-full object-cover"
-/>
-
+              src="/images/smalllogo.png"
+              alt={user?.name || 'User'}
+              className="w-24 h-24 rounded-full object-cover"
+            />
 
             <button
               onClick={handleLogout}
