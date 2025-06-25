@@ -33,11 +33,11 @@ const CTASection: React.FC = () => {
             <div className="text-gray-400">Institutions</div>
           </div>
           <div>
-            <div className="text-3xl font-bold text-orange-500">12+</div>
+            <div className="text-3xl font-bold text-orange-500">6</div>
             <div className="text-gray-400">Drone Models</div>
           </div>
           <div>
-            <div className="text-3xl font-bold text-orange-500">25+</div>
+            <div className="text-3xl font-bold text-orange-500">7</div>
             <div className="text-gray-400">Training Scenarios</div>
           </div>
         </div>

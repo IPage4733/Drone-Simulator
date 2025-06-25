@@ -9,7 +9,7 @@ const Footer: React.FC = () => {
           <div>
             <h3 className="text-xl font-bold mb-4">IPage Drone Simulator</h3>
             <p className="text-gray-400 mb-4">
-              India's most versatile drone simulator – Real drones. Real scenarios. Real learning.
+              Indi's most versatile drone simulator – Real drones. Real scenarios. Real learning.
             </p>
             <div className="flex space-x-4">
               <a href="#" className="text-gray-400 hover:text-white">
