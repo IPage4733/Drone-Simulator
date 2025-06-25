@@ -16,6 +16,7 @@ import AdminDash from "./pages/Admindashboard/src/AdminDash";
 import AppAuth from "./pages/Login/src/App";
 import { ToastContainer } from "react-toastify";
 import 'react-toastify/dist/ReactToastify.css';
+import UniversalContactForm from "./pages/UniversalContactForm";
 const queryClient = new QueryClient();
 
 
@@ -37,6 +38,7 @@ const App = () => (
           <Route path="/product/*" element={<ProductApp />} />
           <Route path="/Dash/*" element={<AdminDash />} />
           <Route path="/auth/*" element={<AppAuth />} />
+          <Route path="/salesform" element={<UniversalContactForm />} />
         </Routes>
         </CartProvider>
       </BrowserRouter>

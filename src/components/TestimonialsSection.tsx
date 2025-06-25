@@ -108,7 +108,7 @@ const TestimonialsSection = () => {
             <div className="text-gray-600">Average Rating</div>
           </div>
           <div className="text-center">
-            <div className="text-3xl md:text-4xl font-bold text-primary mb-2">2k+</div>
+            <div className="text-3xl md:text-4xl font-bold text-primary mb-2">10k+</div>
             <div className="text-gray-600">Flight Hours</div>
           </div>
           <div className="text-center">

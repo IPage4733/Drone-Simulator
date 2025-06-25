@@ -46,7 +46,7 @@ const PlanCard: React.FC<PlanCardProps> = ({ plan }) => {
     }
 
     if (plan.id === 'institution') {
-      window.location.href = '/contact';
+      window.location.href = '/salesform';
       return;
     }
 
