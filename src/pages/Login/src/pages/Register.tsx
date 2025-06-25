@@ -2,7 +2,7 @@ import React, { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 import Logo from '../components/Logo'
-
+import Navigation from '@/components/Navigation'
 // Country data with codes and phone prefixes
 const countries = [
   { code: 'US', name: 'United States', phone: '+1' },
@@ -140,16 +140,15 @@ const countries = [
 const Register: React.FC = () => {
   const [formData, setFormData] = useState({
     email: '',
-    username: '',
     password: '',
     password_confirm: '',
     full_name: '',
     phone_number: '',
-    country_code: 'US',
-    phone_code: '+1',
+    country_code: 'IN',
+    phone_code: '+91',
     city: '',
     state_province: '',
-    country: 'United States',
+    country: 'India',
     purpose_of_use: 'personal',
     purpose_other: ''
   })
@@ -191,11 +190,7 @@ const Register: React.FC = () => {
       newErrors.email = 'Email is invalid'
     }
 
-    if (!formData.username) {
-      newErrors.username = 'Username is required'
-    } else if (formData.username.length < 3) {
-      newErrors.username = 'Username must be at least 3 characters'
-    }
+
 
     if (!formData.password) {
       newErrors.password = 'Password is required'
@@ -250,7 +245,6 @@ const Register: React.FC = () => {
 
     const requestBody = {
       email: formData.email,
-      username: formData.username,
       password: formData.password,
       password_confirm: formData.password_confirm,
       full_name: formData.full_name,
@@ -285,236 +279,245 @@ const Register: React.FC = () => {
       setIsLoading(false)
     }
   }
- 
 
-  
+
+
 
   return (
-     <>
-    {showVerificationPopup && (
-      <div className="fixed inset-0 z-50 bg-black bg-opacity-40 flex items-center justify-center">
-        <div className="bg-white rounded-lg shadow-lg p-6 max-w-sm w-full text-center">
-          <h3 className="text-lg font-semibold text-green-700 mb-2">Email Verification Sent</h3>
-          <p className="text-gray-700">
-            Your email is not verified. A new verification link has been sent to your email address.
-          </p>
-          <button
-            className="mt-4 px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700"
-            onClick={() => {
-              setShowVerificationPopup(false);
-              navigate('/'); // Redirect after clicking OK
-            }}
-          >
-            OK
-          </button>
-        </div>
-      </div>
-    )}
-    <div className="auth-card" style={{ maxWidth: '600px' }}>
-      <Logo />
-
-      <div className="text-center mb-8">
-        <h2 className="text-3xl font-bold text-gray-900 mb-2">Create Account</h2>
-        <p className="text-gray-600">Join our drone simulation platform</p>
-      </div>
-
-      <form onSubmit={handleSubmit} className="space-y-6">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div className="form-group">
-            <label htmlFor="email" className="form-label">Email Address</label>
-            <input
-              type="email"
-              id="email"
-              name="email"
-              value={formData.email}
-              onChange={handleChange}
-              className={`form-input ${errors.email ? 'border-red-500' : ''}`}
-              placeholder="your@email.com"
-            />
-            {errors.email && <p className="form-error">{errors.email}</p>}
-          </div>
-
-          <div className="form-group">
-            <label htmlFor="username" className="form-label">Username</label>
-            <input
-              type="text"
-              id="username"
-              name="username"
-              value={formData.username}
-              onChange={handleChange}
-              className={`form-input ${errors.username ? 'border-red-500' : ''}`}
-              placeholder="Enter username"
-            />
-            {errors.username && <p className="form-error">{errors.username}</p>}
+    <>
+      <Navigation />
+      {showVerificationPopup && (
+        <div className="fixed inset-0 z-50 bg-black bg-opacity-40 flex items-center justify-center">
+          <div className="bg-white rounded-lg shadow-lg p-6 max-w-sm w-full text-center">
+            <h3 className="text-lg font-semibold text-green-700 mb-2">Email Verification Sent</h3>
+            <p className="text-gray-700">
+              Your email is not verified. A new verification link has been sent to your email address.
+            </p>
+            <button
+              className="mt-4 px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700"
+              onClick={() => {
+                setShowVerificationPopup(false);
+                navigate('/'); // Redirect after clicking OK
+              }}
+            >
+              OK
+            </button>
           </div>
         </div>
+      )}
+      <div
+        className="pt-24 min-h-screen w-full bg-cover bg-center bg-no-repeat flex justify-end items-center px-2 md:px-12"
+        style={{ backgroundImage: "url('/images/l1.png')" }}
+      >
+        <div className="w-full max-w-sm bg-white shadow-lg rounded-xl px-6 py-8 text-sm">
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div className="form-group">
-            <label htmlFor="password" className="form-label">Password</label>
-            <input
-              type="password"
-              id="password"
-              name="password"
-              value={formData.password}
-              onChange={handleChange}
-              className={`form-input ${errors.password ? 'border-red-500' : ''}`}
-              placeholder="Enter password"
-            />
-            {errors.password && <p className="form-error">{errors.password}</p>}
-          </div>
-
-          <div className="form-group">
-            <label htmlFor="password_confirm" className="form-label">Confirm Password</label>
-            <input
-              type="password"
-              id="password_confirm"
-              name="password_confirm"
-              value={formData.password_confirm}
-              onChange={handleChange}
-              className={`form-input ${errors.password_confirm ? 'border-red-500' : ''}`}
-              placeholder="Confirm password"
-            />
-            {errors.password_confirm && <p className="form-error">{errors.password_confirm}</p>}
-          </div>
-        </div>
-
-        <div className="form-group">
-          <label htmlFor="full_name" className="form-label">Full Name</label>
-          <input
-            type="text"
-            id="full_name"
-            name="full_name"
-            value={formData.full_name}
-            onChange={handleChange}
-            className={`form-input ${errors.full_name ? 'border-red-500' : ''}`}
-            placeholder="Enter your full name"
+          <img
+            src="/images/logo.jpg"
+            alt="Drone Simulator Logo"
+            className="w-40 mx-auto mb-3"
           />
-          {errors.full_name && <p className="form-error">{errors.full_name}</p>}
-        </div>
 
-        <div className="form-group">
-          <label htmlFor="country_code" className="form-label">Country</label>
-          <select
-            id="country_code"
-            name="country_code"
-            value={formData.country_code}
-            onChange={handleChange}
-            className="form-input"
-          >
-            {countries.map((country) => (
-              <option key={country.code} value={country.code}>
-                {country.name}
-              </option>
-            ))}
-          </select>
-        </div>
 
-        <div className="form-group">
-          <label htmlFor="phone_number" className="form-label">Phone Number</label>
-          <div className="flex">
-            <div className="flex items-center px-3 py-3 bg-gray-50 border border-r-0 border-gray-300 rounded-l-lg text-gray-700 font-medium">
-              {formData.phone_code}
+          <div className="text-center mb-3">
+            <h2 className="text-base font-semibold text-gray-900 mb-1">Create Account</h2>
+          </div>
+
+          {/* Form - Ultra Compact */}
+          <form onSubmit={handleSubmit} className="space-y-5">
+            {/* Row 1: Email & Username */}
+            <div className="grid grid-cols-2 gap-1.5">
+              <div>
+                <label className="block text-xs font-medium text-gray-700 mb-0.5">Email</label>
+                <input
+                  type="email"
+                  name="email"
+                  value={formData.email}
+                  onChange={handleChange}
+                  className={`w-full px-1.5 py-1 border rounded text-xs focus:ring-1 focus:ring-orange-500 focus:border-transparent ${errors.email ? 'border-red-500' : 'border-gray-300'}`}
+                  placeholder="email@domain.com"
+                />
+                {errors.email && <p className="text-red-500 text-xs mt-0.5">{errors.email}</p>}
+              </div>
+              <div>
+                <label className="block text-xs font-medium text-gray-700 mb-0.5">Full Name</label>
+                <input
+                  type="text"
+                  name="full_name"
+                  value={formData.full_name}
+                  onChange={handleChange}
+                  className={`w-full px-1.5 py-1 border rounded text-xs focus:ring-1 focus:ring-orange-500 focus:border-transparent ${errors.full_name ? 'border-red-500' : 'border-gray-300'}`}
+                  placeholder="Your name"
+                />
+                {errors.full_name && <p className="text-red-500 text-xs mt-0.5">{errors.full_name}</p>}
+              </div>
             </div>
-            <input
-              type="tel"
-              id="phone_number"
-              name="phone_number"
-              value={formData.phone_number}
-              onChange={handleChange}
-              className={`form-input rounded-l-none ${errors.phone_number ? 'border-red-500' : ''}`}
-              placeholder="Enter phone number"
-            />
+
+
+
+            {/* Row 2: Password & Confirm */}
+            <div className="grid grid-cols-2 gap-1.5">
+              <div>
+                <label className="block text-xs font-medium text-gray-700 mb-0.5">Password</label>
+                <input
+                  type="password"
+                  name="password"
+                  value={formData.password}
+                  onChange={handleChange}
+                  className={`w-full px-1.5 py-1 border rounded text-xs focus:ring-1 focus:ring-orange-500 focus:border-transparent ${errors.password ? 'border-red-500' : 'border-gray-300'}`}
+                  placeholder="••••••••"
+                />
+                {errors.password && <p className="text-red-500 text-xs mt-0.5">{errors.password}</p>}
+              </div>
+              <div>
+                <label className="block text-xs font-medium text-gray-700 mb-0.5">Confirm</label>
+                <input
+                  type="password"
+                  name="password_confirm"
+                  value={formData.password_confirm}
+                  onChange={handleChange}
+                  className={`w-full px-1.5 py-1 border rounded text-xs focus:ring-1 focus:ring-orange-500 focus:border-transparent ${errors.password_confirm ? 'border-red-500' : 'border-gray-300'}`}
+                  placeholder="••••••••"
+                />
+                {errors.password_confirm && <p className="text-red-500 text-xs mt-0.5">{errors.password_confirm}</p>}
+              </div>
+            </div>
+
+            {/* Row 3: Full Name & Country */}
+            <div className="grid grid-cols-2 gap-1.5">
+              {/* Country Field */}
+              <div>
+                <label className="block text-xs font-medium text-gray-700 mb-0.5">Country</label>
+                <select
+                  name="country_code"
+                  value={formData.country_code}
+                  onChange={handleChange}
+                  className="w-full px-1.5 py-1 border border-gray-300 rounded text-xs focus:ring-1 focus:ring-orange-500 focus:border-transparent"
+                >
+                  {countries.map((country) => (
+                    <option key={country.code} value={country.code}>
+                      {country.name}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              {/* Phone Number Field */}
+              <div>
+                <label className="block text-xs font-medium text-gray-700 mb-0.5 whitespace-nowrap">Phone Number</label>
+                <div className="flex">
+                  <div className="flex items-center px-1.5 py-1 bg-gray-50 border border-r-0 border-gray-300 rounded-l text-xs font-medium text-gray-700 min-w-[40px] justify-center">
+                    {formData.phone_code}
+                  </div>
+                  <input
+                    type="tel"
+                    name="phone_number"
+                    value={formData.phone_number}
+                    onChange={handleChange}
+                     className={`w-32 px-1.5 py-1 border rounded-r text-xs focus:ring-1 focus:ring-orange-500 focus:border-transparent ${errors.phone_number ? 'border-red-500' : 'border-gray-300'}`}
+                    placeholder="Phone number"
+                  />
+                </div>
+                {errors.phone_number && <p className="text-red-500 text-xs mt-0.5">{errors.phone_number}</p>}
+              </div>
+            </div>
+
+
+            {/* Row 4: Phone Number - Compact */}
+
+
+            {/* Row 5: City, State & Purpose in 3 columns */}
+            <div className="grid grid-cols-3 gap-1.5">
+              <div>
+                <label className="block text-xs font-medium text-gray-700 mb-0.5">City</label>
+                <input
+                  type="text"
+                  name="city"
+                  value={formData.city}
+                  onChange={handleChange}
+                  className={`w-full px-1.5 py-1 border rounded text-xs focus:ring-1 focus:ring-orange-500 focus:border-transparent ${errors.city ? 'border-red-500' : 'border-gray-300'}`}
+                  placeholder="City"
+                />
+                {errors.city && <p className="text-red-500 text-xs mt-0.5">{errors.city}</p>}
+              </div>
+              <div>
+                <label className="block text-xs font-medium text-gray-700 mb-0.5">State</label>
+                <input
+                  type="text"
+                  name="state_province"
+                  value={formData.state_province}
+                  onChange={handleChange}
+                  className={`w-full px-1.5 py-1 border rounded text-xs focus:ring-1 focus:ring-orange-500 focus:border-transparent ${errors.state_province ? 'border-red-500' : 'border-gray-300'}`}
+                  placeholder="State"
+                />
+                {errors.state_province && <p className="text-red-500 text-xs mt-0.5">{errors.state_province}</p>}
+              </div>
+              <div>
+                <label className="block text-xs font-medium text-gray-700 mb-0.5">Purpose</label>
+                <select
+                  name="purpose_of_use"
+                  value={formData.purpose_of_use}
+                  onChange={handleChange}
+                  className="w-full px-1.5 py-1 border border-gray-300 rounded text-xs focus:ring-1 focus:ring-orange-500 focus:border-transparent"
+                >
+                  <option value="personal">Personal</option>
+                  <option value="commercial">Commercial</option>
+                  <option value="educational">Educational</option>
+                  <option value="research">Research</option>
+                  <option value="other">Other</option>
+                </select>
+              </div>
+            </div>
+
+            {formData.purpose_of_use === 'other' && (
+              <div>
+                <label className="block text-xs font-medium text-gray-700 mb-0.5">Specify Purpose</label>
+                <input
+                  type="text"
+                  name="purpose_other"
+                  value={formData.purpose_other}
+                  onChange={handleChange}
+                  className={`w-full px-1.5 py-1 border rounded text-xs focus:ring-1 focus:ring-orange-500 focus:border-transparent ${errors.purpose_other ? 'border-red-500' : 'border-gray-300'}`}
+                  placeholder="Enter your specific purpose"
+                />
+                {errors.purpose_other && <p className="text-red-500 text-xs mt-0.5">{errors.purpose_other}</p>}
+              </div>
+            )}
+
+            {errors.submit && <p className="text-red-500 text-xs text-center">{errors.submit}</p>}
+
+            {/* Submit Button - Compact */}
+            <button
+              type="submit"
+              disabled={isLoading}
+              className="w-full bg-orange-500 hover:bg-orange-600 text-white font-medium py-1.5 px-4 rounded text-xs transition-colors disabled:opacity-50 disabled:cursor-not-allowed mt-2"
+            >
+              {isLoading ? (
+                <div className="flex items-center justify-center">
+                  <svg className="animate-spin -ml-1 mr-2 h-3 w-3 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                  </svg>
+                  Creating...
+                </div>
+              ) : (
+                'Create Account'
+              )}
+            </button>
+          </form>
+
+          <div className="mt-6 text-center">
+            <p className="text-gray-600">
+              Already have an account?{' '}
+              <Link
+                to="/auth/login"
+                className="text-orange-500 hover:text-orange-600 font-medium"
+              >
+                Sign in
+              </Link>
+            </p>
           </div>
-          {errors.phone_number && <p className="form-error">{errors.phone_number}</p>}
         </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div className="form-group">
-            <label htmlFor="city" className="form-label">City</label>
-            <input
-              type="text"
-              id="city"
-              name="city"
-              value={formData.city}
-              onChange={handleChange}
-              className={`form-input ${errors.city ? 'border-red-500' : ''}`}
-              placeholder="Enter city"
-            />
-            {errors.city && <p className="form-error">{errors.city}</p>}
-          </div>
-
-          <div className="form-group">
-            <label htmlFor="state_province" className="form-label">State/Province</label>
-            <input
-              type="text"
-              id="state_province"
-              name="state_province"
-              value={formData.state_province}
-              onChange={handleChange}
-              className={`form-input ${errors.state_province ? 'border-red-500' : ''}`}
-              placeholder="Enter state/province"
-            />
-            {errors.state_province && <p className="form-error">{errors.state_province}</p>}
-          </div>
-        </div>
-
-        <div className="form-group">
-          <label htmlFor="purpose_of_use" className="form-label">Purpose of Use</label>
-          <select
-            id="purpose_of_use"
-            name="purpose_of_use"
-            value={formData.purpose_of_use}
-            onChange={handleChange}
-            className="form-input"
-          >
-            <option value="personal">Personal</option>
-            <option value="commercial">Commercial</option>
-            <option value="educational">Educational</option>
-            <option value="research">Research</option>
-            <option value="other">Other</option>
-          </select>
-        </div>
-
-        {formData.purpose_of_use === 'other' && (
-          <div className="form-group">
-            <label htmlFor="purpose_other" className="form-label">Please specify your purpose</label>
-            <input
-              type="text"
-              id="purpose_other"
-              name="purpose_other"
-              value={formData.purpose_other}
-              onChange={handleChange}
-              className={`form-input ${errors.purpose_other ? 'border-red-500' : ''}`}
-              placeholder="Enter your specific purpose"
-            />
-            {errors.purpose_other && <p className="form-error">{errors.purpose_other}</p>}
-          </div>
-        )}
-
-        {errors.submit && <p className="form-error text-center">{errors.submit}</p>}
-
-        <button
-          type="submit"
-          disabled={isLoading}
-          className="btn-primary"
-        >
-          {isLoading ? 'Creating Account...' : 'Create Account'}
-        </button>
-      </form>
-
-      <div className="mt-6 text-center">
-        <p className="text-gray-600">
-          Already have an account?{' '}
-          <Link
-            to="/auth/login"
-            className="text-orange-500 hover:text-orange-600 font-medium"
-          >
-            Sign in
-          </Link>
-        </p>
       </div>
-    </div>
     </>
   );
 }
