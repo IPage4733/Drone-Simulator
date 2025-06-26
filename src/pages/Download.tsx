@@ -25,7 +25,7 @@ const Download = () => {
   const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast();
 const handleDownload = () => {
-  // First file (EXE)
+  // 1. Download EXE
   const exeLink = document.createElement('a');
   exeLink.href = "https://storage.cloud.google.com/ipagedronesimulator/IPAGE%20Drone%20Simulator%20Beta%20v1.0.exe?authuser=8";
   exeLink.download = "IPAGE_Drone_Simulator.exe";
@@ -33,16 +33,27 @@ const handleDownload = () => {
   exeLink.click();
   document.body.removeChild(exeLink);
 
-  // Wait 2 seconds, then download the second file (APK)
+  // 2. Download APK after 2 seconds
   setTimeout(() => {
     const apkLink = document.createElement('a');
     apkLink.href = "https://storage.cloud.google.com/ipagedronesimulator/IPAGE%20DroneMobileController%20Beta%20v1.apk?authuser=8";
-    apkLink.download = "IPAGE_DroneMobileController.apk";
+    apkLink.download = "Dronesimulator_DroneMobileController.apk";
     document.body.appendChild(apkLink);
     apkLink.click();
     document.body.removeChild(apkLink);
   }, 2000);
+
+  // 3. Download additional file from Google Drive after 4 seconds
+  setTimeout(() => {
+    const driveLink = document.createElement('a');
+    driveLink.href = "https://drive.google.com/uc?export=download&id=1VfPOgz_cG_4sr0_8z9_T97Pml3Twytz-";
+    driveLink.download = "Simulator_tutorial.pdf"; // Optional: set name for the downloaded file
+    document.body.appendChild(driveLink);
+    driveLink.click();
+    document.body.removeChild(driveLink);
+  }, 4000);
 };
+
 
   const handleInputChange = (field: string, value: string | boolean) => {
     setFormData(prev => ({
