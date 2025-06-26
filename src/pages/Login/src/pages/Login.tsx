@@ -110,11 +110,13 @@ const Login: React.FC = () => {
 
 
         <div className="bg-white rounded-lg shadow-md px-4 py-5 w-full max-w-xs text-xs">
-          <img
-            src="/images/1.png"
-            alt="Drone Simulator Logo"
-            className="w-40 mx-auto mb-2"
-          />
+
+
+<img
+  src="/images/logonew.png"
+  alt="Drone Simulator Logo"
+  className="w-64 mx-auto mb-3"
+/>
 
 
 

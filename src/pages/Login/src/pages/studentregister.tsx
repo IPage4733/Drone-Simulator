@@ -137,7 +137,7 @@ const countries = [
   { code: 'MH', name: 'Marshall Islands', phone: '+692' }
 ].sort((a, b) => a.name.localeCompare(b.name))
 
-const Register: React.FC = () => {
+const Studentregister: React.FC = () => {
   const [formData, setFormData] = useState({
     email: '',
     password: '',
@@ -184,11 +184,13 @@ const Register: React.FC = () => {
   const validateForm = () => {
     const newErrors: { [key: string]: string } = {}
 
-    if (!formData.email) {
-      newErrors.email = 'Email is required'
-    } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
-      newErrors.email = 'Email is invalid'
-    }
+if (!formData.email) {
+  newErrors.email = 'Email is required'
+} else if (!/\S+@\S+\.\S+/.test(formData.email)) {
+  newErrors.email = 'Email is invalid'
+} else if (!/^[\w.-]+@[\w.-]+\.(edu|ac)(\.[a-z]{2,})?$/.test(formData.email)) {
+  newErrors.email = 'Use a valid institutional email (.edu or .ac)'
+}
 
 
 
@@ -319,7 +321,7 @@ const Register: React.FC = () => {
 
 
           <div className="text-center mb-3">
-            <h2 className="text-base font-semibold text-gray-900 mb-1">Create Account</h2>
+            <h2 className="text-base font-semibold text-gray-900 mb-1">Student Registration</h2>
           </div>
 
           {/* Form - Ultra Compact */}
@@ -487,23 +489,22 @@ const Register: React.FC = () => {
 
             {/* Submit Button - Compact */}
             <button
-  type="submit"
-  disabled={isLoading}
-  className="w-40 mx-auto block bg-orange-500 hover:bg-orange-600 text-white font-medium py-[6px] px-3 rounded text-[11px] transition-colors disabled:opacity-50 disabled:cursor-not-allowed mt-2"
->
-  {isLoading ? (
-    <div className="flex items-center justify-center">
-      <svg className="animate-spin -ml-1 mr-2 h-3 w-3 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-      </svg>
-      Creating...
-    </div>
-  ) : (
-    'Create Account'
-  )}
-</button>
-
+              type="submit"
+              disabled={isLoading}
+              className="w-full bg-orange-500 hover:bg-orange-600 text-white font-medium py-1.5 px-4 rounded text-xs transition-colors disabled:opacity-50 disabled:cursor-not-allowed mt-2"
+            >
+              {isLoading ? (
+                <div className="flex items-center justify-center">
+                  <svg className="animate-spin -ml-1 mr-2 h-3 w-3 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                  </svg>
+                  Creating...
+                </div>
+              ) : (
+                'Create Account'
+              )}
+            </button>
           </form>
 
           <div className="mt-6 text-center">
@@ -523,4 +524,4 @@ const Register: React.FC = () => {
   );
 }
 
-export default Register
+export default Studentregister

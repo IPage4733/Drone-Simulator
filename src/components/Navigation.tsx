@@ -56,7 +56,7 @@ const handleLogout = async () => {
         <div className="flex justify-between items-center h-20 md:h-24 py-2">
           {/* Logo */}
           <Link to="/" className="flex items-center space-x-4">
-            <img src="/images/logo.jpg" alt="Logo" className="w-[190px] h-auto object-contain" />
+            <img src="/images/logonew.png" alt="Logo" className="w-[190px] h-auto object-contain" />
           </Link>
 
           {/* Desktop Navigation */}
