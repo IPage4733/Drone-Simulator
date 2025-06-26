@@ -21,6 +21,7 @@ import PrivacyPolicy from "./pages/Admindashboard/src/pages/PrivacyPolicy";
 import TermsAndConditions from "./pages/Admindashboard/src/pages/termsandcondi";
 import CookiePolicy from "./pages/Admindashboard/src/pages/cookiepolicy";
 import RefundPolicy from "./pages/Admindashboard/src/pages/refundpolicy";
+import GeneralPolicy from "./pages/Admindashboard/src/pages/generalpolicy";
 const queryClient = new QueryClient();
 
 
@@ -47,6 +48,7 @@ const App = () => (
           <Route path="/terms" element={<TermsAndConditions />} />
            <Route path="/cookie" element={<CookiePolicy />} />
            <Route path="/refund" element={< RefundPolicy/>} />
+            <Route path="/general" element={<GeneralPolicy/>} />
         </Routes>
         </CartProvider>
       </BrowserRouter>
