@@ -192,7 +192,7 @@ const PlanCard: React.FC<PlanCardProps> = ({ plan }) => {
                       Login
                     </button>
                     <button
-                      onClick={() => (window.location.href = '/auth/register')}
+                      onClick={() => (window.location.href = '/auth/studentregister')}
                       className="w-full bg-white bg-opacity-30 hover:bg-opacity-50 text-white font-semibold py-2 rounded-md text-sm border border-white border-opacity-20"
                     >
                       Sign Up
