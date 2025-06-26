@@ -170,7 +170,7 @@ const PlanCard: React.FC<PlanCardProps> = ({ plan }) => {
               <p className="text-sm text-white text-opacity-80 mb-4">
                 {modalMode === 'login'
                   ? plan.id === 'Student'
-                    ? 'Login using your .edu or institute email.'
+                    ? 'Enter your educational email to verify and unlock discounts. Accepted domains: .edu, .ac.in'
                     : 'Login to unlock advanced drone simulation, analytics, and training modules.'
                   : 'Enter your educational email to verify and unlock discounts. Accepted domains: .edu, .ac.in, .university'}
               </p>
@@ -184,10 +184,9 @@ const PlanCard: React.FC<PlanCardProps> = ({ plan }) => {
                     Login
                   </button>
                   <button
-                    onClick={() => (window.location.href = '/auth/register')}
+                    onClick={() => (window.location.href = '/auth/studentregister')}
                     className="w-full bg-white bg-opacity-30 hover:bg-opacity-50 text-white font-semibold py-2 rounded-md text-sm transition-colors duration-200 border border-white border-opacity-20"
-                  >
-                    Sign Up
+                  >Register as student
                   </button>
                 </div>
               ) : (

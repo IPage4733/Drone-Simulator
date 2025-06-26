@@ -69,9 +69,10 @@ const Footer = () => {
             © 2024 DroneSimulator. All rights reserved.
           </p>
           <div className="flex space-x-6 mt-4 md:mt-0">
-            <Link to="#" className="text-gray-400 hover:text-white text-sm transition-colors">Privacy Policy</Link>
-            <Link to="#" className="text-gray-400 hover:text-white text-sm transition-colors">Terms of Service</Link>
-            <Link to="#" className="text-gray-400 hover:text-white text-sm transition-colors">Cookie Policy</Link>
+             <Link to="/privacy-policy" className="text-gray-400 hover:text-white text-sm transition-colors">Privacy Policy</ Link>
+            <Link to="/terms" className="text-gray-400 hover:text-white text-sm transition-colors">Terms of Service</Link>
+            <Link to="/cookie" className="text-gray-400 hover:text-white text-sm transition-colors">Cookie Policy</Link>
+             <Link to="/refund" className="text-gray-400 hover:text-white text-sm transition-colors">Refund  Policy</Link>
           </div>
         </div>
       </div>

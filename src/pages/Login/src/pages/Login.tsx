@@ -110,11 +110,12 @@ const Login: React.FC = () => {
 
 
         <div className="bg-white rounded-lg shadow-md px-4 py-5 w-full max-w-xs text-xs">
-<img
-  src="/images/1.png"
-  alt="Drone Simulator Logo"
-  className="w-64 mx-auto mb-3"
-/>
+          <img
+            src="/images/1.png"
+            alt="Drone Simulator Logo"
+            className="w-40 mx-auto mb-2"
+          />
+
 
 
           <div className="text-center mb-3">
@@ -153,17 +154,18 @@ const Login: React.FC = () => {
 
             {errors.submit && <p className="text-red-500 text-center mt-1">{errors.submit}</p>}
 
-            <button
-              type="submit"
-              disabled={isLoading}
-              className="btn-primary w-full text-[13px] py-1 mt-1"
-            >
-              {isLoading ? 'Signing in...' : 'Sign In'}
-            </button>
+           <button
+  type="submit"
+  disabled={isLoading}
+  className="btn-primary w-40 text-[11px] py-[6px] mt-1 mx-auto block"
+>
+  {isLoading ? 'Signing in...' : 'Sign In'}
+</button>
+
           </form>
 
-          <div className="mt-4 text-center">
-            <p className="text-[11px] text-gray-400 mb-1">or</p>
+          <div className="mt-2 text-center">
+            <p className="text-[10px] text-gray-400 mb-0">or</p>
             <div className="flex justify-center">
               <GoogleLogin
                 onSuccess={handleGoogleLoginSuccess}
@@ -176,6 +178,13 @@ const Login: React.FC = () => {
             <Link to="/auth/forgot-password" className="text-orange-500 hover:text-orange-600 font-medium">
               Forgot password?
             </Link>
+           <button
+  type="button"
+  onClick={() => navigate('/auth/studentregister')}
+  className="btn-primary w-40 text-[11px] py-[6px] mt-2 mx-auto block"
+>
+  Register as Student
+</button>
 
             <div className="pt-3 border-t border-gray-200 mt-3">
               <p className="text-gray-600">
@@ -185,7 +194,11 @@ const Login: React.FC = () => {
                 </Link>
               </p>
             </div>
+
+            {/* Login as Student button */}
+
           </div>
+
         </div>
       </div>
     </>
