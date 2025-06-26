@@ -35,7 +35,14 @@ const PlanCard: React.FC<PlanCardProps> = ({ plan }) => {
     setError('Verification link has been sent to your email.');
   };
 
+  
+
   const handleAddToCart = () => {
+
+        if (plan.id === 'institution') {
+      window.location.href = '/salesform';
+      return;
+    }
     const userEmail = sessionStorage.getItem('auth_email');
 
     if (!userEmail) {
@@ -53,10 +60,6 @@ const PlanCard: React.FC<PlanCardProps> = ({ plan }) => {
       }
     }
 
-    if (plan.id === 'institution') {
-      window.location.href = '/salesform';
-      return;
-    }
 
     if (plan.id === 'free') {
       window.location.href = '/auth/register';
