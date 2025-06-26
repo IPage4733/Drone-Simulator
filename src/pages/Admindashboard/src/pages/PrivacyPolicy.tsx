@@ -103,7 +103,7 @@ const sections = [
     title: '7. Child Privacy Policy',
     content: (
       <p>
-        IPage Drone Simulator is not intended for users under 13 years of age. If data is collected unknowingly, it will be deleted upon discovery unless parental consent is provided.
+        IPage Drone Simulator is not intended for users under 12 years of age. If data is collected unknowingly, it will be deleted upon discovery unless parental consent is provided.
       </p>
     ),
   },
