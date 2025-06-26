@@ -62,7 +62,7 @@ const PrivacyPolicy: React.FC = () => {
 
           <section>
             <h2 className="text-xl font-semibold mb-3">7. Contact Us</h2>
-            <p>For questions regarding this policy, contact us at <a href="mailto:support@yourdomain.com" className="text-orange-500 underline">support@yourdomain.com</a>.</p>
+            <p>For questions regarding this policy, contact us at <a href="mailto:bd@dronesimulator.pro" className="text-orange-500 underline">support@yourdomain.com</a>.</p>
           </section>
         </div>
       </div>
