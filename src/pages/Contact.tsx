@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Navigation from "@/components/Navigation";
 import Footer from "@/components/Footer";
 import { Card, CardContent } from "@/components/ui/card";
@@ -7,7 +7,8 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
-import { useEffect } from "react";
+import { useRef } from "react";
+import emailjs from "@emailjs/browser";
 
 const Contact = () => {
   const [formData, setFormData] = useState({
@@ -17,6 +18,7 @@ const Contact = () => {
   });
   const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast();
+  const formRef = useRef<HTMLFormElement>(null);
 
   const handleInputChange = (field: string, value: string) => {
     setFormData(prev => ({
@@ -24,80 +26,121 @@ const Contact = () => {
       [field]: value
     }));
   };
-  useEffect(() => { 
-  window.scrollTo(0, 0);
-}, []);
+
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
 
-    setTimeout(() => {
-      console.log("Contact form submitted:", formData);
+    // Ensure form reference exists
+    if (!formRef.current) return;
+
+    try {
+      const form = formRef.current;
+      const formData = {
+        name: form.name.valueOf,
+        email: form.email.value,
+        message: form.message.value
+      };
+
+      // Send email to admin
+      await emailjs.send(
+        'service_22r9k6a',
+         'template_51gf2uv',
+        // Replace with your EmailJS template ID
+        {
+          name: formData.name,
+          email: formData.email,
+          message: formData.message
+        },
+        'A7Y07i5iVNiyMDhd-' // Replace with your EmailJS user ID
+      );
+
+      // Send thank-you to user (optional)
+      await emailjs.send(
+        'service_22r9k6a', // Same as above
+       'template_zpox92u',
+        {
+          to_name: formData.name,
+          to_email: formData.email
+        },
+        'A7Y07i5iVNiyMDhd-' // Same user ID
+      );
+
       toast({
         title: "Message Sent!",
         description: "Thank you for contacting us. We'll respond within 24 hours.",
       });
+
+      // Reset form data after successful submission
       setFormData({ name: "", email: "", message: "" });
+    } catch (error) {
+      console.error("EmailJS error:", error);
+      toast({
+        title: "Error",
+        description: "There was an issue sending your message. Please try again later.",
+        variant: "destructive",
+      });
+    } finally {
       setIsLoading(false);
-    }, 1500);
+    }
   };
 
   return (
     <div className="min-h-screen flex flex-col justify-between bg-white font-poppins">
       <Navigation />
-
       <main className="flex-grow flex items-center justify-center px-4 pt-32 pb-16">
-  <Card className="w-full max-w-xl shadow-xl border border-gray-200 animate-fade-in">
-    <CardContent className="p-8">
-      <h2 className="text-3xl font-bold text-gray-900 mb-6 text-center">Contact Us</h2>
-      <form onSubmit={handleSubmit} className="space-y-6">
-        <div>
-          <Label htmlFor="name">Your Name *</Label>
-          <Input
-            id="name"
-            type="text"
-            required
-            value={formData.name}
-            onChange={(e) => handleInputChange("name", e.target.value)}
-            placeholder="Enter your full name"
-          />
-        </div>
-        <div>
-          <Label htmlFor="email">Email Address *</Label>
-          <Input
-            id="email"
-            type="email"
-            required
-            value={formData.email}
-            onChange={(e) => handleInputChange("email", e.target.value)}
-            placeholder="your.email@example.com"
-          />
-        </div>
-        <div>
-          <Label htmlFor="message">Message *</Label>
-          <Textarea
-            id="message"
-            required
-            value={formData.message}
-            onChange={(e) => handleInputChange("message", e.target.value)}
-            placeholder="Tell us how we can help you..."
-            className="min-h-[120px]"
-          />
-        </div>
-        <Button
-          type="submit"
-          className="w-full bg-primary hover:bg-primary/90 text-white py-6 text-lg"
-          disabled={isLoading}
-        >
-          {isLoading ? "Sending..." : "Send Message"}
-        </Button>
-      </form>
-    </CardContent>
-  </Card>
-</main>
-
-
+        <Card className="w-full max-w-xl shadow-xl border border-gray-200 animate-fade-in">
+          <CardContent className="p-8">
+            <h2 className="text-3xl font-bold text-gray-900 mb-6 text-center">Contact Us</h2>
+            <form ref={formRef} onSubmit={handleSubmit} className="space-y-6">
+              <div>
+                <Label htmlFor="name">Your Name *</Label>
+                <Input
+                  id="name"
+                  type="text"
+                  required
+                  value={formData.name}
+                  onChange={(e) => handleInputChange("name", e.target.value)}
+                  placeholder="Enter your full name"
+                />
+              </div>
+              <div>
+                <Label htmlFor="email">Email Address *</Label>
+                <Input
+                  id="email"
+                  type="email"
+                  required
+                  value={formData.email}
+                  onChange={(e) => handleInputChange("email", e.target.value)}
+                  placeholder="your.email@example.com"
+                />
+              </div>
+              <div>
+                <Label htmlFor="message">Message *</Label>
+                <Textarea
+                  id="message"
+                  required
+                  value={formData.message}
+                  onChange={(e) => handleInputChange("message", e.target.value)}
+                  placeholder="Tell us how we can help you..."
+                  className="min-h-[120px]"
+                />
+              </div>
+              <Button
+                type="submit"
+                className="w-full bg-primary hover:bg-primary/90 text-white py-6 text-lg"
+                disabled={isLoading}
+              >
+                {isLoading ? "Sending..." : "Send Message"}
+              </Button>
+            </form>
+          </CardContent>
+        </Card>
+      </main>
       <Footer />
     </div>
   );
