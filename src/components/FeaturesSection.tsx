@@ -1,7 +1,9 @@
 
 import { Card, CardContent } from "@/components/ui/card";
+import { useNavigate } from "react-router-dom";
 
 const FeaturesSection = () => {
+    const navigate = useNavigate();
   const features = [
     {
       title: "Realistic Flight Physics",
@@ -99,9 +101,13 @@ const FeaturesSection = () => {
             <p className="text-xl mb-8 opacity-90">
               Join thousands of pilots who have mastered drone flying with our simulator.
             </p>
-            <button className="bg-white text-primary hover:bg-gray-100 font-semibold px-8 py-4 rounded-lg text-lg transition-colors duration-300">
-              Start Your Journey
-            </button>
+                <button
+      onClick={() => navigate("/download")}
+      className="bg-white text-primary hover:bg-gray-100 font-semibold px-8 py-4 rounded-lg text-lg transition-colors duration-300"
+    >
+      Start Your Journey
+    </button>
+
           </div>
         </div>
       </div>
