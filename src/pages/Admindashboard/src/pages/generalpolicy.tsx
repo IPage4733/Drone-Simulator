@@ -96,14 +96,13 @@ const sections = [
        
         <h3 className="font-semibold">1. Purpose</h3>
         <p>To clarify that the simulator is not a replacement for official drone certification.</p>
-        <h3 className="font-semibold mt-4">2. Certification Disclaimer</h3>
-        <p>The simulator alone does not constitute official training or licensing unless used with DGCA-certified RPTOs.</p>
-        <h3 className="font-semibold mt-4">3. Liability Limitations</h3>
+        
+        <h3 className="font-semibold mt-4">2. Liability Limitations</h3>
         <ul className="list-disc list-inside">
           <li>No employment or licensing guarantees</li>
           <li>Users must validate any third-party requirements</li>
         </ul>
-        <h3 className="font-semibold mt-4">4. Guidance</h3>
+        <h3 className="font-semibold mt-4">3. Guidance</h3>
         <p>Users are encouraged to consult relevant authorities for official licensing and training.</p>
       </>
     )
@@ -139,7 +138,7 @@ const sections = [
         <p>Monday to Friday: 10:00 AM – 6:00 PM IST<br/>Closed on weekends and public holidays</p>
         <h3 className="font-semibold mt-4">3. Response Timelines</h3>
         <ul className="list-disc list-inside">
-          <li>Initial response within 24–48 business hours</li>
+          <li>We strive to respond as quickly as possible. In most cases, you will hear from us promptly.</li>
           <li>Urgent cases prioritized for early resolution</li>
         </ul>
         <h3 className="font-semibold mt-4">4. Scope of Support</h3>
