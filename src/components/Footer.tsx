@@ -8,13 +8,13 @@ const Footer = () => {
         <div className="grid md:grid-cols-4 gap-8">
           {/* Logo and Description */}
           <div className="md:col-span-2">
-<img
-    src="/images/logo.jpg"
-    alt="DroneSimulator Logo"
-     className="w-[200px] h-auto object-contain"
-  />
+            <img
+              src="/images/logo.jpg"
+              alt="DroneSimulator Logo"
+              className="w-[200px] h-auto object-contain"
+            />
             <p className="text-gray-400 mb-6 max-w-md">
-              The most comprehensive drone flight simulator for learning, practicing, 
+              The most comprehensive drone flight simulator for learning, practicing,
               and mastering drone piloting skills safely from your device.
             </p>
             <div className="flex space-x-4">
@@ -58,8 +58,8 @@ const Footer = () => {
                 Timber Lake Colony, Shaikpet,<br />
                 Hyderabad - 500008 India<br />
                 Phone: +91 880 434 9999</p>
-                <p>EMail: bd@dronesimulator.pro</p>
-                          </div>
+              <p>EMail: bd@dronesimulator.pro</p>
+            </div>
           </div>
         </div>
 
@@ -69,11 +69,12 @@ const Footer = () => {
             © 2024 DroneSimulator. All rights reserved.
           </p>
           <div className="flex space-x-6 mt-4 md:mt-0">
-             <Link to="/privacy-policy" className="text-gray-400 hover:text-white text-sm transition-colors">Privacy Policy</ Link>
+            <Link to="/privacy-policy" className="text-gray-400 hover:text-white text-sm transition-colors">Privacy Policy</ Link>
             <Link to="/terms" className="text-gray-400 hover:text-white text-sm transition-colors">Terms of Service</Link>
             <Link to="/cookie" className="text-gray-400 hover:text-white text-sm transition-colors">Cookie Policy</Link>
-             <Link to="/refund" className="text-gray-400 hover:text-white text-sm transition-colors">Refund  Policy</Link>
-             <Link to="/general" className="text-gray-400 hover:text-white text-sm transition-colors">General  Policy</Link>
+            <Link to="/refund" className="text-gray-400 hover:text-white text-sm transition-colors">Refund  Policy</Link>
+            <Link to="/general" className="text-gray-400 hover:text-white text-sm transition-colors">General  Policy</Link>
+           <Link to="/?open=help" className="text-sm text-gray-400 hover:text-white">Help</Link>
           </div>
         </div>
       </div>

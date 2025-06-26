@@ -1,4 +1,3 @@
-
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -10,21 +9,19 @@ import Tutorials from "./pages/Tutorials";
 import Download from "./pages/Download";
 import Contact from "./pages/Contact";
 import NotFound from "./pages/NotFound";
-import ProductApp from "../src/pages/products/src/ProductApp"; // ✅ New import
-import { CartProvider } from "../src/pages/products/src/context/CartContext"; // ✅ Add this
+import ProductApp from "./pages/products/src/ProductApp";
+import { CartProvider } from "./pages/products/src/context/CartContext";
 import AdminDash from "./pages/Admindashboard/src/AdminDash";
 import AppAuth from "./pages/Login/src/App";
-import { ToastContainer } from "react-toastify";
-import 'react-toastify/dist/ReactToastify.css';
 import UniversalContactForm from "./pages/UniversalContactForm";
 import PrivacyPolicy from "./pages/Admindashboard/src/pages/PrivacyPolicy";
 import TermsAndConditions from "./pages/Admindashboard/src/pages/termsandcondi";
 import CookiePolicy from "./pages/Admindashboard/src/pages/cookiepolicy";
 import RefundPolicy from "./pages/Admindashboard/src/pages/refundpolicy";
 import GeneralPolicy from "./pages/Admindashboard/src/pages/generalpolicy";
+import HelpPage from "./pages/Admindashboard/src/pages/help"; // Always mounted
+
 const queryClient = new QueryClient();
-
-
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
@@ -32,24 +29,25 @@ const App = () => (
       <Toaster />
       <Sonner />
       <BrowserRouter>
-      <CartProvider>
-        <Routes>
-          <Route path="/" element={<Index />} />
-          <Route path="/features" element={<Features />} />
-          <Route path="/tutorials" element={<Tutorials />} />
-          <Route path="/download" element={<Download />} />
-          <Route path="/contact" element={<Contact />} />
-          <Route path="*" element={<NotFound />} />
-          <Route path="/product/*" element={<ProductApp />} />
-          <Route path="/Dash/*" element={<AdminDash />} />
-          <Route path="/auth/*" element={<AppAuth />} />
-          <Route path="/salesform" element={<UniversalContactForm />} />
-          <Route path="/privacy-policy" element={<PrivacyPolicy />} />
-          <Route path="/terms" element={<TermsAndConditions />} />
-           <Route path="/cookie" element={<CookiePolicy />} />
-           <Route path="/refund" element={< RefundPolicy/>} />
-            <Route path="/general" element={<GeneralPolicy/>} />
-        </Routes>
+        <CartProvider>
+          <Routes>
+            <Route path="/" element={<Index />} />
+            <Route path="/features" element={<Features />} />
+            <Route path="/tutorials" element={<Tutorials />} />
+            <Route path="/download" element={<Download />} />
+            <Route path="/contact" element={<Contact />} />
+            <Route path="/product/*" element={<ProductApp />} />
+            <Route path="/Dash/*" element={<AdminDash />} />
+            <Route path="/auth/*" element={<AppAuth />} />
+            <Route path="/salesform" element={<UniversalContactForm />} />
+            <Route path="/privacy-policy" element={<PrivacyPolicy />} />
+            <Route path="/terms" element={<TermsAndConditions />} />
+            <Route path="/cookie" element={<CookiePolicy />} />
+            <Route path="/refund" element={<RefundPolicy />} />
+            <Route path="/general" element={<GeneralPolicy />} />
+            <Route path="*" element={<NotFound />} />
+          </Routes>
+          <HelpPage /> {/* ✅ Always mounted drawer */}
         </CartProvider>
       </BrowserRouter>
     </TooltipProvider>
