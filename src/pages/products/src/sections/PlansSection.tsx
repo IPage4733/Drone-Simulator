@@ -10,9 +10,9 @@ const PlansSection: React.FC = () => {
           <h2 className="text-3xl md:text-4xl font-bold mb-4">
             Choose Your <span className="text-orange-500">Plan</span>
           </h2>
-          <p className="text-gray-600 max-w-2xl mx-auto">
-            Select the perfect plan for your drone simulation needs, whether you're an individual learner or an institution training multiple pilots.
-          </p>
+          <b><p className="text-l font-bold  max-w-2xl mx-auto">
+            Select the perfect plan for your drone simulation needs, whether you're an student, individual learner or an institution training multiple pilots.
+          </p></b>
         </div>
         
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 max-w-7xl mx-auto">
