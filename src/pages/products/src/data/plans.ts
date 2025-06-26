@@ -32,7 +32,7 @@ const plans: Plan[] = [
     buttonText: 'Add to Cart',
     buttonVariant: 'primary',
     mostPopular: true,
-    stripe_price_id: 'price_1RcJttCKYG7gRDVPBkHPkocp'
+    stripe_price_id: 'price_1ReFCPCKYG7gRDVPCr3307yG'
   },
   {
     id: 'pro',
@@ -48,7 +48,7 @@ const plans: Plan[] = [
     buttonText: 'Add to Cart',
     buttonVariant: 'primary',
     mostPopular: true,
-    stripe_price_id: 'price_1RcJttCKYG7gRDVPBkHPkocp'
+    stripe_price_id: 'price_1ReFBMCKYG7gRDVPSE55nhzo'
   },
   {
     id: 'institution',
