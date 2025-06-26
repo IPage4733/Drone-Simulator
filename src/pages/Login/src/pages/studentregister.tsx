@@ -184,13 +184,13 @@ const Studentregister: React.FC = () => {
   const validateForm = () => {
     const newErrors: { [key: string]: string } = {}
 
-if (!formData.email) {
-  newErrors.email = 'Email is required'
-} else if (!/\S+@\S+\.\S+/.test(formData.email)) {
-  newErrors.email = 'Email is invalid'
-} else if (!/^[\w.-]+@[\w.-]+\.(edu|ac)(\.[a-z]{2,})?$/.test(formData.email)) {
-  newErrors.email = 'Use a valid institutional email (.edu or .ac)'
-}
+    if (!formData.email) {
+      newErrors.email = 'Email is required'
+    } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
+      newErrors.email = 'Email is invalid'
+    } else if (!/^[\w.-]+@[\w.-]+\.(edu|ac)(\.[a-z]{2,})?$/.test(formData.email)) {
+      newErrors.email = 'Use a valid institutional email (.edu or .ac)'
+    }
 
 
 
@@ -313,33 +313,29 @@ if (!formData.email) {
       >
         <div className="w-full max-w-sm bg-white shadow-lg rounded-xl px-6 py-8 text-sm">
 
-          <img
-            src="/images/logonew.png"
-            alt="Drone Simulator Logo"
-            className="w-40 mx-auto mb-3"
-          />
+          <div className="flex items-start gap-4 mb-8">
+            <img
+              src="/images/logosquare.png"
+              alt="Drone Simulator Logo"
+              className="w-14 h-14 mt-1"
+            />
 
-
-          <div className="text-center mb-3">
-            <h2 className="text-base font-semibold text-gray-900 mb-1">Student Registration</h2>
+            <div>
+              <h2 className="text-lg font-semibold text-gray-900">
+                Student Registration
+              </h2>
+              <p className="text-xs text-gray-600">
+                Only emails from educational domains such as <strong>.edu</strong> or <strong>.ac</strong> are allowed.
+              </p>
+            </div>
           </div>
+
+
 
           {/* Form - Ultra Compact */}
           <form onSubmit={handleSubmit} className="space-y-5">
             {/* Row 1: Email & Username */}
             <div className="grid grid-cols-2 gap-1.5">
-              <div>
-                <label className="block text-xs font-medium text-gray-700 mb-0.5">Email</label>
-                <input
-                  type="email"
-                  name="email"
-                  value={formData.email}
-                  onChange={handleChange}
-                  className={`w-full px-1.5 py-1 border rounded text-xs focus:ring-1 focus:ring-orange-500 focus:border-transparent ${errors.email ? 'border-red-500' : 'border-gray-300'}`}
-                  placeholder="email@domain.com"
-                />
-                {errors.email && <p className="text-red-500 text-xs mt-0.5">{errors.email}</p>}
-              </div>
               <div>
                 <label className="block text-xs font-medium text-gray-700 mb-0.5">Full Name</label>
                 <input
@@ -351,6 +347,18 @@ if (!formData.email) {
                   placeholder="Your name"
                 />
                 {errors.full_name && <p className="text-red-500 text-xs mt-0.5">{errors.full_name}</p>}
+              </div>
+              <div>
+                <label className="block text-xs font-medium text-gray-700 mb-0.5">Email</label>
+                <input
+                  type="email"
+                  name="email"
+                  value={formData.email}
+                  onChange={handleChange}
+                  className={`w-full px-1.5 py-1 border rounded text-xs focus:ring-1 focus:ring-orange-500 focus:border-transparent ${errors.email ? 'border-red-500' : 'border-gray-300'}`}
+                  placeholder="use only .edu/.ac domains"
+                />
+                {errors.email && <p className="text-red-500 text-xs mt-0.5">{errors.email}</p>}
               </div>
             </div>
 
@@ -415,7 +423,7 @@ if (!formData.email) {
                     name="phone_number"
                     value={formData.phone_number}
                     onChange={handleChange}
-                     className={`w-32 px-1.5 py-1 border rounded-r text-xs focus:ring-1 focus:ring-orange-500 focus:border-transparent ${errors.phone_number ? 'border-red-500' : 'border-gray-300'}`}
+                    className={`w-32 px-1.5 py-1 border rounded-r text-xs focus:ring-1 focus:ring-orange-500 focus:border-transparent ${errors.phone_number ? 'border-red-500' : 'border-gray-300'}`}
                     placeholder="Phone number"
                   />
                 </div>

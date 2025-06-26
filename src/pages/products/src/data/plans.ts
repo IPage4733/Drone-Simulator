@@ -24,10 +24,10 @@ const plans: Plan[] = [
     price: 9.99,
     billing: 'USD per year',
     features: [
-      'Access to ALL drones',
-      'ALL scenarios included',
+      'ALL scenarios and drones are included',
       'Free, Drawing & Automation modes',
       'Digital Certificate',
+      'Only .edu or .ac emails are allowed.',
     ],
     buttonText: 'Add to Cart',
     buttonVariant: 'primary',

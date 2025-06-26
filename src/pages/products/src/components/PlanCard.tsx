@@ -11,6 +11,7 @@ import { Plan } from '../types';
 import Card from './Card';
 import Button from './Button';
 import { useCart } from '../context/CartContext';
+import { Link } from 'react-router-dom'; // Import Link for redirection
 
 interface PlanCardProps {
   plan: Plan;
@@ -93,7 +94,12 @@ const PlanCard: React.FC<PlanCardProps> = ({ plan }) => {
 
   return (
     <>
-      <Card highlighted={plan.mostPopular} className="h-full flex flex-col">
+      <Card
+        highlighted={plan.mostPopular}
+        className={`h-full flex flex-col ${
+          !plan.mostPopular ? 'border-4 border-gray-300'  : ''
+        }`}
+      >
         {plan.mostPopular && (
           <div className="bg-orange-500 text-white py-1 px-4 text-center text-sm font-semibold">
             Most Popular
@@ -262,7 +268,9 @@ const PlanCard: React.FC<PlanCardProps> = ({ plan }) => {
               )}
 
               <p className="text-xs text-white text-opacity-50 mt-4">
-                Terms & Conditions apply.
+                <Link to="/terms" className="underline hover:text-white text-white/70">
+                  Terms & Conditions apply.
+                </Link>
               </p>
             </div>
           </div>
