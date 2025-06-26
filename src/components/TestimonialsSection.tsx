@@ -14,7 +14,7 @@ const TestimonialsSection = () => {
       name: "Sarah Chen", 
       role: "Photography Enthusiast",
       rating: 5,
-      content: "The night flying feature is amazing! I practiced for weeks before my first real night shoot. Saved me from potential crashes.",
+      content: "The simulator helped me build confidence with complex maneuvers and obstacle avoidance. Practicing here really prepared me for real-world flying!",
       avatar: "SC"
     },
     {

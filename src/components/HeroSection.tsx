@@ -25,7 +25,7 @@ const HeroSection = () => {
 
             <p className="text-xl text-gray-600 mb-8 leading-relaxed">
               Master drone piloting with our advanced simulator featuring realistic physics,
-              night flying, geofencing, and smooth RTL capabilities. Perfect for beginners
+              geofencing, and smooth RTL capabilities. Perfect for beginners
               and professionals alike.
             </p>
 

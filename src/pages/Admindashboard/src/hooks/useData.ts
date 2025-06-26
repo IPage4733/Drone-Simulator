@@ -194,14 +194,7 @@ const mockScenarios: Scenario[] = [
     difficulty: 'Advanced',
     description: 'Flying in various weather conditions'
   },
-  {
-    id: '8',
-    name: 'Night Operations',
-    category: 'Advanced',
-    price: 22,
-    difficulty: 'Advanced',
-    description: 'Low-light and night flying scenarios'
-  }
+
 ];
 
 // Helper function to calculate next payment date
