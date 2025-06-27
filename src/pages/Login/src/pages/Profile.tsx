@@ -78,11 +78,15 @@ const Profile: React.FC = () => {
       backgroundColor: '#f9fafb',
       fontFamily: 'Inter, system-ui, sans-serif'
     },
-    header: {
-      backgroundColor: 'white',
-      boxShadow: '0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06)',
-      borderBottom: '1px solid #e5e7eb'
-    },
+  header: {
+  backgroundColor: 'white',
+  boxShadow: '0 1px 2px rgba(0, 0, 0, 0.05)',
+  borderBottom: '1px solid #e5e7eb',
+  paddingTop: '0.25rem',
+  paddingBottom: '0.25rem', // Reduced vertical space
+  minHeight: '2.5rem' // Optional: controls height directly
+},
+
     headerContent: {
       maxWidth: '80rem',
       margin: '0 auto',
@@ -764,25 +768,7 @@ const Profile: React.FC = () => {
 
   return (
     <>
-      <Link
-        to="/"
-        style={{
-          position: 'fixed',
-          top: '1rem',
-          left: '1rem',
-          zIndex: 999,
-          backgroundColor: '#fff7ed',
-          color: '#f97316',
-          fontWeight: '600',
-          textDecoration: 'none',
-          padding: '0.5rem 1rem',
-          border: '1px solid #f97316',
-          borderRadius: '0.5rem',
-          boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)'
-        }}
-      >
-        ← Back to Home
-      </Link>
+
       <div style={styles.container}>
         {/* Header */}
         <div style={styles.header}>
@@ -816,11 +802,27 @@ const Profile: React.FC = () => {
                     Home
                   </Link>
                 )}
+               <button
+  onClick={() => navigate('/')}
+  style={{
+    ...styles.logoutButton,
+    padding: '0.4rem 0.75rem',
+    fontSize: '0.85rem',
+    borderRadius: '0.375rem',
+  }}
+  onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#ea580c'}
+  onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#f97316'}
+>
+  Back to Home
+</button>
+
 
                 <button
                   onClick={handleLogout}
                   style={{
                     ...styles.logoutButton,
+                    padding: '0.25rem 0.75rem',  // Smaller padding
+                    fontSize: '0.875rem',         // Smaller font size
                     ':hover': { backgroundColor: '#ea580c' }
                   }}
                   onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#ea580c'}
@@ -828,6 +830,7 @@ const Profile: React.FC = () => {
                 >
                   Sign Out
                 </button>
+
               </div>
 
             </div>
@@ -946,7 +949,7 @@ const Profile: React.FC = () => {
               {activeTab === 'overview' && (
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
                   <div>
-                    <h3 style={{ fontSize: '1.5rem', fontWeight: '700', color: '#111827', marginBottom: '1.5rem' }}>Account Overview</h3>
+                     <h3 style={{ fontSize: '1.5rem', fontWeight: '700', color: '#111827' }}>Profile Information</h3>
 
                     <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(400px, 1fr))', gap: '2rem' }}>
                       {/* Scenario Activity */}
