@@ -26,7 +26,9 @@ const PlanCard: React.FC<PlanCardProps> = ({ plan }) => {
 
   const [studentEmail, setStudentEmail] = useState('');
   const [error, setError] = useState('');
+
   const user = JSON.parse(sessionStorage.getItem('auth_user') || '{}');
+
   const handleVerifyStudentEmail = () => {
     const isEducational = /@[\w.-]+\.(edu|ac)(\.[a-z]{2,})?$|\.university$/i.test(studentEmail);
     if (!isEducational) {
@@ -67,6 +69,7 @@ const PlanCard: React.FC<PlanCardProps> = ({ plan }) => {
     }
 
     if (plan.id === 'Student') {
+
       const isEducational = /@[\w.-]+\.(edu|ac)(\.[a-z]{2,})?$|\.university$/i.test(userEmail);
       if (!isEducational) {
         setModalMode('restricted');
@@ -119,8 +122,10 @@ const PlanCard: React.FC<PlanCardProps> = ({ plan }) => {
     <>
       <Card
         highlighted={plan.mostPopular}
+
         className={`h-full flex flex-col ${!plan.mostPopular ? 'border-4 border-gray-300' : ''
           }`}
+
       >
         {plan.mostPopular && (
           <div className="bg-orange-500 text-white py-1 px-4 text-center text-sm font-semibold">

@@ -153,7 +153,6 @@ const Profile: React.FC = () => {
   // Use authenticated user data if available, otherwise use mock data
   const currentUser = detailedUser || mockUser
   const currentPurchases = stripePurchases.length > 0 ? stripePurchases : mockPurchases
-
   useEffect(() => {
     const fetchData = async () => {
       const token = sessionStorage.getItem('auth_token')
@@ -416,9 +415,9 @@ const Profile: React.FC = () => {
   ]
 
   return (
+
     <div className="min-h-screen bg-gray-50 w-full overflow-x-hidden">
-      {/* Mobile Header */}
-      <header className="lg:hidden bg-white border-b border-gray-200 sticky top-0 z-50 w-full">
+     <header className="lg:hidden bg-white border-b border-gray-200 sticky top-0 z-50 w-full">
         <div className="w-full px-3 py-3">
           <div className="flex items-center justify-between w-full">
             <div className="flex items-center gap-2 min-w-0 flex-1">
@@ -660,6 +659,7 @@ const Profile: React.FC = () => {
             </div>
           </nav>
 
+
           {/* Desktop Tabs */}
           <nav className="hidden lg:flex border-b border-gray-200 w-full">
             {tabs.map((tab) => {
@@ -702,6 +702,7 @@ const Profile: React.FC = () => {
                                 <span className="text-xs text-gray-500 bg-gray-100 px-2 py-1 rounded-full ml-2 flex-shrink-0">
                                   {scenario.duration_formatted}
                                 </span>
+
                               </div>
                               <p className="text-sm text-gray-600 mb-1 truncate">{scenario.drone_name}</p>
                               <p className="text-sm text-gray-500 mb-1 truncate">{scenario.location_name}</p>
