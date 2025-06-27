@@ -22,37 +22,40 @@ const Download = () => {
     termsAccepted: false
   });
   const [isSubmitted, setIsSubmitted] = useState(false);
+  const [formErrors, setFormErrors] = useState<{ [key: string]: string }>({});
   const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast();
-  const handleDownload = () => {
-    // 1. Download EXE
-    const exeLink = document.createElement('a');
-    exeLink.href = "https://storage.cloud.google.com/ipagedronesimulator/IPAGE%20Drone%20Simulator%20Beta%20v1.0.exe?authuser=8";
-    exeLink.download = "IPAGE_Drone_Simulator.exe";
-    document.body.appendChild(exeLink);
-    exeLink.click();
-    document.body.removeChild(exeLink);
 
-    // 2. Download APK after 2 seconds
-    setTimeout(() => {
-      const apkLink = document.createElement('a');
-      apkLink.href = "https://storage.cloud.google.com/ipagedronesimulator/IPAGE%20DroneMobileController%20Beta%20v1.apk?authuser=8";
-      apkLink.download = "Dronesimulator_DroneMobileController.apk";
-      document.body.appendChild(apkLink);
-      apkLink.click();
-      document.body.removeChild(apkLink);
-    }, 2000);
+const handleDownload = () => {
+  // 1. Download EXE
+  const exeLink = document.createElement('a');
+  exeLink.href = "https://storage.cloud.google.com/ipagedronesimulator/IPAGE%20Drone%20Simulator%20Beta%20v1.0.exe?authuser=8";
+  exeLink.download = "IPAGE_Drone_Simulator.exe";
+  document.body.appendChild(exeLink);
+  exeLink.click();
+  document.body.removeChild(exeLink);
 
-    // 3. Download additional file from Google Drive after 4 seconds
-    setTimeout(() => {
-      const driveLink = document.createElement('a');
-      driveLink.href = "https://drive.google.com/uc?export=download&id=1VfPOgz_cG_4sr0_8z9_T97Pml3Twytz-";
-      driveLink.download = "Simulator_tutorial.pdf"; // Optional: set name for the downloaded file
-      document.body.appendChild(driveLink);
-      driveLink.click();
-      document.body.removeChild(driveLink);
-    }, 4000);
-  };
+  // 2. Download APK after 2 seconds
+  setTimeout(() => {
+    const apkLink = document.createElement('a');
+    apkLink.href = "https://storage.cloud.google.com/ipagedronesimulator/IPAGE%20DroneMobileController%20Beta%20v1.apk?authuser=8";
+    apkLink.download = "Dronesimulator_DroneMobileController.apk";
+    document.body.appendChild(apkLink);
+    apkLink.click();
+    document.body.removeChild(apkLink);
+  }, 2000);
+
+  // 3. Download additional file from Google Drive after 4 seconds
+  setTimeout(() => {
+    const driveLink = document.createElement('a');
+    driveLink.href = "https://drive.google.com/uc?export=download&id=1YEJTbvjTP_5xcrcYLfdnf05lNcS6mmB8";
+    driveLink.download = "Simulator_tutorial.pdf"; // Optional: set name for the downloaded file
+    document.body.appendChild(driveLink);
+    driveLink.click();
+    document.body.removeChild(driveLink);
+  }, 4000);
+};
+
 
 
   const handleInputChange = (field: string, value: string | boolean) => {
@@ -61,9 +64,59 @@ const Download = () => {
       [field]: value
     }));
   };
+const handleSubmit = async (e: React.FormEvent) => {
+  e.preventDefault();
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const errors: { [key: string]: string } = {};
+
+  if (!formData.name.trim()) errors.name = "Full name is required.";
+  if (!formData.email.trim()) errors.email = "Email is required.";
+  if (!formData.phone.trim()) errors.phone = "Phone number is required.";
+  if (!formData.city.trim()) errors.city = "City is required.";
+  if (!formData.state.trim()) errors.state = "State/Province is required.";
+  if (!formData.country.trim()) errors.country = "Country is required.";
+  if (!formData.purpose.trim()) errors.purpose = "Please select a purpose.";
+  if (!formData.termsAccepted) errors.termsAccepted = "Please accept the terms and conditions.";
+
+  if (Object.keys(errors).length > 0) {
+    setFormErrors(errors);
+    toast({
+      title: "Form Incomplete",
+      description: "Please correct the highlighted fields before submitting.",
+      variant: "destructive",
+    });
+    return;
+  }
+
+  setFormErrors({});
+  setIsLoading(true);
+
+  const safePassword = `${formData.name.replace(/\s/g, '')}@1234`;
+
+  const payload = {
+    email: formData.email,
+    username: formData.name.split(' ')[0] || formData.name,
+    password: safePassword,
+    password_confirm: safePassword,
+    full_name: formData.name,
+    phone_number: formData.phone,
+    city: formData.city,
+    state_province: formData.state,
+    country: formData.country,
+    purpose_of_use: formData.purpose.toLowerCase()
+  };
+
+  try {
+    const response = await fetch("https://34-93-79-185.nip.io/api/download-app/", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify(payload)
+    });
+
+    const result = await response.json();
+
 
     if (!formData.termsAccepted) {
       toast({
@@ -123,6 +176,7 @@ const Download = () => {
       setIsLoading(false);
     }
   };
+
 
 
 
@@ -245,6 +299,7 @@ const Download = () => {
                         onChange={(e) => handleInputChange("name", e.target.value)}
                         className="mt-1"
                       />
+                       {formErrors.name && <p className="text-sm text-red-600 mt-1">{formErrors.name}</p>}
                     </div>
                     <div>
                       <Label htmlFor="email">Email Address *</Label>
@@ -256,6 +311,7 @@ const Download = () => {
                         onChange={(e) => handleInputChange("email", e.target.value)}
                         className="mt-1"
                       />
+                      {formErrors.email && <p className="text-sm text-red-600 mt-1">{formErrors.email}</p>}
                     </div>
                   </div>
 
@@ -270,6 +326,7 @@ const Download = () => {
                         onChange={(e) => handleInputChange("phone", e.target.value)}
                         className="mt-1"
                       />
+                       {formErrors.phone && <p className="text-sm text-red-600 mt-1">{formErrors.phone}</p>}
                     </div>
                     <div>
                       <Label htmlFor="city">City *</Label>
@@ -281,20 +338,25 @@ const Download = () => {
                         onChange={(e) => handleInputChange("city", e.target.value)}
                         className="mt-1"
                       />
+                      {formErrors.city && <p className="text-sm text-red-600 mt-1">{formErrors.city}</p>}
                     </div>
 
                   </div>
                   <div>
-                    <Label htmlFor="country">Country *</Label>
-                    <Input
-                      id="country"
-                      type="text"
-                      required
-                      value={formData.country}
-                      onChange={(e) => handleInputChange("country", e.target.value)}
-                      className="mt-1"
-                    />
-                  </div>
+
+
+  <Label htmlFor="country">Country *</Label>
+  <Input
+    id="country"
+    type="text"
+    required
+    value={formData.country}
+    onChange={(e) => handleInputChange("country", e.target.value)}
+    className="mt-1"
+  />
+    {formErrors.country && <p className="text-sm text-red-600 mt-1">{formErrors.country}</p>}
+</div>
+
 
                   <div className="grid md:grid-cols-2 gap-4">
                     <div>
@@ -307,6 +369,7 @@ const Download = () => {
                         onChange={(e) => handleInputChange("state", e.target.value)}
                         className="mt-1"
                       />
+                       {formErrors.state && <p className="text-sm text-red-600 mt-1">{formErrors.state}</p>}
                     </div>
                     <div>
                       <Label htmlFor="purpose">Purpose of Use *</Label>
@@ -322,6 +385,7 @@ const Download = () => {
                           ))}
                         </SelectContent>
                       </Select>
+                        {formErrors.purpose && <p className="text-sm text-red-600 mt-1">{formErrors.purpose}</p>}
                     </div>
                   </div>
 
@@ -336,6 +400,7 @@ const Download = () => {
                       <span className="text-primary cursor-pointer"> Privacy Policy</span>. I understand that my
                       information will be used to provide access to the DroneSimulator software.
                     </Label>
+                    {formErrors.termsAccepted && <p className="text-sm text-red-600 mt-1">{formErrors.termsAccepted}</p>}
                   </div>
 
                   <Button
