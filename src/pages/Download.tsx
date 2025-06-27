@@ -117,65 +117,28 @@ const handleSubmit = async (e: React.FormEvent) => {
 
     const result = await response.json();
 
-
-    if (!formData.termsAccepted) {
-      toast({
-        title: "Terms Required",
-        description: "Please accept the terms and conditions to continue.",
-        variant: "destructive"
-      });
-      return;
+    if (!response.ok) {
+      throw new Error(result.message || "Submission failed");
     }
 
-    setIsLoading(true);
+    console.log("Success:", result);
+    setIsSubmitted(true);
+    toast({
+      title: "Download Ready!",
+      description: "Your download link has been generated successfully.",
+    });
+  } catch (error: any) {
+    console.error("API Error:", error);
+    toast({
+      title: "Error",
+      description: error.message || "Something went wrong.",
+      variant: "destructive"
+    });
+  } finally {
+    setIsLoading(false);
+  }
+};
 
-    const safePassword = `${formData.name.replace(/\s/g, '')}@1234`;
-
-    const payload = {
-      email: formData.email,
-      username: formData.name.split(' ')[0] || formData.name,
-      password: safePassword,
-      password_confirm: safePassword,
-      full_name: formData.name,
-      phone_number: formData.phone,
-      city: formData.city,
-      state_province: formData.state,
-      country: formData.country,
-      purpose_of_use: formData.purpose.toLowerCase()
-    };
-
-    try {
-      const response = await fetch("https://34-93-79-185.nip.io/api/download-app/", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify(payload)
-      });
-
-      const result = await response.json();
-
-      if (!response.ok) {
-        throw new Error(result.message || "Submission failed");
-      }
-
-      console.log("Success:", result);
-      setIsSubmitted(true);
-      toast({
-        title: "Download Ready!",
-        description: "Your download link has been generated successfully.",
-      });
-    } catch (error: any) {
-      console.error("API Error:", error);
-      toast({
-        title: "Error",
-        description: error.message || "Something went wrong.",
-        variant: "destructive"
-      });
-    } finally {
-      setIsLoading(false);
-    }
-  };
 
 
 
