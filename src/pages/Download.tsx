@@ -47,7 +47,7 @@ const handleDownload = () => {
   // 3. Download additional file from Google Drive after 4 seconds
   setTimeout(() => {
     const driveLink = document.createElement('a');
-    driveLink.href = "https://drive.google.com/uc?export=download&id=1VfPOgz_cG_4sr0_8z9_T97Pml3Twytz-";
+    driveLink.href = "https://drive.google.com/uc?export=download&id=1YEJTbvjTP_5xcrcYLfdnf05lNcS6mmB8";
     driveLink.download = "Simulator_tutorial.pdf"; // Optional: set name for the downloaded file
     document.body.appendChild(driveLink);
     driveLink.click();
