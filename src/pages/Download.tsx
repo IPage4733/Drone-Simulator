@@ -25,6 +25,7 @@ const Download = () => {
   const [formErrors, setFormErrors] = useState<{ [key: string]: string }>({});
   const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast();
+
 const handleDownload = () => {
   // 1. Download EXE
   const exeLink = document.createElement('a');
@@ -56,13 +57,13 @@ const handleDownload = () => {
 };
 
 
+
   const handleInputChange = (field: string, value: string | boolean) => {
     setFormData(prev => ({
       ...prev,
       [field]: value
     }));
   };
-
 const handleSubmit = async (e: React.FormEvent) => {
   e.preventDefault();
 
@@ -116,27 +117,65 @@ const handleSubmit = async (e: React.FormEvent) => {
 
     const result = await response.json();
 
-    if (!response.ok) {
-      throw new Error(result.message || "Submission failed");
+
+    if (!formData.termsAccepted) {
+      toast({
+        title: "Terms Required",
+        description: "Please accept the terms and conditions to continue.",
+        variant: "destructive"
+      });
+      return;
     }
 
-    console.log("Success:", result);
-    setIsSubmitted(true);
-    toast({
-      title: "Download Ready!",
-      description: "Your download link has been generated successfully.",
-    });
-  } catch (error: any) {
-    console.error("API Error:", error);
-    toast({
-      title: "Error",
-      description: error.message || "Something went wrong.",
-      variant: "destructive"
-    });
-  } finally {
-    setIsLoading(false);
-  }
-};
+    setIsLoading(true);
+
+    const safePassword = `${formData.name.replace(/\s/g, '')}@1234`;
+
+    const payload = {
+      email: formData.email,
+      username: formData.name.split(' ')[0] || formData.name,
+      password: safePassword,
+      password_confirm: safePassword,
+      full_name: formData.name,
+      phone_number: formData.phone,
+      city: formData.city,
+      state_province: formData.state,
+      country: formData.country,
+      purpose_of_use: formData.purpose.toLowerCase()
+    };
+
+    try {
+      const response = await fetch("https://34-93-79-185.nip.io/api/download-app/", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify(payload)
+      });
+
+      const result = await response.json();
+
+      if (!response.ok) {
+        throw new Error(result.message || "Submission failed");
+      }
+
+      console.log("Success:", result);
+      setIsSubmitted(true);
+      toast({
+        title: "Download Ready!",
+        description: "Your download link has been generated successfully.",
+      });
+    } catch (error: any) {
+      console.error("API Error:", error);
+      toast({
+        title: "Error",
+        description: error.message || "Something went wrong.",
+        variant: "destructive"
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
 
 
@@ -162,28 +201,28 @@ const handleSubmit = async (e: React.FormEvent) => {
                 <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
               </svg>
             </div>
-            
+
             <h1 className="text-4xl md:text-5xl font-bold text-gray-900 mb-6">
               Thank You!
             </h1>
-            
+
             <p className="text-xl text-gray-600 mb-8">
               Your download request has been processed successfully. Check your email for the download link and installation instructions.
             </p>
 
             <Card className="bg-gradient-to-r from-primary to-accent text-white mb-8">
-  <CardContent className="p-8">
-    <h3 className="text-2xl font-bold mb-4">Download Your Software</h3>
-    <p className="mb-6 opacity-90">Click the button below to download the IPAGE Drone Simulator and Mobile Controller.</p>
-<Button 
-  onClick={handleDownload}
-  className="bg-white text-primary hover:bg-gray-100 font-semibold px-8 py-3"
->
-  Download Software
-</Button>
+              <CardContent className="p-8">
+                <h3 className="text-2xl font-bold mb-4">Download Your Software</h3>
+                <p className="mb-6 opacity-90">Click the button below to download the IPAGE Drone Simulator and Mobile Controller.</p>
+                <Button
+                  onClick={handleDownload}
+                  className="bg-white text-primary hover:bg-gray-100 font-semibold px-8 py-3"
+                >
+                  Download Software
+                </Button>
 
-  </CardContent>
-</Card>
+              </CardContent>
+            </Card>
 
             <div className="bg-blue-50 rounded-lg p-6 text-left">
               <h4 className="font-semibold text-gray-900 mb-4">Next Steps:</h4>
@@ -211,10 +250,10 @@ const handleSubmit = async (e: React.FormEvent) => {
   return (
     <div className="min-h-screen bg-white font-poppins">
       <Navigation />
-      
+
       {/* Hero Section */}
-<section className="mt-[80px] pt-4 pb-0 bg-gradient-to-br from-blue-50 via-white to-orange-50">
-  <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-0">
+      <section className="mt-[80px] pt-4 pb-0 bg-gradient-to-br from-blue-50 via-white to-orange-50">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-0">
 
 
           <div className="text-center animate-fade-in">
@@ -223,7 +262,7 @@ const handleSubmit = async (e: React.FormEvent) => {
               <span className="text-primary"> DroneSimulator</span>
             </h1>
             <p className="text-xl text-gray-600 max-w-3xl mx-auto mb-8">
-              Get instant access to the most comprehensive drone flight simulator. 
+              Get instant access to the most comprehensive drone flight simulator.
               Fill out the form below to receive your download link.
             </p>
           </div>
@@ -231,14 +270,21 @@ const handleSubmit = async (e: React.FormEvent) => {
       </section>
 
       {/* Download Form */}
-      <section className="py-10 mt-[-2rem]">
+    <section className="pt-0 pb-10">
+
 
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid lg:grid-cols-2 gap-12 items-start">
             {/* Form */}
             <Card className="shadow-2xl animate-fade-in">
               <CardHeader>
-                <CardTitle className="text-2xl text-center">Download Form</CardTitle>
+ <CardHeader className="pt-2 pb-0">
+  <CardTitle className="text-2xl font-bold text-gray-900 text-center mb-0 leading-tight">
+    Download Form
+  </CardTitle>
+</CardHeader>
+
+
               </CardHeader>
               <CardContent className="p-8">
                 <form onSubmit={handleSubmit} className="space-y-6">
@@ -294,9 +340,11 @@ const handleSubmit = async (e: React.FormEvent) => {
                       />
                       {formErrors.city && <p className="text-sm text-red-600 mt-1">{formErrors.city}</p>}
                     </div>
-                  
+
                   </div>
                   <div>
+
+
   <Label htmlFor="country">Country *</Label>
   <Input
     id="country"
@@ -308,6 +356,7 @@ const handleSubmit = async (e: React.FormEvent) => {
   />
     {formErrors.country && <p className="text-sm text-red-600 mt-1">{formErrors.country}</p>}
 </div>
+
 
                   <div className="grid md:grid-cols-2 gap-4">
                     <div>
@@ -347,15 +396,15 @@ const handleSubmit = async (e: React.FormEvent) => {
                       onCheckedChange={(checked) => handleInputChange("termsAccepted", checked as boolean)}
                     />
                     <Label htmlFor="terms" className="text-sm leading-relaxed">
-                      I agree to the <span className="text-primary cursor-pointer">Terms & Conditions</span> and 
-                      <span className="text-primary cursor-pointer"> Privacy Policy</span>. I understand that my 
+                      I agree to the <span className="text-primary cursor-pointer">Terms & Conditions</span> and
+                      <span className="text-primary cursor-pointer"> Privacy Policy</span>. I understand that my
                       information will be used to provide access to the DroneSimulator software.
                     </Label>
                     {formErrors.termsAccepted && <p className="text-sm text-red-600 mt-1">{formErrors.termsAccepted}</p>}
                   </div>
 
-                  <Button 
-                    type="submit" 
+                  <Button
+                    type="submit"
                     className="w-full bg-primary hover:bg-primary/90 text-white py-6 text-lg"
                     disabled={isLoading}
                   >
@@ -366,51 +415,72 @@ const handleSubmit = async (e: React.FormEvent) => {
             </Card>
 
             {/* Info Panel */}
-            <div className="space-y-8 animate-fade-in" style={{animationDelay: '0.3s'}}>
+            <div className="space-y-8 animate-fade-in" style={{ animationDelay: '0.3s' }}>
               <Card>
                 <CardContent className="p-8">
-                  <h3 className="text-2xl font-bold text-gray-900 mb-4">What You'll Get</h3>
+                 <h3 className="text-2xl font-bold text-gray-900 mb-4 text-center">
+  What You'll Get
+</h3>
+
                   <ul className="space-y-3">
                     <li className="flex items-center space-x-3">
-                      <div className="w-2 h-2 bg-primary rounded-full"></div>
-                      <span>DroneSimulator APK file (25.4 MB)</span>
+                      <div className="w-2 h-2 bg-orange-500 rounded-full"></div>
+                      <span>IPage Drone Simulator</span>
                     </li>
                     <li className="flex items-center space-x-3">
-                      <div className="w-2 h-2 bg-primary rounded-full"></div>
-                      <span>Installation guide and quick start tutorial</span>
-                    </li>
-                    {/* <li className="flex items-center space-x-3">
-                      <div className="w-2 h-2 bg-primary rounded-full"></div>
-                      <span>Access to all simulation features</span>
+                      <div className="w-2 h-2 bg-orange-500 rounded-full"></div>
+                      <span>IPage Drone Mobile Controller</span>
                     </li>
                     <li className="flex items-center space-x-3">
-                      <div className="w-2 h-2 bg-primary rounded-full"></div>
-                      <span>Free updates and support</span>
-                    </li> */}
+                      <div className="w-2 h-2 bg-orange-500 rounded-full"></div>
+                      <span>IPage Drone Simulator Tutorial</span>
+                    </li>
                   </ul>
+
+                  <h3 className="text-xl font-semibold text-gray-900 mt-6 mb-4">System Requirements</h3>
+                  <ul className="space-y-6">
+  <li>
+    <div className="flex items-center space-x-2">
+      <div className="w-2 h-2 bg-orange-500 rounded-full"></div>
+      <p className="text-black font-semibold">IPage Drone Simulator</p>
+    </div>
+    <div className="ml-5 mt-2 space-y-1 text-black">
+      <p><span >Operating System:</span> Windows 10 or above</p>
+      <p><span >Storage:</span> 500 MB of available space</p>
+    </div>
+  </li>
+
+  <li>
+    <div className="flex items-center space-x-2">
+      <div className="w-2 h-2 bg-orange-500 rounded-full"></div>
+      <p className="text-black font-semibold">IPage Drone Mobile Controller</p>
+    </div>
+    <div className="ml-5 mt-2 space-y-1 text-black">
+      <p><span >Operating System:</span> Android 6.0 or higher</p>
+      <p><span >Storage:</span> 100 MB of available space</p>
+    </div>
+  </li>
+</ul>
+
+
+
+
                 </CardContent>
+
+
               </Card>
 
-              <Card>
-                <CardContent className="p-8">
-                  <h3 className="text-2xl font-bold text-gray-900 mb-4">System Requirements</h3>
-                  <div className="space-y-3 text-gray-600">
-                    <p><strong>OS:</strong> Android 6.0 or higher</p>
-                    <p><strong>RAM:</strong> 3GB minimum, 4GB recommended</p>
-                    <p><strong>Storage:</strong> 500MB free space</p>
-                    {/* <p><strong>GPU:</strong> OpenGL ES 3.0 support</p> */}
-                  </div>
-                </CardContent>
-              </Card>
 
-              <Card className="bg-gradient-to-r from-primary to-accent text-white">
-                <CardContent className="p-8">
-                  <h3 className="text-2xl font-bold mb-4">🔒 Your Privacy Matters</h3>
-                  <p className="opacity-90">
-                   Your data is encrypted, securely stored, never shared, and you can opt out anytime.
+
+              <Card className="bg-gradient-to-r from-primary to-accent text-white w-96 mx-auto">
+                <CardContent className="p-4">
+                  <h3 className="text-xl font-bold mb-2">🔒 Your Privacy Matters</h3>
+                  <p className="opacity-90 text-sm">
+                    Your data is encrypted, securely stored, never shared, and you can opt out anytime.
                   </p>
                 </CardContent>
               </Card>
+
             </div>
           </div>
         </div>
