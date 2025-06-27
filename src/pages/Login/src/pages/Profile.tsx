@@ -579,7 +579,7 @@ const Profile: React.FC = () => {
                 <div className="min-w-0 flex-1">
                   <p className="text-gray-500 text-xs font-medium mb-1">Total Purchases</p>
                   <p className="text-lg lg:text-xl font-bold text-gray-900">
-                    {currentPurchases.filter(p => p.status === 'completed').length}
+                    {currentPurchases.filter(p => p.status === 'succeeded').length}
                   </p>
                 </div>
                 <div className="p-2 bg-blue-50 rounded-lg flex-shrink-0">
