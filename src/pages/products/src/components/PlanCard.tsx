@@ -26,7 +26,9 @@ const PlanCard: React.FC<PlanCardProps> = ({ plan }) => {
 
   const [studentEmail, setStudentEmail] = useState('');
   const [error, setError] = useState('');
+
 const user = JSON.parse(sessionStorage.getItem('auth_user') || '{}');
+
   const handleVerifyStudentEmail = () => {
     const isEducational = /@[\w.-]+\.(edu|ac)(\.[a-z]{2,})?$|\.university$/i.test(studentEmail);
     if (!isEducational) {
@@ -50,8 +52,14 @@ const user = JSON.parse(sessionStorage.getItem('auth_user') || '{}');
       return;
     }
 
-    // ✅ Plan check now works!
- 
+
+    // ✅ Skip check for institution plan
+    if (plan.id !== 'institution' && currentPlan?.trim().toLowerCase() === 'premium') {
+      console.log('✅ Premium plan detected — showing taken modal');
+      setModalMode('taken');
+      setShowModal(true);
+      return;
+    }
     const alreadyInCart = cartItems.find((item: any) => item.id === plan.id);
     if (alreadyInCart) return;
 
@@ -61,6 +69,7 @@ const user = JSON.parse(sessionStorage.getItem('auth_user') || '{}');
     }
 
     if (plan.id === 'Student') {
+
       const isEducational = /@[\w.-]+\.(edu|ac)(\.[a-z]{2,})?$|\.university$/i.test(userEmail);
       if (!isEducational) {
         setModalMode('restricted');
@@ -113,8 +122,12 @@ const user = JSON.parse(sessionStorage.getItem('auth_user') || '{}');
     <>
       <Card
         highlighted={plan.mostPopular}
+
         className={`h-full flex flex-col ${!plan.mostPopular ? 'border-4 border-gray-300' : ''
           }`}
+
+
+
       >
         {plan.mostPopular && (
           <div className="bg-orange-500 text-white py-1 px-4 text-center text-sm font-semibold">
@@ -214,7 +227,13 @@ const user = JSON.parse(sessionStorage.getItem('auth_user') || '{}');
                       Login
                     </button>
                     <button
-                      onClick={() => (window.location.href = '/auth/studentregister')}
+                      onClick={() => {
+                        if (plan.id === 'Student') {
+                          window.location.href = '/auth/studentregister';
+                        } else {
+                          window.location.href = '/auth/register';
+                        }
+                      }}
                       className="w-full bg-white bg-opacity-30 hover:bg-opacity-50 text-white font-semibold py-2 rounded-md text-sm border border-white border-opacity-20"
                     >
                       Sign Up
