@@ -471,15 +471,15 @@ const Profile: React.FC = () => {
             <div className="flex items-center gap-6">
               <div className="flex items-center gap-3">
                 <div className="flex items-center gap-3">
-  <img
-    src="/images/logonew.png" // or wherever your logo is located
-    alt="Logo"
-    className="w-17 h-10 rounded-md object-contain"
-  />
-  <div className="min-w-0">
-    <h1 className="text-base font-bold text-gray-900 truncate">    Profile Dashboard</h1>
-  </div>
-</div>
+                  <img
+                    src="/images/logonew.png" // or wherever your logo is located
+                    alt="Logo"
+                    className="w-17 h-10 rounded-md object-contain"
+                  />
+                  <div className="min-w-0">
+                    <h1 className="text-base font-bold text-gray-900 truncate">    Profile Dashboard</h1>
+                  </div>
+                </div>
               </div>
 
               <Link
