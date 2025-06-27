@@ -70,7 +70,7 @@ const HeroSection = () => {
 
             <div className="absolute -bottom-4 -left-4 bg-white rounded-lg shadow-lg p-4 animate-float" style={{ animationDelay: '1.5s' }}>
               <div className="text-sm font-semibold text-gray-900">Altitude</div>
-              <div className="text-accent font-bold">125.3m</div>
+              <div className="text-accent font-bold">120m</div>
             </div>
           </div>
         </div>

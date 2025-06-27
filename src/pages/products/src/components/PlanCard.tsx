@@ -22,10 +22,11 @@ const PlanCard: React.FC<PlanCardProps> = ({ plan }) => {
   const { addItem } = useCart();
 
   const [showModal, setShowModal] = useState(false);
-  const [modalMode, setModalMode] = useState<'login' | 'verify' | 'restricted'>('login');
+  const [modalMode, setModalMode] = useState<'login' | 'verify' | 'restricted' | 'taken'>('login');
+
   const [studentEmail, setStudentEmail] = useState('');
   const [error, setError] = useState('');
-
+const user = JSON.parse(sessionStorage.getItem('auth_user') || '{}');
   const handleVerifyStudentEmail = () => {
     const isEducational = /@[\w.-]+\.(edu|ac)(\.[a-z]{2,})?$|\.university$/i.test(studentEmail);
     if (!isEducational) {
@@ -35,19 +36,27 @@ const PlanCard: React.FC<PlanCardProps> = ({ plan }) => {
     setError('Verification link has been sent to your email.');
   };
 
-  
+
 
   const handleAddToCart = () => {
-
-        if (plan.id === 'institution') {
-      window.location.href = '/salesform';
-      return;
-    }
     const userEmail = sessionStorage.getItem('auth_email');
+    const user = JSON.parse(sessionStorage.getItem('auth_user') || '{}');
+    const currentPlan = user.plan; // ✅ Extracted correctly
+    const cartItems = JSON.parse(sessionStorage.getItem('cart') || '[]');
 
     if (!userEmail) {
       setModalMode('login');
       setShowModal(true);
+      return;
+    }
+
+    // ✅ Plan check now works!
+ 
+    const alreadyInCart = cartItems.find((item: any) => item.id === plan.id);
+    if (alreadyInCart) return;
+
+    if (plan.id === 'institution') {
+      window.location.href = '/salesform';
       return;
     }
 
@@ -60,20 +69,25 @@ const PlanCard: React.FC<PlanCardProps> = ({ plan }) => {
       }
     }
 
-
     if (plan.id === 'free') {
       window.location.href = '/auth/register';
       return;
     }
 
-    addItem({
+    const newItem = {
       id: plan.id,
       name: plan.name,
       price: plan.price,
-      type: 'plan',
+      type: 'plan' as 'plan',
       stripe_price_id: plan.stripe_price_id,
-    });
+    };
+
+    const updatedCart = [...cartItems, newItem];
+    sessionStorage.setItem('cart', JSON.stringify(updatedCart));
+    addItem(newItem);
   };
+
+
 
   useEffect(() => {
     const userEmail = sessionStorage.getItem('auth_email');
@@ -99,9 +113,8 @@ const PlanCard: React.FC<PlanCardProps> = ({ plan }) => {
     <>
       <Card
         highlighted={plan.mostPopular}
-        className={`h-full flex flex-col ${
-          !plan.mostPopular ? 'border-4 border-gray-300'  : ''
-        }`}
+        className={`h-full flex flex-col ${!plan.mostPopular ? 'border-4 border-gray-300' : ''
+          }`}
       >
         {plan.mostPopular && (
           <div className="bg-orange-500 text-white py-1 px-4 text-center text-sm font-semibold">
@@ -227,11 +240,10 @@ const PlanCard: React.FC<PlanCardProps> = ({ plan }) => {
                     <Mail size={16} className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
                   </div>
                   {error && (
-                    <div className={`flex items-start space-x-2 backdrop-blur-md border rounded-xl p-3 text-sm shadow-lg ${
-                      error.includes('Verification')
-                        ? 'bg-white/20 border-green-300 text-green-100'
-                        : 'bg-white/30 border-red-300 text-red-800'
-                    }`}>
+                    <div className={`flex items-start space-x-2 backdrop-blur-md border rounded-xl p-3 text-sm shadow-lg ${error.includes('Verification')
+                      ? 'bg-white/20 border-green-300 text-green-100'
+                      : 'bg-white/30 border-red-300 text-red-800'
+                      }`}>
                       {error.includes('Verification') ? (
                         <CheckCircle size={18} className="mt-0.5 text-green-100" />
                       ) : (
@@ -269,6 +281,25 @@ const PlanCard: React.FC<PlanCardProps> = ({ plan }) => {
                   </button>
                 </>
               )}
+              {modalMode === 'taken' && (
+                <>
+                  <h2 className="text-2xl font-bold mb-2">You Already Have a Plan</h2>
+                  <p className="text-sm text-white text-opacity-80 mb-2">
+                    You have already purchased the <strong>{user?.plan?.charAt(0).toUpperCase() + user?.plan?.slice(1)}</strong> plan.
+                  </p>
+                  <p className="text-sm text-white text-opacity-80 mb-4">
+                    You cannot add or switch to another plan while your current subscription is active.
+                  </p>
+                  <button
+                    onClick={() => setShowModal(false)}
+                    className="w-full bg-white bg-opacity-30 hover:bg-opacity-50 text-white font-semibold py-2 rounded-md text-sm border border-white border-opacity-20"
+                  >
+                    Close
+                  </button>
+                </>
+              )}
+
+
 
               <p className="text-xs text-white text-opacity-50 mt-4">
                 <Link to="/terms" className="underline hover:text-white text-white/70">
