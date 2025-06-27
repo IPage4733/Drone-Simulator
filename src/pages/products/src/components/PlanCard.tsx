@@ -11,7 +11,7 @@ import { Plan } from '../types';
 import Card from './Card';
 import Button from './Button';
 import { useCart } from '../context/CartContext';
-import { Link } from 'react-router-dom'; // Import Link for redirection
+import { Link } from 'react-router-dom';
 
 interface PlanCardProps {
   plan: Plan;
@@ -25,6 +25,8 @@ const PlanCard: React.FC<PlanCardProps> = ({ plan }) => {
   const [modalMode, setModalMode] = useState<'login' | 'verify' | 'restricted'>('login');
   const [studentEmail, setStudentEmail] = useState('');
   const [error, setError] = useState('');
+  const [alreadySubscribed, setAlreadySubscribed] = useState(false);
+  const [currentPlanInfo, setCurrentPlanInfo] = useState({ name: '', expiry: '' });
 
   const handleVerifyStudentEmail = () => {
     const isEducational = /@[\w.-]+\.(edu|ac)(\.[a-z]{2,})?$|\.university$/i.test(studentEmail);
@@ -35,15 +37,14 @@ const PlanCard: React.FC<PlanCardProps> = ({ plan }) => {
     setError('Verification link has been sent to your email.');
   };
 
-  
-
   const handleAddToCart = () => {
-
-        if (plan.id === 'institution') {
+    if (plan.id === 'institution') {
       window.location.href = '/salesform';
       return;
     }
     const userEmail = sessionStorage.getItem('auth_email');
+    const userPlan = sessionStorage.getItem('currentPlan');
+    const planExpiry = sessionStorage.getItem('planExpiry');
 
     if (!userEmail) {
       setModalMode('login');
@@ -51,7 +52,7 @@ const PlanCard: React.FC<PlanCardProps> = ({ plan }) => {
       return;
     }
 
-    if (plan.id === 'Student') {
+    if (plan.id.toLowerCase() === 'student') {
       const isEducational = /@[\w.-]+\.(edu|ac)(\.[a-z]{2,})?$|\.university$/i.test(userEmail);
       if (!isEducational) {
         setModalMode('restricted');
@@ -60,8 +61,18 @@ const PlanCard: React.FC<PlanCardProps> = ({ plan }) => {
       }
     }
 
+    if (
+      userPlan &&
+      planExpiry &&
+      userPlan.toLowerCase() !== 'free' &&
+      userPlan.toLowerCase() !== 'institution'
+    ) {
+      setCurrentPlanInfo({ name: userPlan, expiry: planExpiry });
+      setAlreadySubscribed(true);
+      return;
+    }
 
-    if (plan.id === 'free') {
+    if (plan.id.toLowerCase() === 'free') {
       window.location.href = '/auth/register';
       return;
     }
@@ -79,7 +90,7 @@ const PlanCard: React.FC<PlanCardProps> = ({ plan }) => {
     const userEmail = sessionStorage.getItem('auth_email');
     const pendingPlanId = sessionStorage.getItem('pendingPlanId');
     if (userEmail && pendingPlanId === plan.id) {
-      if (plan.id === 'Student') {
+      if (plan.id.toLowerCase() === 'student') {
         const isEducational = /@[\w.-]+\.(edu|ac)(\.[a-z]{2,})?$|\.university$/i.test(userEmail);
         if (!isEducational) {
           setModalMode('restricted');
@@ -99,9 +110,7 @@ const PlanCard: React.FC<PlanCardProps> = ({ plan }) => {
     <>
       <Card
         highlighted={plan.mostPopular}
-        className={`h-full flex flex-col ${
-          !plan.mostPopular ? 'border-4 border-gray-300'  : ''
-        }`}
+        className={`h-full flex flex-col ${!plan.mostPopular ? 'border-4 border-gray-300' : ''}`}
       >
         {plan.mostPopular && (
           <div className="bg-orange-500 text-white py-1 px-4 text-center text-sm font-semibold">
@@ -129,6 +138,24 @@ const PlanCard: React.FC<PlanCardProps> = ({ plan }) => {
           </Button>
         </div>
       </Card>
+
+      {alreadySubscribed && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-60 px-4">
+          <div className="relative w-full max-w-md bg-white rounded-lg shadow-2xl p-6">
+            <h2 className="text-xl font-bold text-gray-900 mb-2">You Already Have an Active Plan</h2>
+            <p className="text-gray-700 mb-4">
+              Your current plan: <strong>{currentPlanInfo.name}</strong><br />
+              Expiry date: <strong>{new Date(currentPlanInfo.expiry).toLocaleDateString()}</strong>
+            </p>
+            <button
+              onClick={() => setAlreadySubscribed(false)}
+              className="w-full bg-orange-600 hover:bg-orange-700 text-white font-semibold py-2 rounded-md"
+            >
+              Close
+            </button>
+          </div>
+        </div>
+      )}
 
       {showModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-60 px-4">

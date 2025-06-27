@@ -20,6 +20,7 @@ import CookiePolicy from "./pages/Admindashboard/src/pages/cookiepolicy";
 import RefundPolicy from "./pages/Admindashboard/src/pages/refundpolicy";
 import GeneralPolicy from "./pages/Admindashboard/src/pages/generalpolicy";
 import HelpPage from "./pages/Admindashboard/src/pages/help"; // Always mounted
+import ScrollToTop from "./components/scrolltop";
 
 const queryClient = new QueryClient();
 
@@ -29,6 +30,7 @@ const App = () => (
       <Toaster />
       <Sonner />
       <BrowserRouter>
+      <ScrollToTop />
         <CartProvider>
           <Routes>
             <Route path="/" element={<Index />} />
