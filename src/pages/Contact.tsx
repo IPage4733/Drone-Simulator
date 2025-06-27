@@ -48,26 +48,27 @@ const Contact = () => {
 
       // Send email to admin
       await emailjs.send(
-        'service_22r9k6a',
-         'template_51gf2uv',
+        'service_5i30di6',
+             'template_1aixnah',
+        
         // Replace with your EmailJS template ID
         {
           name: formData.name,
           email: formData.email,
           message: formData.message
         },
-        'A7Y07i5iVNiyMDhd-' // Replace with your EmailJS user ID
+        'AQ6NK5LNuVX1X9dLh' // Replace with your EmailJS user ID
       );
 
       // Send thank-you to user (optional)
       await emailjs.send(
-        'service_22r9k6a', // Same as above
-       'template_zpox92u',
+        'service_5i30di6', // Same as above
+   'template_vv5knni',
         {
           to_name: formData.name,
           to_email: formData.email
         },
-        'A7Y07i5iVNiyMDhd-' // Same user ID
+        'AQ6NK5LNuVX1X9dLh' // Same user ID
       );
 
       toast({
