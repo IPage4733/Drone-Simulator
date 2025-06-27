@@ -39,7 +39,7 @@ const Footer = () => {
             <ul className="space-y-2">
               <li><Link to="/" className="text-gray-400 hover:text-white transition-colors">Home</Link></li>
               <li><Link to="/features" className="text-gray-400 hover:text-white transition-colors">Features</Link></li>
-              <li><Link to="/tutorials" className="text-gray-400 hover:text-white transition-colors">Tutorials</Link></li>
+              {/* <li><Link to="/tutorials" className="text-gray-400 hover:text-white transition-colors">Tutorials</Link></li> */}
               <li><Link to="/download" className="text-gray-400 hover:text-white transition-colors">Download</Link></li>
               <li><Link to="/contact" className="text-gray-400 hover:text-white transition-colors">Contact Us</Link></li>
             </ul>
@@ -52,7 +52,7 @@ const Footer = () => {
               <p><b>IPage UM Services Pte Ltd</b><br />
                 641A,Punggol drive,<br />
                 Singapore - 821641<br />
-                Phone: +65 9006 2901</p>
+                WhatsApp: +65 9006 2901</p>
               <p><b>IPage UM Services Pvt Ltd</b><br />
                 5A/6B, White Waters,<br />
                 Timber Lake Colony, Shaikpet,<br />

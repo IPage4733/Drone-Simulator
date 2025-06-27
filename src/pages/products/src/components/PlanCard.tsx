@@ -27,7 +27,7 @@ const PlanCard: React.FC<PlanCardProps> = ({ plan }) => {
   const [studentEmail, setStudentEmail] = useState('');
   const [error, setError] = useState('');
 
-  const user = JSON.parse(sessionStorage.getItem('auth_user') || '{}');
+const user = JSON.parse(sessionStorage.getItem('auth_user') || '{}');
 
   const handleVerifyStudentEmail = () => {
     const isEducational = /@[\w.-]+\.(edu|ac)(\.[a-z]{2,})?$|\.university$/i.test(studentEmail);
@@ -52,7 +52,7 @@ const PlanCard: React.FC<PlanCardProps> = ({ plan }) => {
       return;
     }
 
-    // ✅ Plan check now works!
+
     // ✅ Skip check for institution plan
     if (plan.id !== 'institution' && currentPlan?.trim().toLowerCase() === 'premium') {
       console.log('✅ Premium plan detected — showing taken modal');
@@ -125,6 +125,8 @@ const PlanCard: React.FC<PlanCardProps> = ({ plan }) => {
 
         className={`h-full flex flex-col ${!plan.mostPopular ? 'border-4 border-gray-300' : ''
           }`}
+
+
 
       >
         {plan.mostPopular && (
