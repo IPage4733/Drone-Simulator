@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useRef } from 'react';
 import HeroSection from '../sections/HeroSection';
 import DronesSection from '../sections/DronesSection';
 import ScenariosSection from '../sections/ScenariosSection';
@@ -9,16 +9,22 @@ import CTASection from '../sections/CTASection';
 import Navigation from '@/components/Navigation';
 
 const HomePage: React.FC = () => {
+    const planRef = useRef<HTMLDivElement>(null);
+      const scrollToPlans = () => {
+      planRef.current?.scrollIntoView({ behavior: 'smooth' });
+    };
   return (
     <main>
       <Navigation />
-      <HeroSection />
+      <HeroSection scrollToPlans={scrollToPlans} />
       {/* <DronesSection /> */}
       {/* <ScenariosSection /> */}
-      <PlansSection />
+      <div ref={planRef}>
+  <PlansSection />
+</div>
       {/* <CustomPlanSection /> */}
       <FeaturesSection />
-      <CTASection />
+      <CTASection scrollToPlans={scrollToPlans} />
     </main>
   );
 };

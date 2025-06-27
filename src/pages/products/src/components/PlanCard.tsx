@@ -11,7 +11,7 @@ import { Plan } from '../types';
 import Card from './Card';
 import Button from './Button';
 import { useCart } from '../context/CartContext';
-import { Link } from 'react-router-dom'; // Import Link for redirection
+import { Link } from 'react-router-dom';
 
 interface PlanCardProps {
   plan: Plan;
@@ -26,7 +26,6 @@ const PlanCard: React.FC<PlanCardProps> = ({ plan }) => {
 
   const [studentEmail, setStudentEmail] = useState('');
   const [error, setError] = useState('');
-  const user = JSON.parse(sessionStorage.getItem('auth_user') || '{}');
   const handleVerifyStudentEmail = () => {
     const isEducational = /@[\w.-]+\.(edu|ac)(\.[a-z]{2,})?$|\.university$/i.test(studentEmail);
     if (!isEducational) {
@@ -43,7 +42,6 @@ const PlanCard: React.FC<PlanCardProps> = ({ plan }) => {
     const user = JSON.parse(sessionStorage.getItem('auth_user') || '{}');
     const currentPlan = user.plan; // ✅ Extracted correctly
     const cartItems = JSON.parse(sessionStorage.getItem('cart') || '[]');
-
     if (!userEmail) {
       setModalMode('login');
       setShowModal(true);
@@ -67,6 +65,7 @@ const PlanCard: React.FC<PlanCardProps> = ({ plan }) => {
     }
 
     if (plan.id === 'Student') {
+
       const isEducational = /@[\w.-]+\.(edu|ac)(\.[a-z]{2,})?$|\.university$/i.test(userEmail);
       if (!isEducational) {
         setModalMode('restricted');
@@ -99,7 +98,7 @@ const PlanCard: React.FC<PlanCardProps> = ({ plan }) => {
     const userEmail = sessionStorage.getItem('auth_email');
     const pendingPlanId = sessionStorage.getItem('pendingPlanId');
     if (userEmail && pendingPlanId === plan.id) {
-      if (plan.id === 'Student') {
+      if (plan.id.toLowerCase() === 'student') {
         const isEducational = /@[\w.-]+\.(edu|ac)(\.[a-z]{2,})?$|\.university$/i.test(userEmail);
         if (!isEducational) {
           setModalMode('restricted');
@@ -119,8 +118,10 @@ const PlanCard: React.FC<PlanCardProps> = ({ plan }) => {
     <>
       <Card
         highlighted={plan.mostPopular}
+
         className={`h-full flex flex-col ${!plan.mostPopular ? 'border-4 border-gray-300' : ''
           }`}
+
       >
         {plan.mostPopular && (
           <div className="bg-orange-500 text-white py-1 px-4 text-center text-sm font-semibold">
@@ -148,6 +149,24 @@ const PlanCard: React.FC<PlanCardProps> = ({ plan }) => {
           </Button>
         </div>
       </Card>
+
+      {alreadySubscribed && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-60 px-4">
+          <div className="relative w-full max-w-md bg-white rounded-lg shadow-2xl p-6">
+            <h2 className="text-xl font-bold text-gray-900 mb-2">You Already Have an Active Plan</h2>
+            <p className="text-gray-700 mb-4">
+              Your current plan: <strong>{currentPlanInfo.name}</strong><br />
+              Expiry date: <strong>{new Date(currentPlanInfo.expiry).toLocaleDateString()}</strong>
+            </p>
+            <button
+              onClick={() => setAlreadySubscribed(false)}
+              className="w-full bg-orange-600 hover:bg-orange-700 text-white font-semibold py-2 rounded-md"
+            >
+              Close
+            </button>
+          </div>
+        </div>
+      )}
 
       {showModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-60 px-4">

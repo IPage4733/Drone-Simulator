@@ -3,7 +3,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { useNavigate } from "react-router-dom";
 
 const FeaturesSection = () => {
-    const navigate = useNavigate();
+  const navigate = useNavigate();
   const features = [
     {
       title: "Realistic Flight Physics",
@@ -61,32 +61,32 @@ const FeaturesSection = () => {
         </div>
 
         {/* Features Grid */}
-     <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-  {features.map((feature, idx) => (
-    <div key={idx} className="p-6 rounded-xl bg-white shadow-md">
-      
-      {/* Icon and Title in a row */}
-      <div className="flex items-center mb-2">
-        {typeof feature.icon === "string" &&
-        (feature.icon.endsWith(".png") || feature.icon.endsWith(".ico")) ? (
-          <img
-            src={feature.icon}
-            alt={feature.title}
-            className="w-10 h-10 mr-3"
-          />
-        ) : (
-          <div className="text-3xl mr-3">{feature.icon}</div>
-        )}
-        <h3 className="text-xl font-semibold text-black">
-          {feature.title}
-        </h3>
-      </div>
+        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+          {features.map((feature, idx) => (
+            <div key={idx} className="p-6 rounded-xl bg-white shadow-md">
 
-      {/* Description */}
-      <p className="text-gray-800 text-sm">{feature.description}</p>
-    </div>
-  ))}
-</div>
+              {/* Icon and Title in a row */}
+              <div className="flex items-center mb-2">
+                {typeof feature.icon === "string" &&
+                  (feature.icon.endsWith(".png") || feature.icon.endsWith(".ico")) ? (
+                  <img
+                    src={feature.icon}
+                    alt={feature.title}
+                    className="w-10 h-10 mr-3"
+                  />
+                ) : (
+                  <div className="text-3xl mr-3">{feature.icon}</div>
+                )}
+                <h3 className="text-xl font-semibold text-black">
+                  {feature.title}
+                </h3>
+              </div>
+
+              {/* Description */}
+              <p className="text-gray-800 text-sm">{feature.description}</p>
+            </div>
+          ))}
+        </div>
 
 
 
@@ -101,12 +101,15 @@ const FeaturesSection = () => {
             <p className="text-xl mb-8 opacity-90">
               Join thousands of pilots who have mastered drone flying with our simulator.
             </p>
-                <button
-      onClick={() => navigate("/download")}
-      className="bg-white text-primary hover:bg-gray-100 font-semibold px-8 py-4 rounded-lg text-lg transition-colors duration-300"
-    >
-      Start Your Journey
-    </button>
+            <button
+              onClick={() => {
+                navigate("/download");
+                window.scrollTo(0, 0); // 👈 Scroll to top
+              }}
+              className="bg-white text-primary hover:bg-gray-100 font-semibold px-8 py-4 rounded-lg text-lg transition-colors duration-300"
+            >
+              Start Your Journey
+            </button>
 
           </div>
         </div>

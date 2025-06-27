@@ -1,18 +1,54 @@
 import React, { useState, useEffect } from 'react'
 import { useAuth } from '../context/AuthContext'
 import { useNavigate, Link } from 'react-router-dom'
+import {
+  User,
+  Settings,
+  ShoppingBag,
+  Award,
+  Edit3,
+  Save,
+  X,
+  ArrowLeft,
+  Mail,
+  Phone,
+  MapPin,
+  Calendar,
+  TrendingUp,
+  Package,
+  DollarSign,
+  Activity,
+  Eye,
+  EyeOff,
+  Monitor,
+  Gamepad2,
+  GraduationCap,
+  Building,
+  AlertCircle,
+  CheckCircle,
+  Clock,
+  XCircle,
+  RefreshCw,
+  BarChart3,
+  Users,
+  Globe,
+  Menu,
+  ChevronDown
+} from 'lucide-react'
 
 const Profile: React.FC = () => {
-  const { user, purchases, updateProfile, logout, isAuthenticated } = useAuth()
+  const { user, updateProfile, logout, isAuthenticated } = useAuth()
   const navigate = useNavigate()
   const [activeTab, setActiveTab] = useState('overview')
-  const [stripePurchases, setStripePurchases] = useState<any[]>([]);
+  const [stripePurchases, setStripePurchases] = useState<any[]>([])
   const [isEditing, setIsEditing] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
   const [successMessage, setSuccessMessage] = useState('')
   const [errors, setErrors] = useState<{ [key: string]: string }>({})
-  const [detailedUser, setDetailedUser] = useState<any>(null);
-  const [showAllScenarios, setShowAllScenarios] = useState(false);
+  const [detailedUser, setDetailedUser] = useState<any>(null)
+  const [showAllScenarios, setShowAllScenarios] = useState(false)
+  const [apiError, setApiError] = useState(false)
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
   const [formData, setFormData] = useState({
     email: '',
     username: '',
@@ -25,493 +61,112 @@ const Profile: React.FC = () => {
     purpose_other: ''
   })
 
-  // Mock data for when user is not authenticated
+  // Enhanced mock data with more realistic information
   const mockUser = {
     email: 'demo@example.com',
     username: 'DemoUser',
     full_name: 'Demo User',
     phone_number: '+1 555-0123',
-    city: 'Demo City',
-    state_province: 'Demo State',
-    country: 'Demo Country',
+    city: 'San Francisco',
+    state_province: 'California',
+    country: 'United States',
     purpose_of_use: 'personal',
     avatar_url: '',
     member_since: '2024-01-01',
-    subscription_status: 'free' as const,
-    total_flight_hours: 25.5,
-    achievements: ['Welcome Aboard', 'First Flight', 'Night Pilot']
+    subscription_status: 'premium' as const,
+    is_active: true,
+    plan: 'premium',
+    plan_expiry_date: '2024-12-31',
+    statistics: {
+      total_scenarios_completed: 47,
+      total_app_sessions: 156,
+      total_flight_hours: 89.5
+    },
+    recent_activity: {
+      recent_scenarios: [
+        {
+          scenario_name: 'Urban Navigation',
+          drone_name: 'DJI Mavic Pro',
+          location_name: 'Downtown San Francisco',
+          start_time: '2024-01-15T14:30:00Z',
+          duration_formatted: '25 minutes'
+        },
+        {
+          scenario_name: 'Night Flight Training',
+          drone_name: 'Autel EVO II',
+          location_name: 'Golden Gate Park',
+          start_time: '2024-01-14T20:15:00Z',
+          duration_formatted: '18 minutes'
+        },
+        {
+          scenario_name: 'Weather Challenge',
+          drone_name: 'DJI Mini 3',
+          location_name: 'Ocean Beach',
+          start_time: '2024-01-13T11:45:00Z',
+          duration_formatted: '32 minutes'
+        },
+        {
+          scenario_name: 'Precision Landing',
+          drone_name: 'DJI Air 2S',
+          location_name: 'Alcatraz Island',
+          start_time: '2024-01-12T16:20:00Z',
+          duration_formatted: '22 minutes'
+        }
+      ]
+    },
+    achievements: ['Welcome Aboard', 'First Flight', 'Night Pilot', 'Precision Master', 'Weather Warrior']
   }
 
   const mockPurchases = [
     {
       id: 'DEMO-001',
-      product_name: 'DroneSimulator Basic License',
-      product_type: 'software' as const,
-      amount: 99.99,
+      product_name: 'DroneSimulator Pro License',
+      product_type: 'software',
+      amount: '199.99',
       currency: 'USD',
-      purchase_date: '2024-01-15',
-      status: 'completed' as const,
-      description: 'Basic drone simulation software with essential features',
-      invoice_url: '#'
+      payment_date: '2024-01-15T00:00:00Z',
+      status: 'completed',
+      description: 'Professional drone simulation software with advanced features and unlimited scenarios'
     },
     {
       id: 'DEMO-002',
-      product_name: 'Beginner Training Course',
-      product_type: 'training' as const,
-      amount: 49.99,
+      product_name: 'Advanced Pilot Training Course',
+      product_type: 'training',
+      amount: '89.99',
       currency: 'USD',
-      purchase_date: '2024-02-01',
-      status: 'completed' as const,
-      description: 'Introduction to drone piloting and basic safety protocols',
-      invoice_url: '#'
+      payment_date: '2024-02-01T00:00:00Z',
+      status: 'completed',
+      description: 'Comprehensive training course covering advanced flight techniques and safety protocols'
+    },
+    {
+      id: 'DEMO-003',
+      product_name: 'Weather Simulation Pack',
+      product_type: 'software',
+      amount: '49.99',
+      currency: 'USD',
+      payment_date: '2024-02-15T00:00:00Z',
+      status: 'completed',
+      description: 'Additional weather scenarios including storms, fog, and extreme conditions'
     }
   ]
+
   // Use authenticated user data if available, otherwise use mock data
-  const currentUser = user || mockUser
-  const currentPurchases = stripePurchases;
-
-
-  // Inline styles
-  const styles = {
-    container: {
-      minHeight: '100vh',
-      backgroundColor: '#f9fafb',
-      fontFamily: 'Inter, system-ui, sans-serif'
-    },
-  header: {
-  backgroundColor: 'white',
-  boxShadow: '0 1px 2px rgba(0, 0, 0, 0.05)',
-  borderBottom: '1px solid #e5e7eb',
-  paddingTop: '0.25rem',
-  paddingBottom: '0.25rem', // Reduced vertical space
-  minHeight: '2.5rem' // Optional: controls height directly
-},
-
-    headerContent: {
-      maxWidth: '80rem',
-      margin: '0 auto',
-      padding: '0 1rem'
-    },
-    headerInner: {
-      display: 'flex',
-      alignItems: 'center',
-      justifyContent: 'space-between',
-      height: '4rem'
-    },
-    logoContainer: {
-      display: 'flex',
-      alignItems: 'center',
-      gap: '1rem'
-    },
-    logoIcon: {
-      backgroundColor: '#f97316',
-      borderRadius: '0.5rem',
-      padding: '0.5rem'
-    },
-    logoText: {
-      fontSize: '1.25rem',
-      fontWeight: '700',
-      color: '#111827'
-    },
-    logoSubtext: {
-      fontSize: '0.875rem',
-      color: '#6b7280'
-    },
-    nav: {
-      display: 'flex',
-      alignItems: 'center',
-      gap: '2rem'
-    },
-    navLink: {
-      color: '#6b7280',
-      textDecoration: 'none',
-      fontWeight: '500',
-      padding: '0.5rem 1rem',
-      borderRadius: '0.5rem',
-      transition: 'all 0.2s',
-      cursor: 'pointer'
-    },
-    navLinkHover: {
-      color: '#f97316',
-      backgroundColor: '#fff7ed'
-    },
-    logoutButton: {
-      backgroundColor: '#f97316',
-      color: 'white',
-      padding: '0.5rem 1rem',
-      borderRadius: '0.5rem',
-      fontWeight: '500',
-      border: 'none',
-      cursor: 'pointer',
-      transition: 'background-color 0.2s'
-    },
-    mainContent: {
-      maxWidth: '80rem',
-      margin: '0 auto',
-      padding: '2rem 1rem'
-    },
-    profileHeader: {
-      background: 'linear-gradient(to right, #f97316, #ea580c)',
-      borderRadius: '1rem',
-      padding: '2rem',
-      marginBottom: '2rem'
-    },
-    profileHeaderInner: {
-      display: 'flex',
-      alignItems: 'center',
-      justifyContent: 'space-between'
-    },
-    profileInfo: {
-      display: 'flex',
-      alignItems: 'center',
-      gap: '1.5rem'
-    },
-    avatar: {
-      width: '6rem',
-      height: '6rem',
-      backgroundColor: 'white',
-      borderRadius: '50%',
-      display: 'flex',
-      alignItems: 'center',
-      justifyContent: 'center'
-    },
-    avatarText: {
-      fontSize: '1.875rem',
-      fontWeight: '700',
-      color: '#f97316'
-    },
-    profileName: {
-      fontSize: '1.875rem',
-      fontWeight: '700',
-      color: 'white',
-      marginBottom: '0.5rem'
-    },
-    profileUsername: {
-      color: '#fed7aa',
-      fontSize: '1.125rem'
-    },
-    profileMeta: {
-      display: 'flex',
-      alignItems: 'center',
-      gap: '1rem',
-      marginTop: '0.75rem'
-    },
-    badge: {
-      backgroundColor: 'rgba(255, 255, 255, 0.2)',
-      color: 'white',
-      padding: '0.25rem 0.75rem',
-      borderRadius: '9999px',
-      fontSize: '0.875rem',
-      fontWeight: '500'
-    },
-    memberSince: {
-      color: '#fed7aa',
-      fontSize: '0.875rem'
-    },
-    flightHours: {
-      textAlign: 'right' as const,
-      color: 'white'
-    },
-    flightHoursNumber: {
-      fontSize: '1.875rem',
-      fontWeight: '700'
-    },
-    flightHoursLabel: {
-      color: '#fed7aa'
-    },
-    statsGrid: {
-      display: 'flex',
-      justifyContent: 'space-between',
-      gap: '1.5rem',
-      flexWrap: 'wrap',
-      marginBottom: '2rem'
-    },
-
-    statCard: {
-      backgroundColor: 'white',
-      borderRadius: '0.75rem',
-      padding: '1.5rem',
-      boxShadow: '0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06)'
-    },
-    statCardInner: {
-      display: 'flex',
-      alignItems: 'center',
-      justifyContent: 'space-between'
-    },
-    statLabel: {
-      color: '#6b7280',
-      fontSize: '0.875rem'
-    },
-    statValue: {
-      fontSize: '1.5rem',
-      fontWeight: '700',
-      color: '#111827'
-    },
-    statIcon: {
-      padding: '0.75rem',
-      borderRadius: '0.5rem'
-    },
-    tabsContainer: {
-      backgroundColor: 'white',
-      borderRadius: '1rem',
-      boxShadow: '0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06)'
-    },
-    tabsHeader: {
-      borderBottom: '1px solid #e5e7eb'
-    },
-    tabsNav: {
-      display: 'flex',
-      gap: '2rem',
-      padding: '0 2rem',
-      paddingTop: '1.5rem'
-    },
-    tab: {
-      display: 'flex',
-      alignItems: 'center',
-      gap: '0.5rem',
-      padding: '1rem 0.25rem',
-      borderBottom: '2px solid transparent',
-      fontWeight: '500',
-      fontSize: '0.875rem',
-      cursor: 'pointer',
-      transition: 'all 0.2s',
-      background: 'none',
-      border: 'none'
-    },
-    tabActive: {
-      borderBottomColor: '#f97316',
-      color: '#ea580c'
-    },
-    tabInactive: {
-      color: '#6b7280'
-    },
-    tabContent: {
-      padding: '2rem'
-    },
-    formInput: {
-      width: '100%',
-      padding: '0.75rem 1rem',
-      border: '1px solid #d1d5db',
-      borderRadius: '0.5rem',
-      fontSize: '0.875rem',
-      transition: 'all 0.2s',
-      outline: 'none'
-    },
-    formInputFocused: {
-      borderColor: '#f97316',
-      boxShadow: '0 0 0 3px rgba(249, 115, 22, 0.1)'
-    },
-    formInputDisabled: {
-      backgroundColor: '#f9fafb',
-      cursor: 'not-allowed'
-    },
-    formInputError: {
-      borderColor: '#ef4444'
-    },
-    formLabel: {
-      display: 'block',
-      fontSize: '0.875rem',
-      fontWeight: '500',
-      color: '#374151',
-      marginBottom: '0.5rem'
-    },
-    formGroup: {
-      marginBottom: '1.5rem'
-    },
-    formGrid: {
-      display: 'grid',
-      gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))',
-      gap: '1.5rem'
-    },
-    formGridFull: {
-      gridColumn: '1 / -1'
-    },
-    button: {
-      padding: '0.75rem 1.5rem',
-      borderRadius: '0.5rem',
-      fontWeight: '500',
-      cursor: 'pointer',
-      transition: 'all 0.2s',
-      border: 'none'
-    },
-    buttonPrimary: {
-      backgroundColor: '#f97316',
-      color: 'white'
-    },
-    buttonSecondary: {
-      backgroundColor: '#6b7280',
-      color: 'white'
-    },
-    buttonDisabled: {
-      opacity: 0.5,
-      cursor: 'not-allowed'
-    },
-    errorMessage: {
-      color: '#ef4444',
-      fontSize: '0.875rem',
-      marginTop: '0.25rem'
-    },
-    successMessage: {
-      padding: '1rem',
-      backgroundColor: '#f0fdf4',
-      border: '1px solid #bbf7d0',
-      borderRadius: '0.5rem',
-      marginBottom: '1.5rem'
-    },
-    successMessageInner: {
-      display: 'flex',
-      alignItems: 'center'
-    },
-    successMessageText: {
-      color: '#15803d',
-      marginLeft: '0.75rem'
-    },
-    purchaseCard: {
-      backgroundColor: '#f9fafb',
-      borderRadius: '0.75rem',
-      padding: '1.5rem',
-      marginBottom: '1rem'
-    },
-    purchaseCardInner: {
-      display: 'flex',
-      alignItems: 'center',
-      justifyContent: 'space-between'
-    },
-    purchaseInfo: {
-      display: 'flex',
-      alignItems: 'center',
-      gap: '1rem'
-    },
-    purchaseIcon: {
-      backgroundColor: 'white',
-      padding: '0.75rem',
-      borderRadius: '0.5rem',
-      boxShadow: '0 1px 3px 0 rgba(0, 0, 0, 0.1)'
-    },
-    purchaseDetails: {
-      flex: 1
-    },
-    purchaseTitle: {
-      fontWeight: '600',
-      color: '#111827'
-    },
-    purchaseDescription: {
-      color: '#6b7280',
-      fontSize: '0.875rem'
-    },
-    purchaseMeta: {
-      display: 'flex',
-      alignItems: 'center',
-      gap: '1rem',
-      marginTop: '0.5rem'
-    },
-    purchaseMetaItem: {
-      fontSize: '0.875rem',
-      color: '#6b7280'
-    },
-    statusBadge: {
-      padding: '0.25rem 0.5rem',
-      borderRadius: '9999px',
-      fontSize: '0.75rem',
-      fontWeight: '500'
-    },
-    statusCompleted: {
-      backgroundColor: '#dcfce7',
-      color: '#166534'
-    },
-    statusPending: {
-      backgroundColor: '#fef3c7',
-      color: '#92400e'
-    },
-    statusCancelled: {
-      backgroundColor: '#fee2e2',
-      color: '#991b1b'
-    },
-    statusRefunded: {
-      backgroundColor: '#f3f4f6',
-      color: '#374151'
-    },
-    purchasePrice: {
-      textAlign: 'right' as const
-    },
-    purchasePriceAmount: {
-      fontSize: '1.25rem',
-      fontWeight: '700',
-      color: '#111827'
-    },
-    purchasePriceCurrency: {
-      fontSize: '0.875rem',
-      color: '#6b7280'
-    },
-    achievementGrid: {
-      display: 'grid',
-      gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))',
-      gap: '1.5rem'
-    },
-    achievementCard: {
-      background: 'linear-gradient(135deg, #fefce8 0%, #fed7aa 100%)',
-      borderRadius: '0.75rem',
-      padding: '1.5rem',
-      border: '1px solid #fde68a'
-    },
-    achievementHeader: {
-      display: 'flex',
-      alignItems: 'center',
-      gap: '0.75rem',
-      marginBottom: '1rem'
-    },
-    achievementIcon: {
-      backgroundColor: '#fef3c7',
-      padding: '0.75rem',
-      borderRadius: '50%'
-    },
-    achievementTitle: {
-      fontWeight: '700',
-      color: '#111827'
-    },
-    achievementSubtitle: {
-      fontSize: '0.875rem',
-      color: '#6b7280'
-    },
-    achievementDescription: {
-      backgroundColor: '#fef3c7',
-      borderRadius: '0.5rem',
-      padding: '0.75rem'
-    },
-    achievementDescriptionText: {
-      fontSize: '0.875rem',
-      color: '#92400e'
-    },
-    demoNotice: {
-      backgroundColor: '#fef3c7',
-      border: '1px solid #fde68a',
-      borderRadius: '0.5rem',
-      padding: '1rem',
-      marginBottom: '2rem'
-    },
-    demoNoticeInner: {
-      display: 'flex',
-      alignItems: 'center'
-    },
-    demoNoticeText: {
-      color: '#92400e',
-      marginLeft: '0.75rem'
-    }
-  }
+  const currentUser = detailedUser || mockUser
+  const currentPurchases = stripePurchases.length > 0 ? stripePurchases : mockPurchases
   useEffect(() => {
     const fetchData = async () => {
-      const token = sessionStorage.getItem('auth_token');
-      const storedUser = sessionStorage.getItem('auth_user');
+      const token = sessionStorage.getItem('auth_token')
+      const storedUser = sessionStorage.getItem('auth_user')
 
       if (!token || !storedUser) {
-        console.warn('Missing token or user session');
-        return;
+        setApiError(true)
+        return
       }
 
-      const { email } = JSON.parse(storedUser);
-
-      // 1. Fetch single user details
       try {
+        const { email } = JSON.parse(storedUser)
+
+        // Fetch user details
         const userRes = await fetch('https://34-93-79-185.nip.io/api/get-single-user-details/', {
           method: 'POST',
           headers: {
@@ -519,65 +174,57 @@ const Profile: React.FC = () => {
             Authorization: `Bearer ${token}`
           },
           body: JSON.stringify({ email })
-        });
+        })
 
-        const userResult = await userRes.json();
-        console.log('User Detail API Response:', userResult);
-
-        if (userRes.ok && userResult.data) {
-          setDetailedUser(userResult.data);
+        if (userRes.ok) {
+          const userResult = await userRes.json()
+          if (userResult.data) {
+            setDetailedUser(userResult.data)
+            setApiError(false)
+          }
         } else {
-          console.error('Failed to fetch user details:', userResult.message);
+          throw new Error('Failed to fetch user details')
         }
-      } catch (error) {
-        console.error('User API error:', error);
-      }
 
-      // 2. Fetch stripe transactions
-      try {
+        // Fetch stripe transactions
         const stripeRes = await fetch('https://34-93-79-185.nip.io/api/stripe/my-transactions/', {
           headers: {
             Authorization: `Token ${token}`
           }
-        });
+        })
 
-        const stripeResult = await stripeRes.json();
-        console.log('Stripe Transactions API Response:', stripeResult);
-
-        // ✅ Correct extraction from 'transactions'
-        const transactions = Array.isArray(stripeResult.transactions) ? stripeResult.transactions : [];
-
-        setStripePurchases(transactions);
-      } catch (err) {
-        console.error('Stripe API error:', err);
+        if (stripeRes.ok) {
+          const stripeResult = await stripeRes.json()
+          const transactions = Array.isArray(stripeResult.transactions) ? stripeResult.transactions : []
+          setStripePurchases(transactions)
+        }
+      } catch (error) {
+        console.error('API error:', error)
+        setApiError(true)
       }
-    };
+    }
 
-    fetchData();
-  }, []);
+    fetchData()
+  }, [])
 
-  // Populate form fields from detailedUser after it's fetched
+  // Populate form fields
   useEffect(() => {
-    if (detailedUser) {
-      const isOtherPurpose = !['personal', 'commercial', 'educational', 'research'].includes(detailedUser.purpose_of_use);
+    if (currentUser) {
+      const isOtherPurpose = !['personal', 'commercial', 'educational', 'research'].includes(currentUser.purpose_of_use)
 
       setFormData({
-        email: detailedUser.email || '',
-        username: detailedUser.username || '',
-        full_name: detailedUser.full_name || '',
-        phone_number: detailedUser.phone_number || '',
-        city: detailedUser.city || '',
-        state_province: detailedUser.state_province || '',
-        country: detailedUser.country || '',
-        purpose_of_use: isOtherPurpose ? 'other' : detailedUser.purpose_of_use || '',
-        purpose_other: isOtherPurpose ? detailedUser.purpose_of_use || '' : ''
-      });
+        email: currentUser.email || '',
+        username: currentUser.username || '',
+        full_name: currentUser.full_name || '',
+        phone_number: currentUser.phone_number || '',
+        city: currentUser.city || '',
+        state_province: currentUser.state_province || '',
+        country: currentUser.country || '',
+        purpose_of_use: isOtherPurpose ? 'other' : currentUser.purpose_of_use || '',
+        purpose_other: isOtherPurpose ? currentUser.purpose_of_use || '' : ''
+      })
     }
-  }, [detailedUser]);
-
-
-
-
+  }, [currentUser])
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target
@@ -634,22 +281,22 @@ const Profile: React.FC = () => {
   }
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+    e.preventDefault()
 
-    if (!validateForm()) return;
+    if (!validateForm()) return
 
-    const tokenInStorage = sessionStorage.getItem('auth_token');
+    const tokenInStorage = sessionStorage.getItem('auth_token')
     if (!isAuthenticated && !tokenInStorage) {
-      setErrors({ submit: 'Please log in to edit your profile.' });
-      return;
+      setErrors({ submit: 'Please log in to edit your profile.' })
+      return
     }
 
-    setIsLoading(true);
+    setIsLoading(true)
 
     const payload = {
       email: formData.email,
       username: formData.username,
-      password: `${formData.username}@1234`, // optional logic (you can remove this if not required)
+      password: `${formData.username}@1234`,
       password_confirm: `${formData.username}@1234`,
       full_name: formData.full_name,
       phone_number: formData.phone_number,
@@ -657,7 +304,7 @@ const Profile: React.FC = () => {
       state_province: formData.state_province,
       country: formData.country,
       purpose_of_use: formData.purpose_of_use === 'other' ? formData.purpose_other : formData.purpose_of_use
-    };
+    }
 
     try {
       const response = await fetch('https://34-93-79-185.nip.io/api/update-user-details/', {
@@ -667,40 +314,48 @@ const Profile: React.FC = () => {
           Authorization: `Bearer ${tokenInStorage}`
         },
         body: JSON.stringify(payload)
-      });
+      })
 
-      const result = await response.json();
+      const result = await response.json()
 
       if (!response.ok) {
-        throw new Error(result.message || 'Failed to update profile.');
+        throw new Error(result.message || 'Failed to update profile.')
       }
 
-      // Update sessionStorage and context if needed
-      sessionStorage.setItem('auth_user', JSON.stringify(result.data));
+      sessionStorage.setItem('auth_user', JSON.stringify(result.data))
       if (updateProfile) {
-        updateProfile(result.data); // if your context accepts and updates with this object
+        updateProfile(result.data)
       }
 
-      setSuccessMessage('Profile updated successfully!');
-      setIsEditing(false);
+      setSuccessMessage('Profile updated successfully!')
+      setIsEditing(false)
     } catch (error: any) {
-      console.error('Update error:', error);
-      setErrors({ submit: error.message || 'Failed to update profile. Please try again.' });
+      console.error('Update error:', error)
+      setErrors({ submit: error.message || 'Failed to update profile. Please try again.' })
     } finally {
-      setIsLoading(false);
-    }
-  };
-
-
-  const handleLogout = () => {
-    if (isAuthenticated) {
-      logout()
-      navigate('/auth/login')
-    } else {
-      navigate('/auth/login')
+      setIsLoading(false)
     }
   }
+  const getTotalFlightHours = (scenarios: any[]) => {
+    let totalSeconds = 0
 
+    scenarios.forEach((s) => {
+      if (s.duration_formatted) {
+        const [hh, mm, ss] = s.duration_formatted.split(':').map(Number)
+        totalSeconds += (hh * 3600 + mm * 60 + ss)
+      }
+    })
+
+    return (totalSeconds / 3600).toFixed(1) // return in hours
+  }
+
+  const handleLogout = () => {
+    sessionStorage.clear(); // ✅ Clears auth_token and auth_user
+    if (isAuthenticated) {
+      logout(); // ✅ Clears context, tokens, etc.
+    }
+    navigate('/auth/login'); // ✅ Redirect to login
+  }
   const handleCancel = () => {
     if (currentUser) {
       const isOtherPurpose = !['personal', 'commercial', 'educational', 'research'].includes(currentUser.purpose_of_use)
@@ -721,690 +376,755 @@ const Profile: React.FC = () => {
     setSuccessMessage('')
   }
 
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case 'completed': return styles.statusCompleted
-      case 'pending': return styles.statusPending
-      case 'cancelled': return styles.statusCancelled
-      case 'refunded': return styles.statusRefunded
-      default: return styles.statusRefunded
+  const getStatusBadge = (status: string) => {
+    const badges = {
+      completed: { icon: CheckCircle, color: 'text-emerald-700 bg-emerald-50 border-emerald-200', text: 'Completed' },
+      pending: { icon: Clock, color: 'text-amber-700 bg-amber-50 border-amber-200', text: 'Pending' },
+      cancelled: { icon: XCircle, color: 'text-red-700 bg-red-50 border-red-200', text: 'Cancelled' },
+      refunded: { icon: RefreshCw, color: 'text-slate-700 bg-slate-50 border-slate-200', text: 'Refunded' }
     }
+
+    const badge = badges[status as keyof typeof badges] || badges.completed
+    const Icon = badge.icon
+
+    return (
+      <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium border ${badge.color}`}>
+        <Icon className="w-3 h-3" />
+        {badge.text}
+      </span>
+    )
   }
 
-  const getProductTypeIcon = (type: string) => {
-    switch (type) {
-      case 'software':
-        return (
-          <svg style={{ width: '1.25rem', height: '1.25rem', color: '#2563eb' }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 3v2m6-2v2M9 19v2m6-2v2M5 9H3m2 6H3m18-6h-2m2 6h-2M7 19h10a2 2 0 002-2V7a2 2 0 00-2-2H7a2 2 0 00-2 2v10a2 2 0 002 2zM9 9h6v6H9V9z" />
-          </svg>
-        )
-      case 'hardware':
-        return (
-          <svg style={{ width: '1.25rem', height: '1.25rem', color: '#6b7280' }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z" />
-          </svg>
-        )
-      case 'subscription':
-        return (
-          <svg style={{ width: '1.25rem', height: '1.25rem', color: '#7c3aed' }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
-          </svg>
-        )
-      case 'training':
-        return (
-          <svg style={{ width: '1.25rem', height: '1.25rem', color: '#059669' }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.746 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
-          </svg>
-        )
-      default:
-        return (
-          <svg style={{ width: '1.25rem', height: '1.25rem', color: '#6b7280' }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
-          </svg>
-        )
+  const getProductIcon = (type: string) => {
+    const icons = {
+      software: Monitor,
+      hardware: Package,
+      training: GraduationCap,
+      subscription: RefreshCw
     }
+
+    const Icon = icons[type as keyof typeof icons] || Package
+    return <Icon className="w-5 h-5" />
   }
+
+  const tabs = [
+    { id: 'overview', name: 'Overview', icon: BarChart3 },
+    { id: 'profile', name: 'Profile', icon: User },
+    { id: 'purchases', name: 'Purchases', icon: ShoppingBag },
+    // { id: 'achievements', name: 'Achievements', icon: Award }
+  ]
 
   return (
-    <>
 
-      <div style={styles.container}>
-        {/* Header */}
-        <div style={styles.header}>
-          <div style={styles.headerContent}>
-            <div style={styles.headerInner}>
-              <div style={styles.logoContainer}>
-                <div style={styles.logoIcon}>
-                  <svg style={{ width: '1.5rem', height: '1.5rem', color: 'white' }} fill="currentColor" viewBox="0 0 24 24">
-                    <path d="M12 2L2 7v10c0 5.55 3.84 9.74 9 11 0 0 1-.37 1-1s-.37-1-1-1c-4.34-1.04-7-4.55-7-9V8.3l7-3.11 7 3.11V17c0 4.45-2.66 7.96-7 9 0 0-1 .37-1 1s1 1 1 1c5.16-1.26 9-5.45 9-11V7l-10-5z" />
-                  </svg>
-                </div>
-                <div>
-                  <h1 style={styles.logoText}>DroneSimulator</h1>
-                  <p style={styles.logoSubtext}>Profile Dashboard</p>
+    <div className="min-h-screen bg-gray-50 w-full overflow-x-hidden">
+     <header className="lg:hidden bg-white border-b border-gray-200 sticky top-0 z-50 w-full">
+        <div className="w-full px-3 py-3">
+          <div className="flex items-center justify-between w-full">
+            <div className="flex items-center gap-2 min-w-0 flex-1">
+              <div className="flex items-center gap-3">
+                <img
+                  src="images/logonew.png" // or wherever your logo is located
+                  alt="Logo"
+                  className="w-10 h-10 rounded-md object-contain"
+                />
+                <div className="min-w-0">
+                  <h1 className="text-base font-bold text-gray-900 truncate">Profile Dashboard</h1>
                 </div>
               </div>
-              <div style={styles.nav}>
-                {isAuthenticated && (
-                  <Link
-                    to="/"
-                    style={styles.navLink}
-                    onMouseEnter={(e) => {
-                      e.currentTarget.style.color = styles.navLinkHover.color
-                      e.currentTarget.style.backgroundColor = styles.navLinkHover.backgroundColor
-                    }}
-                    onMouseLeave={(e) => {
-                      e.currentTarget.style.color = styles.navLink.color
-                      e.currentTarget.style.backgroundColor = 'transparent'
-                    }}
-                  >
-                    Home
-                  </Link>
-                )}
-               <button
-  onClick={() => navigate('/')}
-  style={{
-    ...styles.logoutButton,
-    padding: '0.4rem 0.75rem',
-    fontSize: '0.85rem',
-    borderRadius: '0.375rem',
-  }}
-  onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#ea580c'}
-  onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#f97316'}
->
-  Back to Home
-</button>
+            </div>
 
+            <button
+              onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+              className="p-2 text-gray-600 hover:text-orange-500 transition-colors flex-shrink-0"
+            >
+              <Menu className="w-5 h-5" />
+            </button>
+          </div>
 
-                <button
-                  onClick={handleLogout}
-                  style={{
-                    ...styles.logoutButton,
-                    padding: '0.25rem 0.75rem',  // Smaller padding
-                    fontSize: '0.875rem',         // Smaller font size
-                    ':hover': { backgroundColor: '#ea580c' }
-                  }}
-                  onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#ea580c'}
-                  onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#f97316'}
-                >
-                  Sign Out
-                </button>
+          {/* Mobile Menu */}
+          {isMobileMenuOpen && (
+            <div className="mt-3 pt-3 border-t border-gray-200 w-full">
+              <Link
+                to="/"
+                className="flex items-center gap-2 text-gray-600 hover:text-orange-500 transition-colors py-2 w-full"
+                onClick={() => setIsMobileMenuOpen(false)}
+              >
+                <ArrowLeft className="w-4 h-4" />
+                Back to Home
+              </Link>
+              <button
+                onClick={handleLogout}
+                className="w-full mt-2 px-3 py-2 bg-orange-500 hover:bg-orange-600 text-white rounded-lg font-medium transition-colors text-sm"
+              >
+                Sign Out
+              </button>
+            </div>
+          )}
+        </div>
+      </header>
 
+      {/* Desktop Header */}
+      <header className="hidden lg:block bg-white border-b border-gray-200 sticky top-0 z-50 w-full">
+        <div className="w-full px-6 py-4">
+          <div className="flex items-center justify-between w-full">
+            <div className="flex items-center gap-6">
+              <div className="flex items-center gap-3">
+                <div className="flex items-center gap-3">
+                  <img
+                    src="/images/logonew.png" // or wherever your logo is located
+                    alt="Logo"
+                    className="w-17 h-10 rounded-md object-contain"
+                  />
+                  <div className="min-w-0">
+                    <h1 className="text-base font-bold text-gray-900 truncate">    Profile Dashboard</h1>
+                  </div>
+                </div>
               </div>
 
+              <Link
+                to="/"
+                className="flex items-center gap-2 text-gray-600 hover:text-orange-500 transition-colors font-medium"
+              >
+                <ArrowLeft className="w-4 h-4" />
+                Back to Home
+              </Link>
+            </div>
+
+            <button
+              onClick={handleLogout}
+              className="px-5 py-2.5 bg-orange-500 hover:bg-orange-600 text-white rounded-xl font-medium transition-colors"
+            >
+              Sign Out
+            </button>
+          </div>
+        </div>
+      </header>
+
+      {/* API Error Notice */}
+      {apiError && (
+        <div className="bg-amber-50 border-b border-amber-200 w-full px-3 lg:px-6 py-3">
+          <div className="flex items-center gap-2">
+            <AlertCircle className="w-4 h-4 text-amber-600 flex-shrink-0" />
+            <div className="min-w-0 flex-1">
+              <p className="font-semibold text-amber-800 text-sm">Demo Mode</p>
+              <p className="text-xs text-amber-700">
+                Unable to connect to server. Showing sample data for demonstration.
+              </p>
             </div>
           </div>
         </div>
+      )}
 
-        <div style={styles.mainContent}>
-          {/* Demo Notice for non-authenticated users */}
+      {/* Main Content */}
+      <main className="w-full px-3 lg:px-6 py-4 lg:py-6">
+        {/* User Header Section */}
+        <div className="mb-6 lg:mb-8 w-full">
+          <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between mb-4 lg:mb-6 gap-4 w-full">
+            <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 lg:gap-4 w-full min-w-0">
+              <div className="w-12 h-12 lg:w-16 lg:h-16 bg-orange-500 rounded-xl flex items-center justify-center flex-shrink-0">
+                <span className="text-lg lg:text-xl font-bold text-white">
+                  {currentUser.full_name?.charAt(0)?.toUpperCase() || 'U'}
+                </span>
+              </div>
+              <div className="min-w-0 flex-1 w-full">
+                <h2 className="text-xl lg:text-2xl font-bold text-gray-900 mb-1 truncate">{currentUser.full_name}</h2>
+                <p className="text-gray-600 text-sm lg:text-base mb-2 truncate">@{currentUser.username}</p>
+                <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-4 text-xs lg:text-sm text-gray-500">
+                  <div className="flex items-center gap-1.5">
+                    <Calendar className="w-3 h-3 flex-shrink-0" />
+                    <span className="truncate">
+                      Member since {new Date(currentUser.created_at || currentUser.member_since || '2024-01-01').getFullYear()}
+                    </span>
 
-
-          {/* Profile Header */}
-
-
-          {/* Stats Cards */}
-          <div style={styles.statsGrid}>
-            <div style={styles.statCard}>
-              <div style={styles.statCardInner}>
-                <div>
-                  <p style={styles.statLabel}>Total Purchases</p>
-                  <p style={styles.statValue}>{currentPurchases.length}</p>
-                </div>
-                <div style={{ ...styles.statIcon, backgroundColor: '#dbeafe' }}>
-                  <svg style={{ width: '1.25rem', height: '1.25rem', color: '#2563eb' }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
-                  </svg>
+                  </div>
+                  <div className="flex items-center gap-1.5">
+                    <MapPin className="w-3 h-3 flex-shrink-0" />
+                    <span className="truncate">{currentUser.city}, {currentUser.country}</span>
+                  </div>
+                  <div className="flex items-center gap-1.5">
+                    <Globe className="w-3 h-3 flex-shrink-0" />
+                    <span className="truncate">{currentUser.purpose_of_use?.charAt(0).toUpperCase() + currentUser.purpose_of_use?.slice(1)}</span>
+                  </div>
                 </div>
               </div>
             </div>
 
-            <div style={styles.statCard}>
-              <div style={styles.statCardInner}>
-                <div>
-                  <p style={styles.statLabel}>Total Spent</p>
-                  <p style={styles.statValue}>
-                    ${currentPurchases.reduce((sum, p) => sum + (typeof p.amount === 'string' ? parseFloat(p.amount) : p.amount || 0), 0).toFixed(2)}
-                  </p>
+            {/* Quick Stats - Desktop */}
+            <div className="hidden lg:flex gap-6 flex-shrink-0">
+              <div className="text-center">
+                <div className="text-2xl font-bold text-gray-900 mb-1">
+                  {getTotalFlightHours(currentUser.recent_activity?.recent_scenarios || [])}
                 </div>
-                <div style={{ ...styles.statIcon, backgroundColor: '#dcfce7' }}>
-                  <svg style={{ width: '1.5rem', height: '1.5rem', color: '#16a34a' }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1" />
-                  </svg>
+                <div className="text-xs text-gray-500 font-medium">Flight Hours</div>
+              </div>
+              <div className="text-center">
+                <div className="text-2xl font-bold text-gray-900 mb-1">
+                  {currentUser.statistics?.total_scenarios_completed || 47}
                 </div>
+                <div className="text-xs text-gray-500 font-medium">Scenarios</div>
+              </div>
+              <div className="text-center">
+                <div className="text-2xl font-bold text-gray-900 mb-1">
+                  {currentUser.statistics?.total_app_sessions ?? 0}
+                </div>
+                <div className="text-xs text-gray-500 font-medium">Sessions</div>
               </div>
             </div>
-
-
-
-            {/* <div style={styles.statCard}>
-              {/* <div style={styles.statCardInner}>
-                {/* <div>
-                  <p style={styles.statLabel}>Active Orders</p>
-                  <p style={styles.statValue}>
-                    {currentPurchases.filter(p => p.status === 'pending').length}
-                  </p>
-                </div> */}
-            {/* <div style={{ ...styles.statIcon, backgroundColor: '#fed7aa' }}>
-                  <svg style={{ width: '1.5rem', height: '1.5rem', color: '#ea580c' }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                  </svg>
-                </div> 
-              </div> 
-            </div> */}
           </div>
 
-          {/* Tabs */}
-          <div style={styles.tabsContainer}>
-            <div style={styles.tabsHeader}>
-              <nav style={styles.tabsNav}>
-                {[
-                  {
-                    id: 'overview',
-                    name: 'Overview',
-                    icon: (
-                      <svg style={{ width: '1.25rem', height: '1.25rem' }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
-                      </svg>
-                    )
-                  },
-                  {
-                    id: 'profile',
-                    name: 'Profile Settings',
-                    icon: (
-                      <svg style={{ width: '1.25rem', height: '1.25rem' }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                      </svg>
-                    )
-                  },
-                  {
-                    id: 'purchases',
-                    name: 'Purchase History',
-                    icon: (
-                      <svg style={{ width: '1.25rem', height: '1.25rem' }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 3h2l.4 2M7 13h10l4-8H5.4m0 0L7 13m0 0l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17M17 13v4a2 2 0 01-2 2H9a2 2 0 01-2-2v-4m8 0V9a2 2 0 00-2-2H9a2 2 0 00-2 2v4.01" />
-                      </svg>
-                    )
-                  },
+          {/* Stats Cards */}
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 lg:gap-4 w-full">
+            <div className="bg-white rounded-xl p-3 lg:p-4 border border-gray-200">
+              <div className="flex items-center justify-between">
+                <div className="min-w-0 flex-1">
+                  <p className="text-gray-500 text-xs font-medium mb-1">Total Purchases</p>
+                  <p className="text-lg lg:text-xl font-bold text-gray-900">
+                    {currentPurchases.filter(p => p.status === 'completed').length}
+                  </p>
+                </div>
+                <div className="p-2 bg-blue-50 rounded-lg flex-shrink-0">
+                  <ShoppingBag className="w-4 lg:w-5 h-4 lg:h-5 text-blue-600" />
+                </div>
+              </div>
+            </div>
 
-                ].map((tab) => (
+            <div className="bg-white rounded-xl p-3 lg:p-4 border border-gray-200">
+              <div className="flex items-center justify-between">
+                <div className="min-w-0 flex-1">
+                  <p className="text-gray-500 text-xs font-medium mb-1">Total Spent</p>
+                  <p className="text-lg lg:text-xl font-bold text-gray-900">
+                    ${currentPurchases
+                      .filter(p => p.status === 'completed')
+                      .reduce((sum, p) => sum + parseFloat(p.amount || '0'), 0)
+                      .toFixed(2)}
+                  </p>
+                </div>
+                <div className="p-2 bg-emerald-50 rounded-lg flex-shrink-0">
+                  <DollarSign className="w-4 lg:w-5 h-4 lg:h-5 text-emerald-600" />
+                </div>
+              </div>
+            </div>
+
+            <div className="bg-white rounded-xl p-3 lg:p-4 border border-gray-200">
+              <div className="flex items-center justify-between">
+                <div className="min-w-0 flex-1">
+                  <p className="text-gray-500 text-xs font-medium mb-1">Account Status</p>
+                  <p className="text-lg lg:text-xl font-bold text-emerald-600">
+                    {currentUser.is_active ? 'Active' : 'Inactive'}
+                  </p>
+                </div>
+                <div className="p-2 bg-emerald-50 rounded-lg flex-shrink-0">
+                  <Activity className="w-4 lg:w-5 h-4 lg:h-5 text-emerald-600" />
+                </div>
+              </div>
+            </div>
+
+            {/* <div className="bg-white rounded-xl p-3 lg:p-4 border border-gray-200">
+              <div className="flex items-center justify-between">
+                <div className="min-w-0 flex-1">
+                  <p className="text-gray-500 text-xs font-medium mb-1">Achievements</p>
+                  <p className="text-lg lg:text-xl font-bold text-gray-900">
+                    {currentUser.achievements?.length || 0}
+                  </p>
+                </div>
+                <div className="p-2 bg-amber-50 rounded-lg flex-shrink-0">
+                  <Award className="w-4 lg:w-5 h-4 lg:h-5 text-amber-600" />
+                </div>
+              </div>
+            </div> */}
+          </div>
+        </div>
+
+        {/* Tabs Navigation */}
+        <div className="bg-white rounded-xl border border-gray-200 overflow-hidden w-full">
+          {/* Mobile Tabs */}
+          <nav className="lg:hidden border-b border-gray-200 w-full">
+            <div className="flex overflow-x-auto w-full">
+              {tabs.map((tab) => {
+                const Icon = tab.icon
+                return (
                   <button
                     key={tab.id}
                     onClick={() => setActiveTab(tab.id)}
-                    style={{
-                      ...styles.tab,
-                      ...(activeTab === tab.id ? styles.tabActive : styles.tabInactive)
-                    }}
+                    className={`flex items-center gap-2 px-3 py-3 text-xs font-medium border-b-2 transition-colors whitespace-nowrap flex-shrink-0 ${activeTab === tab.id
+                      ? 'border-orange-500 text-orange-600 bg-orange-50'
+                      : 'border-transparent text-gray-500 hover:text-gray-700 hover:bg-gray-50'
+                      }`}
                   >
-                    {tab.icon}
-                    <span>{tab.name}</span>
+                    <Icon className="w-3 h-3" />
+                    {tab.name}
                   </button>
-                ))}
-              </nav>
+                )
+              })}
             </div>
+          </nav>
 
-            <div style={styles.tabContent}>
-              {/* Overview Tab */}
-              {activeTab === 'overview' && (
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
-                  <div>
-                     <h3 style={{ fontSize: '1.5rem', fontWeight: '700', color: '#111827' }}>Profile Information</h3>
 
-                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(400px, 1fr))', gap: '2rem' }}>
-                      {/* Scenario Activity */}
-                      <div style={{ backgroundColor: '#f9fafb', borderRadius: '0.75rem', padding: '1.5rem' }}>
-                        <h4 style={{ fontSize: '1.125rem', fontWeight: '600', color: '#111827', marginBottom: '1rem' }}>Scenario Activity</h4>
+          {/* Desktop Tabs */}
+          <nav className="hidden lg:flex border-b border-gray-200 w-full">
+            {tabs.map((tab) => {
+              const Icon = tab.icon
+              return (
+                <button
+                  key={tab.id}
+                  onClick={() => setActiveTab(tab.id)}
+                  className={`flex items-center gap-2 px-6 py-4 text-sm font-medium border-b-2 transition-colors ${activeTab === tab.id
+                    ? 'border-orange-500 text-orange-600 bg-orange-50'
+                    : 'border-transparent text-gray-500 hover:text-gray-700 hover:bg-gray-50'
+                    }`}
+                >
+                  <Icon className="w-4 h-4" />
+                  {tab.name}
+                </button>
+              )
+            })}
+          </nav>
 
-                        <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-                          {(detailedUser?.recent_activity?.recent_scenarios || [])
-                            .slice(0, showAllScenarios ? undefined : 3)
-                            .map((item, index) => (
-                              <div
-                                key={index}
-                                style={{
-                                  backgroundColor: 'white',
-                                  padding: '1rem',
-                                  borderRadius: '0.5rem',
-                                  boxShadow: '0 1px 2px rgba(0,0,0,0.05)'
-                                }}
-                              >
-                                <div style={{ fontWeight: '600', color: '#111827' }}>
-                                  {item.scenario_name} – {item.drone_name}
-                                </div>
-                                <div style={{ fontSize: '0.875rem', color: '#6b7280' }}>{item.location_name}</div>
-                                <div style={{ fontSize: '0.875rem', color: '#6b7280' }}>
-                                  {new Date(item.start_time).toLocaleString()} | Duration: {item.duration_formatted}
-                                </div>
+          {/* Tab Content */}
+          <div className="p-3 lg:p-6 w-full">
+            {/* Overview Tab */}
+            {activeTab === 'overview' && (
+              <div className="space-y-4 lg:space-y-6 w-full">
+                <div className="w-full">
+                  <h3 className="text-lg lg:text-xl font-bold text-gray-900 mb-3 lg:mb-4">Account Overview</h3>
+
+                  <div className="grid grid-cols-1 xl:grid-cols-2 gap-4 lg:gap-6 w-full">
+                    {/* Recent Activity */}
+                    <div className="bg-gray-50 rounded-xl p-3 lg:p-4 w-full">
+                      <h4 className="text-base font-semibold text-gray-900 mb-3 lg:mb-4">Recent Scenarios</h4>
+                      <div className="space-y-3 w-full">
+                        {(currentUser.recent_activity?.recent_scenarios || [])
+                          .slice(0, showAllScenarios ? undefined : 4)
+                          .map((scenario: any, index: number) => (
+                            <div key={index} className="bg-white rounded-lg p-3 border border-gray-200 w-full">
+                              <div className="flex items-start justify-between mb-2 w-full">
+                                <h5 className="font-semibold text-gray-900 text-sm truncate flex-1 min-w-0">{scenario.scenario_name}</h5>
+                                <span className="text-xs text-gray-500 bg-gray-100 px-2 py-1 rounded-full ml-2 flex-shrink-0">
+                                  {scenario.duration_formatted}
+                                </span>
+
                               </div>
-                            ))}
+                              <p className="text-sm text-gray-600 mb-1 truncate">{scenario.drone_name}</p>
+                              <p className="text-sm text-gray-500 mb-1 truncate">{scenario.location_name}</p>
+                              <p className="text-xs text-gray-400">
+                                {new Date(scenario.start_time).toLocaleDateString()}
+                              </p>
+                            </div>
+                          ))}
 
-                          {detailedUser?.recent_activity?.recent_scenarios?.length > 3 && (
-                            <button
-                              type="button"
-                              onClick={() => setShowAllScenarios(!showAllScenarios)}
-                              style={{
-                                marginTop: '0.5rem',
-                                alignSelf: 'flex-start',
-                                background: 'none',
-                                color: '#f97316',
-                                border: 'none',
-                                cursor: 'pointer',
-                                fontWeight: '500',
-                                fontSize: '0.875rem'
-                              }}
-                            >
-                              {showAllScenarios ? 'View Less' : 'View More'}
-                            </button>
-                          )}
+                        {currentUser.recent_activity?.recent_scenarios?.length > 4 && (
+                          <button
+                            onClick={() => setShowAllScenarios(!showAllScenarios)}
+                            className="text-orange-600 hover:text-orange-700 text-sm font-medium transition-colors"
+                          >
+                            {showAllScenarios ? 'Show Less' : 'Show More'}
+                          </button>
+                        )}
 
-                          {(!detailedUser?.recent_activity?.recent_scenarios || detailedUser.recent_activity.recent_scenarios.length === 0) && (
-                            <p style={{ fontSize: '0.875rem', color: '#9ca3af' }}>No scenarios available.</p>
-                          )}
-                        </div>
+                        {(!currentUser.recent_activity?.recent_scenarios || currentUser.recent_activity.recent_scenarios.length === 0) && (
+                          <p className="text-gray-500 text-sm">No recent scenarios available.</p>
+                        )}
                       </div>
+                    </div>
 
-                      {/* Quick Stats */}
-                      <div style={{ backgroundColor: '#f9fafb', borderRadius: '0.75rem', padding: '1.5rem' }}>
-                        <h4 style={{ fontSize: '1.125rem', fontWeight: '600', color: '#111827', marginBottom: '1rem' }}>Quick Stats</h4>
-                        <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-                          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                            <span style={{ color: '#6b7280' }}>Account Status</span>
-                            <span style={{ fontWeight: '600', color: '#059669' }}>{detailedUser?.is_active ? 'Active' : 'Inactive'}</span>
-                          </div>
-
-                          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                            <span style={{ color: '#6b7280' }}>Subscription</span>
-                            <span style={{ fontWeight: '600', color: '#ea580c' }}>
-                              {detailedUser?.plan?.toUpperCase() || currentUser.subscription_status.toUpperCase()}
-                            </span>
-                          </div>
-
-                          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                            <span style={{ color: '#6b7280' }}>Plan Expiry</span>
-                            <span style={{ fontWeight: '600', color: '#111827' }}>
-                              {detailedUser?.plan_expiry_date
-                                ? new Date(detailedUser.plan_expiry_date).toLocaleDateString()
-                                : 'N/A'}
-                            </span>
-                          </div>
-
-                          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                            <span style={{ color: '#6b7280' }}>Scenarios Completed</span>
-                            <span style={{ fontWeight: '600', color: '#111827' }}>
-                              {detailedUser?.statistics?.total_scenarios_completed ?? 0}
-                            </span>
-                          </div>
-
-                          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                            <span style={{ color: '#6b7280' }}>App Sessions</span>
-                            <span style={{ fontWeight: '600', color: '#111827' }}>
-                              {detailedUser?.statistics?.total_app_sessions ?? 0}
-                            </span>
-                          </div>
-
-                          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                            <span style={{ color: '#6b7280' }}>Location</span>
-                            <span style={{ fontWeight: '600', color: '#111827' }}>
-                              {detailedUser?.city || currentUser.city}, {detailedUser?.country || currentUser.country}
-                            </span>
-                          </div>
-
-                          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                            <span style={{ color: '#6b7280' }}>Purpose</span>
-                            <span style={{ fontWeight: '600', color: '#111827', textTransform: 'capitalize' }}>
-                              {detailedUser?.purpose_of_use || currentUser.purpose_of_use}
-                            </span>
-                          </div>
-
-                          {/* Stripe-based purchase stats */}
-                          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                            <span style={{ color: '#6b7280' }}>Total Purchases</span>
-                            <span style={{ fontWeight: '600', color: '#111827' }}>{stripePurchases.length}</span>
-                          </div>
-
-                          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                            <span style={{ color: '#6b7280' }}>Total Spent</span>
-                            <span style={{ fontWeight: '600', color: '#111827' }}>
-                              ${stripePurchases.reduce((sum, p) => sum + parseFloat(p.amount), 0).toFixed(2)}
-                            </span>
-                          </div>
+                    {/* Account Details */}
+                    <div className="bg-gray-50 rounded-xl p-3 lg:p-4 w-full">
+                      <h4 className="text-base font-semibold text-gray-900 mb-3 lg:mb-4">Account Details</h4>
+                      <div className="space-y-3 w-full">
+                        <div className="flex justify-between items-center py-2 border-b border-gray-200 w-full">
+                          <span className="text-gray-600 font-medium text-sm">Subscription</span>
+                          <span className="font-bold text-gray-900 uppercase text-xs bg-orange-500 text-white px-2 py-1 rounded-full">
+                            {currentUser.plan || 'Free'}
+                          </span>
+                        </div>
+                        <div className="flex justify-between items-center py-2 border-b border-gray-200 w-full">
+                          <span className="text-gray-600 font-medium text-sm">Plan Expiry</span>
+                          <span className="font-semibold text-gray-900 text-sm">
+                            {currentUser.plan_expiry_date
+                              ? new Date(currentUser.plan_expiry_date).toLocaleDateString()
+                              : 'N/A'}
+                          </span>
+                        </div>
+                        <div className="flex justify-between items-center py-2 border-b border-gray-200 w-full">
+                          <span className="text-gray-600 font-medium text-sm">Total Sessions</span>
+                          <span className="font-semibold text-gray-900 text-sm">
+                            {currentUser.statistics?.total_app_sessions || 0}
+                          </span>
+                        </div>
+                        <div className="flex justify-between items-center py-2 w-full">
+                          <span className="text-gray-600 font-medium text-sm">Member Since</span>
+                          <span className="font-semibold text-gray-900 text-sm">
+                            {new Date(currentUser.created_at || currentUser.member_since || '2024-01-01').toLocaleDateString()}
+                          </span>
                         </div>
                       </div>
                     </div>
                   </div>
                 </div>
-              )}
+              </div>
+            )}
 
+            {/* Profile Tab */}
+            {activeTab === 'profile' && (
+              <div className="w-full">
+                {/* Success Message */}
+                {successMessage && (
+                  <div className="mb-4 lg:mb-6 p-3 bg-emerald-50 border border-emerald-200 rounded-xl w-full">
+                    <div className="flex items-center gap-2">
+                      <CheckCircle className="w-4 h-4 text-emerald-600 flex-shrink-0" />
+                      <p className="text-emerald-800 font-medium text-sm">{successMessage}</p>
+                    </div>
+                  </div>
+                )}
 
-
-
-              {/* Profile Settings Tab */}
-              {activeTab === 'profile' && (
-                <div>
-                  {/* Success Message */}
-                  {successMessage && (
-                    <div style={styles.successMessage}>
-                      <div style={styles.successMessageInner}>
-                        <svg style={{ width: '1.25rem', height: '1.25rem', color: '#16a34a' }} fill="currentColor" viewBox="0 0 20 20">
-                          <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-                        </svg>
-                        <span style={styles.successMessageText}>{successMessage}</span>
-                      </div>
+                {/* Profile Form */}
+                <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between mb-4 lg:mb-6 gap-3 w-full">
+                  <h3 className="text-lg lg:text-xl font-bold text-gray-900">Profile Settings</h3>
+                  {!isEditing ? (
+                    <button
+                      onClick={() => {
+                        const tokenInStorage = sessionStorage.getItem('auth_token')
+                        if (!isAuthenticated && !tokenInStorage) {
+                          setErrors({ submit: 'Please log in to edit your profile.' })
+                          return
+                        }
+                        setIsEditing(true)
+                      }}
+                      className="flex items-center gap-2 px-4 py-2 bg-orange-500 hover:bg-orange-600 text-white rounded-xl font-medium transition-colors text-sm"
+                    >
+                      <Edit3 className="w-4 h-4" />
+                      Edit Profile
+                    </button>
+                  ) : (
+                    <div className="flex gap-2">
+                      <button
+                        onClick={handleCancel}
+                        className="flex items-center gap-2 px-4 py-2 bg-gray-500 hover:bg-gray-600 text-white rounded-xl font-medium transition-colors text-sm"
+                      >
+                        <X className="w-4 h-4" />
+                        Cancel
+                      </button>
+                      <button
+                        onClick={handleSubmit}
+                        disabled={isLoading}
+                        className="flex items-center gap-2 px-4 py-2 bg-orange-500 hover:bg-orange-600 disabled:opacity-50 text-white rounded-xl font-medium transition-colors text-sm"
+                      >
+                        <Save className="w-4 h-4" />
+                        {isLoading ? 'Saving...' : 'Save Changes'}
+                      </button>
                     </div>
                   )}
+                </div>
 
-                  <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
-                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1.5rem' }}>
-                      <h3 style={{ fontSize: '1.5rem', fontWeight: '700', color: '#111827' }}>Profile Information</h3>
-                      {!isEditing ? (
-                        <button
-                          type="button"
-                          onClick={() => {
-                            const tokenInStorage = sessionStorage.getItem('auth_token');
-                            if (!isAuthenticated && !tokenInStorage) {
-                              setErrors({ submit: 'Please log in to edit your profile.' });
-                              return;
-                            }
-                            setIsEditing(true);
-                          }}
-
-                          style={{ ...styles.button, ...styles.buttonPrimary, padding: '0.75rem 1.5rem' }}
-                        >
-                          Edit Profile
-                        </button>
-                      ) : (
-                        <div style={{ display: 'flex', gap: '0.75rem' }}>
-                          <button
-                            type="button"
-                            onClick={handleCancel}
-                            style={{ ...styles.button, ...styles.buttonSecondary, padding: '0.5rem 1rem' }}
-                          >
-                            Cancel
-                          </button>
-                          <button
-                            type="submit"
-                            disabled={isLoading}
-                            style={{
-                              ...styles.button,
-                              ...styles.buttonPrimary,
-                              ...(isLoading ? styles.buttonDisabled : {}),
-                              padding: '0.5rem 1rem'
-                            }}
-                          >
-                            {isLoading ? 'Saving...' : 'Save Changes'}
-                          </button>
-                        </div>
-                      )}
-                    </div>
-
-                    <div style={styles.formGrid}>
-                      <div style={styles.formGroup}>
-                        <label htmlFor="email" style={styles.formLabel}>Email Address</label>
+                <form onSubmit={handleSubmit} className="bg-gray-50 rounded-xl p-3 lg:p-6 w-full">
+                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 lg:gap-6 w-full">
+                    {/* Email */}
+                    <div className="w-full">
+                      <label className="block text-sm font-semibold text-gray-700 mb-2">
+                        Email Address
+                      </label>
+                      <div className="relative w-full">
+                        <Mail className="absolute left-3 top-3 w-4 h-4 text-gray-400" />
                         <input
                           type="email"
-                          id="email"
                           name="email"
                           value={formData.email}
                           onChange={handleChange}
                           disabled={!isEditing}
-                          style={{
-                            ...styles.formInput,
-                            ...(!isEditing ? styles.formInputDisabled : {}),
-                            ...(errors.email ? styles.formInputError : {})
-                          }}
+                          className={`w-full pl-10 pr-3 py-3 border rounded-xl transition-colors text-sm ${!isEditing
+                            ? 'bg-gray-100 text-gray-500 cursor-not-allowed border-gray-200'
+                            : 'bg-white hover:border-gray-400 focus:border-orange-500 focus:ring-4 focus:ring-orange-100 border-gray-300'
+                            } ${errors.email ? 'border-red-300' : ''
+                            }`}
                         />
-                        {errors.email && <p style={styles.errorMessage}>{errors.email}</p>}
                       </div>
+                      {errors.email && <p className="mt-1 text-sm text-red-600">{errors.email}</p>}
+                    </div>
 
-                      <div style={styles.formGroup}>
-                        <label htmlFor="username" style={styles.formLabel}>Username</label>
+                    {/* Username */}
+                    <div className="w-full">
+                      <label className="block text-sm font-semibold text-gray-700 mb-2">
+                        Username
+                      </label>
+                      <div className="relative w-full">
+                        <User className="absolute left-3 top-3 w-4 h-4 text-gray-400" />
                         <input
                           type="text"
-                          id="username"
                           name="username"
                           value={formData.username}
                           onChange={handleChange}
                           disabled={!isEditing}
-                          style={{
-                            ...styles.formInput,
-                            ...(!isEditing ? styles.formInputDisabled : {}),
-                            ...(errors.username ? styles.formInputError : {})
-                          }}
+                          className={`w-full pl-10 pr-3 py-3 border rounded-xl transition-colors text-sm ${!isEditing
+                            ? 'bg-gray-100 text-gray-500 cursor-not-allowed border-gray-200'
+                            : 'bg-white hover:border-gray-400 focus:border-orange-500 focus:ring-4 focus:ring-orange-100 border-gray-300'
+                            } ${errors.username ? 'border-red-300' : ''
+                            }`}
                         />
-                        {errors.username && <p style={styles.errorMessage}>{errors.username}</p>}
                       </div>
+                      {errors.username && <p className="mt-1 text-sm text-red-600">{errors.username}</p>}
+                    </div>
 
-                      <div style={{ ...styles.formGroup, ...styles.formGridFull }}>
-                        <label htmlFor="full_name" style={styles.formLabel}>Full Name</label>
-                        <input
-                          type="text"
-                          id="full_name"
-                          name="full_name"
-                          value={formData.full_name}
-                          onChange={handleChange}
-                          disabled={!isEditing}
-                          style={{
-                            ...styles.formInput,
-                            ...(!isEditing ? styles.formInputDisabled : {}),
-                            ...(errors.full_name ? styles.formInputError : {})
-                          }}
-                        />
-                        {errors.full_name && <p style={styles.errorMessage}>{errors.full_name}</p>}
-                      </div>
+                    {/* Full Name */}
+                    <div className="lg:col-span-2 w-full">
+                      <label className="block text-sm font-semibold text-gray-700 mb-2">
+                        Full Name
+                      </label>
+                      <input
+                        type="text"
+                        name="full_name"
+                        value={formData.full_name}
+                        onChange={handleChange}
+                        disabled={!isEditing}
+                        className={`w-full px-3 py-3 border rounded-xl transition-colors text-sm ${!isEditing
+                          ? 'bg-gray-100 text-gray-500 cursor-not-allowed border-gray-200'
+                          : 'bg-white hover:border-gray-400 focus:border-orange-500 focus:ring-4 focus:ring-orange-100 border-gray-300'
+                          } ${errors.full_name ? 'border-red-300' : ''
+                          }`}
+                      />
+                      {errors.full_name && <p className="mt-1 text-sm text-red-600">{errors.full_name}</p>}
+                    </div>
 
-                      <div style={styles.formGroup}>
-                        <label htmlFor="phone_number" style={styles.formLabel}>Phone Number</label>
+                    {/* Phone */}
+                    <div className="w-full">
+                      <label className="block text-sm font-semibold text-gray-700 mb-2">
+                        Phone Number
+                      </label>
+                      <div className="relative w-full">
+                        <Phone className="absolute left-3 top-3 w-4 h-4 text-gray-400" />
                         <input
                           type="tel"
-                          id="phone_number"
                           name="phone_number"
                           value={formData.phone_number}
                           onChange={handleChange}
                           disabled={!isEditing}
-                          style={{
-                            ...styles.formInput,
-                            ...(!isEditing ? styles.formInputDisabled : {}),
-                            ...(errors.phone_number ? styles.formInputError : {})
-                          }}
+                          className={`w-full pl-10 pr-3 py-3 border rounded-xl transition-colors text-sm ${!isEditing
+                            ? 'bg-gray-100 text-gray-500 cursor-not-allowed border-gray-200'
+                            : 'bg-white hover:border-gray-400 focus:border-orange-500 focus:ring-4 focus:ring-orange-100 border-gray-300'
+                            } ${errors.phone_number ? 'border-red-300' : ''
+                            }`}
                         />
-                        {errors.phone_number && <p style={styles.errorMessage}>{errors.phone_number}</p>}
                       </div>
-
-                      <div style={styles.formGroup}>
-                        <label htmlFor="purpose_of_use" style={styles.formLabel}>Purpose of Use</label>
-                        <select
-                          id="purpose_of_use"
-                          name="purpose_of_use"
-                          value={formData.purpose_of_use}
-                          onChange={handleChange}
-                          disabled={!isEditing}
-                          style={{
-                            ...styles.formInput,
-                            ...(!isEditing ? styles.formInputDisabled : {})
-                          }}
-                        >
-                          <option value="personal">Personal</option>
-                          <option value="commercial">Commercial</option>
-                          <option value="educational">Educational</option>
-                          <option value="research">Research</option>
-                          <option value="other">Other</option>
-                        </select>
-                      </div>
-
-                      {formData.purpose_of_use === 'other' && (
-                        <div style={{ ...styles.formGroup, ...styles.formGridFull }}>
-                          <label htmlFor="purpose_other" style={styles.formLabel}>Please specify your purpose</label>
-                          <input
-                            type="text"
-                            id="purpose_other"
-                            name="purpose_other"
-                            value={formData.purpose_other}
-                            onChange={handleChange}
-                            disabled={!isEditing}
-                            placeholder="Enter your specific purpose"
-                            style={{
-                              ...styles.formInput,
-                              ...(!isEditing ? styles.formInputDisabled : {}),
-                              ...(errors.purpose_other ? styles.formInputError : {})
-                            }}
-                          />
-                          {errors.purpose_other && <p style={styles.errorMessage}>{errors.purpose_other}</p>}
-                        </div>
-                      )}
-
-                      <div style={styles.formGroup}>
-                        <label htmlFor="city" style={styles.formLabel}>City</label>
-                        <input
-                          type="text"
-                          id="city"
-                          name="city"
-                          value={formData.city}
-                          onChange={handleChange}
-                          disabled={!isEditing}
-                          style={{
-                            ...styles.formInput,
-                            ...(!isEditing ? styles.formInputDisabled : {}),
-                            ...(errors.city ? styles.formInputError : {})
-                          }}
-                        />
-                        {errors.city && <p style={styles.errorMessage}>{errors.city}</p>}
-                      </div>
-
-                      <div style={styles.formGroup}>
-                        <label htmlFor="state_province" style={styles.formLabel}>State/Province</label>
-                        <input
-                          type="text"
-                          id="state_province"
-                          name="state_province"
-                          value={formData.state_province}
-                          onChange={handleChange}
-                          disabled={!isEditing}
-                          style={{
-                            ...styles.formInput,
-                            ...(!isEditing ? styles.formInputDisabled : {}),
-                            ...(errors.state_province ? styles.formInputError : {})
-                          }}
-                        />
-                        {errors.state_province && <p style={styles.errorMessage}>{errors.state_province}</p>}
-                      </div>
-
-                      <div style={styles.formGroup}>
-                        <label htmlFor="country" style={styles.formLabel}>Country</label>
-                        <input
-                          type="text"
-                          id="country"
-                          name="country"
-                          value={formData.country}
-                          onChange={handleChange}
-                          disabled={!isEditing}
-                          style={{
-                            ...styles.formInput,
-                            ...(!isEditing ? styles.formInputDisabled : {}),
-                            ...(errors.country ? styles.formInputError : {})
-                          }}
-                        />
-                        {errors.country && <p style={styles.errorMessage}>{errors.country}</p>}
-                      </div>
+                      {errors.phone_number && <p className="mt-1 text-sm text-red-600">{errors.phone_number}</p>}
                     </div>
 
-                    {errors.submit && <p style={{ ...styles.errorMessage, textAlign: 'center' }}>{errors.submit}</p>}
-                  </form>
-                </div>
-              )}
+                    {/* Purpose */}
+                    <div className="w-full">
+                      <label className="block text-sm font-semibold text-gray-700 mb-2">
+                        Purpose of Use
+                      </label>
+                      <select
+                        name="purpose_of_use"
+                        value={formData.purpose_of_use}
+                        onChange={handleChange}
+                        disabled={!isEditing}
+                        className={`w-full px-3 py-3 border rounded-xl transition-colors text-sm ${!isEditing
+                          ? 'bg-gray-100 text-gray-500 cursor-not-allowed border-gray-200'
+                          : 'bg-white hover:border-gray-400 focus:border-orange-500 focus:ring-4 focus:ring-orange-100 border-gray-300'
+                          }`}
+                      >
+                        <option value="personal">Personal</option>
+                        <option value="commercial">Commercial</option>
+                        <option value="educational">Educational</option>
+                        <option value="research">Research</option>
+                        <option value="other">Other</option>
+                      </select>
+                    </div>
 
-              {/* Purchase History Tab */}
-              {activeTab === 'purchases' && (
-                <div>
-                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1.5rem' }}>
-                    <h3 style={{ fontSize: '1.5rem', fontWeight: '700', color: '#111827' }}>Purchase History</h3>
-                    <div style={{ fontSize: '0.875rem', color: '#6b7280' }}>
-                      Total: ${currentPurchases.reduce((sum, p) => sum + parseFloat(p.amount || '0'), 0).toFixed(2)}
+                    {/* Other Purpose */}
+                    {formData.purpose_of_use === 'other' && (
+                      <div className="lg:col-span-2 w-full">
+                        <label className="block text-sm font-semibold text-gray-700 mb-2">
+                          Please specify your purpose
+                        </label>
+                        <input
+                          type="text"
+                          name="purpose_other"
+                          value={formData.purpose_other}
+                          onChange={handleChange}
+                          disabled={!isEditing}
+                          placeholder="Enter your specific purpose"
+                          className={`w-full px-3 py-3 border rounded-xl transition-colors text-sm ${!isEditing
+                            ? 'bg-gray-100 text-gray-500 cursor-not-allowed border-gray-200'
+                            : 'bg-white hover:border-gray-400 focus:border-orange-500 focus:ring-4 focus:ring-orange-100 border-gray-300'
+                            } ${errors.purpose_other ? 'border-red-300' : ''
+                            }`}
+                        />
+                        {errors.purpose_other && <p className="mt-1 text-sm text-red-600">{errors.purpose_other}</p>}
+                      </div>
+                    )}
+
+                    {/* City */}
+                    <div className="w-full">
+                      <label className="block text-sm font-semibold text-gray-700 mb-2">
+                        City
+                      </label>
+                      <input
+                        type="text"
+                        name="city"
+                        value={formData.city}
+                        onChange={handleChange}
+                        disabled={!isEditing}
+                        className={`w-full px-3 py-3 border rounded-xl transition-colors text-sm ${!isEditing
+                          ? 'bg-gray-100 text-gray-500 cursor-not-allowed border-gray-200'
+                          : 'bg-white hover:border-gray-400 focus:border-orange-500 focus:ring-4 focus:ring-orange-100 border-gray-300'
+                          } ${errors.city ? 'border-red-300' : ''
+                          }`}
+                      />
+                      {errors.city && <p className="mt-1 text-sm text-red-600">{errors.city}</p>}
+                    </div>
+
+                    {/* State */}
+                    <div className="w-full">
+                      <label className="block text-sm font-semibold text-gray-700 mb-2">
+                        State/Province
+                      </label>
+                      <input
+                        type="text"
+                        name="state_province"
+                        value={formData.state_province}
+                        onChange={handleChange}
+                        disabled={!isEditing}
+                        className={`w-full px-3 py-3 border rounded-xl transition-colors text-sm ${!isEditing
+                          ? 'bg-gray-100 text-gray-500 cursor-not-allowed border-gray-200'
+                          : 'bg-white hover:border-gray-400 focus:border-orange-500 focus:ring-4 focus:ring-orange-100 border-gray-300'
+                          } ${errors.state_province ? 'border-red-300' : ''
+                          }`}
+                      />
+                      {errors.state_province && <p className="mt-1 text-sm text-red-600">{errors.state_province}</p>}
+                    </div>
+
+                    {/* Country */}
+                    <div className="w-full">
+                      <label className="block text-sm font-semibold text-gray-700 mb-2">
+                        Country
+                      </label>
+                      <input
+                        type="text"
+                        name="country"
+                        value={formData.country}
+                        onChange={handleChange}
+                        disabled={!isEditing}
+                        className={`w-full px-3 py-3 border rounded-xl transition-colors text-sm ${!isEditing
+                          ? 'bg-gray-100 text-gray-500 cursor-not-allowed border-gray-200'
+                          : 'bg-white hover:border-gray-400 focus:border-orange-500 focus:ring-4 focus:ring-orange-100 border-gray-300'
+                          } ${errors.country ? 'border-red-300' : ''
+                          }`}
+                      />
+                      {errors.country && <p className="mt-1 text-sm text-red-600">{errors.country}</p>}
                     </div>
                   </div>
 
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-                    {currentPurchases.map((purchase, index) => (
-                      <div key={purchase.id} style={styles.purchaseCard}>
-                        <div style={styles.purchaseCardInner}>
-                          <div style={styles.purchaseInfo}>
-                            <div style={styles.purchaseIcon}>
-                              {getProductTypeIcon(purchase.product_type)}
+                  {errors.submit && (
+                    <div className="mt-4 lg:mt-6 p-3 bg-red-50 border border-red-200 rounded-xl w-full">
+                      <p className="text-red-800 text-sm">{errors.submit}</p>
+                    </div>
+                  )}
+                </form>
+              </div>
+            )}
+
+            {/* Purchases Tab */}
+            {activeTab === 'purchases' && (
+              <div className="w-full">
+                <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between mb-4 lg:mb-6 gap-3 w-full">
+                  <h3 className="text-lg lg:text-xl font-bold text-gray-900">Purchase History</h3>
+                  <div className="text-sm lg:text-base text-gray-600 font-semibold">
+                    Total: ${currentPurchases
+                      .filter(p => p.status === 'completed')
+                      .reduce((sum, p) => sum + parseFloat(p.amount || '0'), 0)
+                      .toFixed(2)}
+                  </div>
+                </div>
+
+                <div className="space-y-3 lg:space-y-4 w-full">
+                  {currentPurchases
+                    .filter(p => p.status === 'completed')
+                    .map((purchase, index) => (
+                      <div key={purchase.id} className="bg-gray-50 rounded-xl p-3 lg:p-4 border border-gray-200 w-full">
+                        <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-3 w-full">
+                          <div className="flex items-start gap-3 w-full min-w-0">
+                            <div className="p-2 bg-white rounded-xl border border-gray-200 flex-shrink-0">
+                              {getProductIcon(purchase.product_type)}
                             </div>
-                            <div style={styles.purchaseDetails}>
-                              <h4 style={styles.purchaseTitle}>{purchase.product_name}</h4>
-                              <p style={styles.purchaseDescription}>{purchase.description}</p>
-                              <div style={styles.purchaseMeta}>
-                                <span style={styles.purchaseMetaItem}>Order #{index + 1}</span>
-                                <span style={styles.purchaseMetaItem}>
+                            <div className="flex-1 min-w-0 w-full">
+                              <h4 className="font-semibold text-gray-900 mb-1 text-sm lg:text-base truncate">{purchase.product_name}</h4>
+                              <p className="text-gray-600 text-xs lg:text-sm mb-2 leading-relaxed">{purchase.description}</p>
+                              <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-4 text-xs text-gray-500">
+                                <span className="font-medium">Order #{index + 1}</span>
+                                <span>
                                   {purchase.payment_date
                                     ? new Date(purchase.payment_date).toLocaleDateString()
                                     : 'N/A'}
                                 </span>
-                                <span style={{ ...styles.statusBadge, ...getStatusColor(purchase.status) }}>
-                                  {purchase.status}
-                                </span>
+                                {getStatusBadge(purchase.status)}
                               </div>
                             </div>
                           </div>
-                          <div style={styles.purchasePrice}>
-                            <div style={styles.purchasePriceAmount}>
+                          <div className="text-right flex-shrink-0">
+                            <div className="text-xl lg:text-2xl font-bold text-gray-900 mb-1">
                               ${parseFloat(purchase.amount || '0').toFixed(2)}
                             </div>
-                            <div style={styles.purchasePriceCurrency}>{purchase.currency}</div>
-                            {purchase.invoice_url && (
-                              <button style={{ color: '#f97316', fontSize: '0.875rem', fontWeight: '500', marginTop: '0.5rem', background: 'none', border: 'none', cursor: 'pointer' }}>
-                                Download Invoice
-                              </button>
-                            )}
+                            <div className="text-xs text-gray-500 font-medium">{purchase.currency}</div>
                           </div>
                         </div>
                       </div>
                     ))}
-                  </div>
+
+                  {currentPurchases.filter(p => p.status === 'completed').length === 0 && (
+                    <div className="text-center py-8 lg:py-12 w-full">
+                      <ShoppingBag className="w-8 lg:w-12 h-8 lg:h-12 text-gray-400 mx-auto mb-3" />
+                      <p className="text-gray-500 text-sm lg:text-base">No completed purchases found.</p>
+                    </div>
+                  )}
                 </div>
-              )}
+              </div>
+            )}
 
-              {/* Achievements Tab */}
-              {activeTab === 'achievements' && (
-                <div>
-                  <h3 style={{ fontSize: '1.5rem', fontWeight: '700', color: '#111827', marginBottom: '1.5rem' }}>Your Achievements</h3>
+            {/* Achievements Tab
+            {activeTab === 'achievements' && (
+              <div className="w-full">
+                <h3 className="text-lg lg:text-xl font-bold text-gray-900 mb-4 lg:mb-6">Your Achievements</h3>
 
-                  <div style={styles.achievementGrid}>
-                    {currentUser.achievements.map((achievement, index) => (
-                      <div key={index} style={styles.achievementCard}>
-                        <div style={styles.achievementHeader}>
-                          <div style={styles.achievementIcon}>
-                            <svg style={{ width: '1.5rem', height: '1.5rem', color: '#d97706' }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z" />
-                            </svg>
-                          </div>
-                          <div>
-                            <h4 style={styles.achievementTitle}>{achievement}</h4>
-                            <p style={styles.achievementSubtitle}>Achievement unlocked</p>
-                          </div>
+                <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-3 lg:gap-4 w-full">
+                  {currentUser.achievements?.map((achievement: string, index: number) => (
+                    <div key={index} className="bg-gradient-to-br from-amber-50 to-orange-50 rounded-xl p-3 lg:p-4 border border-amber-200 w-full">
+                      <div className="flex items-center gap-3 mb-3">
+                        <div className="p-2 bg-amber-100 rounded-full flex-shrink-0">
+                          <Award className="w-4 lg:w-5 h-4 lg:h-5 text-amber-600" />
                         </div>
-                        <div style={styles.achievementDescription}>
-                          <p style={styles.achievementDescriptionText}>
-                            {achievement === 'First Flight' && 'Completed your first drone simulation flight'}
-                            {achievement === 'Night Pilot' && 'Successfully completed 10 night flights'}
-                            {achievement === 'Precision Landing' && 'Achieved 95% landing accuracy'}
-                            {achievement === 'Weather Master' && 'Flew in all weather conditions'}
-                            {achievement === '100 Hours' && 'Accumulated 100+ hours of flight time'}
-                            {achievement === 'Welcome Aboard' && 'Welcome to DroneSimulator!'}
-                          </p>
+                        <div className="min-w-0 flex-1">
+                          <h4 className="font-bold text-gray-900 text-sm lg:text-base truncate">{achievement}</h4>
+                          <p className="text-xs text-gray-600">Achievement unlocked</p>
                         </div>
                       </div>
-                    ))}
-                  </div>
+                      <div className="bg-amber-100 rounded-lg p-3">
+                        <p className="text-xs lg:text-sm text-amber-800 leading-relaxed">
+                          {achievement === 'First Flight' && 'Completed your first drone simulation flight'}
+                          {achievement === 'Night Pilot' && 'Successfully completed 10 night flights'}
+                          {achievement === 'Precision Master' && 'Achieved 95% landing accuracy'}
+                          {achievement === 'Weather Warrior' && 'Flew in all weather conditions'}
+                          {achievement === '100 Hours' && 'Accumulated 100+ hours of flight time'}
+                          {achievement === 'Welcome Aboard' && 'Welcome to DroneSimulator!'}
+                          {!['First Flight', 'Night Pilot', 'Precision Master', 'Weather Warrior', '100 Hours', 'Welcome Aboard'].includes(achievement) &&
+                            'A special achievement in your drone simulation journey'}
+                        </p>
+                      </div>
+                    </div>
+                  )) || []}
+
+                  {(!currentUser.achievements || currentUser.achievements.length === 0) && (
+                    <div className="col-span-full text-center py-8 lg:py-12 w-full">
+                      <Award className="w-8 lg:w-12 h-8 lg:h-12 text-gray-400 mx-auto mb-3" />
+                      <p className="text-gray-500 text-sm lg:text-base">No achievements yet. Keep flying to unlock them!</p>
+                    </div>
+                  )}
                 </div>
-              )}
-            </div>
+              </div>
+            )} */}
           </div>
         </div>
-
-      </div>
-    </>
+      </main>
+    </div>
   )
 }
 
