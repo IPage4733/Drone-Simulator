@@ -22,6 +22,7 @@ const Download = () => {
     termsAccepted: false
   });
   const [isSubmitted, setIsSubmitted] = useState(false);
+  const [formErrors, setFormErrors] = useState<{ [key: string]: string }>({});
   const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast();
 const handleDownload = () => {
@@ -65,15 +66,28 @@ const handleDownload = () => {
 const handleSubmit = async (e: React.FormEvent) => {
   e.preventDefault();
 
-  if (!formData.termsAccepted) {
+  const errors: { [key: string]: string } = {};
+
+  if (!formData.name.trim()) errors.name = "Full name is required.";
+  if (!formData.email.trim()) errors.email = "Email is required.";
+  if (!formData.phone.trim()) errors.phone = "Phone number is required.";
+  if (!formData.city.trim()) errors.city = "City is required.";
+  if (!formData.state.trim()) errors.state = "State/Province is required.";
+  if (!formData.country.trim()) errors.country = "Country is required.";
+  if (!formData.purpose.trim()) errors.purpose = "Please select a purpose.";
+  if (!formData.termsAccepted) errors.termsAccepted = "Please accept the terms and conditions.";
+
+  if (Object.keys(errors).length > 0) {
+    setFormErrors(errors);
     toast({
-      title: "Terms Required",
-      description: "Please accept the terms and conditions to continue.",
-      variant: "destructive"
+      title: "Form Incomplete",
+      description: "Please correct the highlighted fields before submitting.",
+      variant: "destructive",
     });
     return;
   }
 
+  setFormErrors({});
   setIsLoading(true);
 
   const safePassword = `${formData.name.replace(/\s/g, '')}@1234`;
@@ -123,6 +137,7 @@ const handleSubmit = async (e: React.FormEvent) => {
     setIsLoading(false);
   }
 };
+
 
 
 
@@ -238,6 +253,7 @@ const handleSubmit = async (e: React.FormEvent) => {
                         onChange={(e) => handleInputChange("name", e.target.value)}
                         className="mt-1"
                       />
+                       {formErrors.name && <p className="text-sm text-red-600 mt-1">{formErrors.name}</p>}
                     </div>
                     <div>
                       <Label htmlFor="email">Email Address *</Label>
@@ -249,6 +265,7 @@ const handleSubmit = async (e: React.FormEvent) => {
                         onChange={(e) => handleInputChange("email", e.target.value)}
                         className="mt-1"
                       />
+                      {formErrors.email && <p className="text-sm text-red-600 mt-1">{formErrors.email}</p>}
                     </div>
                   </div>
 
@@ -263,6 +280,7 @@ const handleSubmit = async (e: React.FormEvent) => {
                         onChange={(e) => handleInputChange("phone", e.target.value)}
                         className="mt-1"
                       />
+                       {formErrors.phone && <p className="text-sm text-red-600 mt-1">{formErrors.phone}</p>}
                     </div>
                     <div>
                       <Label htmlFor="city">City *</Label>
@@ -274,6 +292,7 @@ const handleSubmit = async (e: React.FormEvent) => {
                         onChange={(e) => handleInputChange("city", e.target.value)}
                         className="mt-1"
                       />
+                      {formErrors.city && <p className="text-sm text-red-600 mt-1">{formErrors.city}</p>}
                     </div>
                   
                   </div>
@@ -287,6 +306,7 @@ const handleSubmit = async (e: React.FormEvent) => {
     onChange={(e) => handleInputChange("country", e.target.value)}
     className="mt-1"
   />
+    {formErrors.country && <p className="text-sm text-red-600 mt-1">{formErrors.country}</p>}
 </div>
 
                   <div className="grid md:grid-cols-2 gap-4">
@@ -300,6 +320,7 @@ const handleSubmit = async (e: React.FormEvent) => {
                         onChange={(e) => handleInputChange("state", e.target.value)}
                         className="mt-1"
                       />
+                       {formErrors.state && <p className="text-sm text-red-600 mt-1">{formErrors.state}</p>}
                     </div>
                     <div>
                       <Label htmlFor="purpose">Purpose of Use *</Label>
@@ -315,6 +336,7 @@ const handleSubmit = async (e: React.FormEvent) => {
                           ))}
                         </SelectContent>
                       </Select>
+                        {formErrors.purpose && <p className="text-sm text-red-600 mt-1">{formErrors.purpose}</p>}
                     </div>
                   </div>
 
@@ -329,6 +351,7 @@ const handleSubmit = async (e: React.FormEvent) => {
                       <span className="text-primary cursor-pointer"> Privacy Policy</span>. I understand that my 
                       information will be used to provide access to the DroneSimulator software.
                     </Label>
+                    {formErrors.termsAccepted && <p className="text-sm text-red-600 mt-1">{formErrors.termsAccepted}</p>}
                   </div>
 
                   <Button 
