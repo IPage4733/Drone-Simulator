@@ -6,7 +6,9 @@ const HelpPage: React.FC = () => {
     const location = useLocation();
     const [visible, setVisible] = useState(false);
     const [showFeedback, setShowFeedback] = useState(false);
-    const [screenshot, setScreenshot] = useState<File | null>(null);
+    const [screenshots, setScreenshots] = useState<File[]>([]);
+    const [description, setDescription] = useState("");
+    const [allowEmail, setAllowEmail] = useState(false);
     const [expandedSections, setExpandedSections] = useState<Record<string, boolean>>({});
 
     useEffect(() => {
@@ -28,6 +30,56 @@ const HelpPage: React.FC = () => {
         const allCollapsed: Record<string, boolean> = {};
         sections.forEach(section => allCollapsed[section.key] = false);
         setExpandedSections(allCollapsed);
+    };
+
+    const handleFeedbackSubmit = async () => {
+        const token = sessionStorage.getItem("auth_token");
+        if (!token) {
+            alert("You must be logged in to send feedback.");
+            return;
+        }
+
+        const formData = new FormData();
+        formData.append("description", description);
+        screenshots.forEach((file) => {
+            formData.append("images", file); // ✅ must match field name in backend
+        });
+
+        try {
+            const response = await fetch("https://34-93-79-185.nip.io/api/feedback/", {
+                method: "POST",
+                headers: {
+                    Authorization: `Token ${token}`,
+                    // ❌ DO NOT set Content-Type for FormData — the browser handles it
+                },
+                body: formData,
+            });
+
+            const result = await response.json();
+            console.log("✅ API Response:", result);
+
+            if (response.ok) {
+                alert("✅ Feedback submitted successfully!");
+                setDescription("");
+                setScreenshots([]);
+                setShowFeedback(false);
+            } else {
+                alert("❌ Failed to submit feedback: " + (result?.detail || "Unknown error"));
+            }
+        } catch (error) {
+            console.error("Feedback Error:", error);
+            alert("An error occurred. Please try again later.");
+        }
+    };
+
+
+    const toBase64 = (file: File): Promise<string> => {
+        return new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            reader.readAsDataURL(file);
+            reader.onload = () => resolve(reader.result as string);
+            reader.onerror = reject;
+        });
     };
 
     if (!visible) return null;
@@ -87,14 +139,14 @@ const HelpPage: React.FC = () => {
             key: "faq",
             title: "FAQs",
             content: (
-                 <ul className="list-disc pl-4 text-gray-600">
+                <ul className="list-disc pl-4 text-gray-600">
                     <li><b>What is Drone Simulator?</b> A cloud-based flight simulation platform.</li>
                     <li><b>How do I sign up?</b> Enter your email and confirm via email link.</li>
                     <li><b>System Requirements:</b> Win10, Intel i5+, 8GB RAM, GTX 1060+, 2GB free space.</li>
                     <li><b>Upgrade Plan:</b> Go to Account → Upgrade Plan and choose your tier.</li>
                     <li><b>Free Trial:</b> 15-day free access to all features.</li>
                     <li><b>What USB controllers are supported?</b> Flysky FS-i6S, and others.</li>
-                   <li><b>What keyboard controls are available?</b> <a href="https://drive.google.com/uc?export=download&id=1VfPOgz_cG_4sr0_8z9_T97Pml3Twytz-" className="text-blue-600 underline ml-1" target="_blank" rel="noopener noreferrer">Check here</a></li>
+                    <li><b>What keyboard controls are available?</b> <a href="https://drive.google.com/uc?export=download&id=1VfPOgz_cG_4sr0_8z9_T97Pml3Twytz-" className="text-blue-600 underline ml-1" target="_blank" rel="noopener noreferrer">Check here</a></li>
                     <li><b>How realistic are the flight controls?</b> Real-world physics engine simulates actual drone behavior.</li>
                     <li><b>Are new aircraft & scenarios free?</b> Yes, downloadable updates are free with valid license.</li>
                     <li><b>Student Offers:</b> Students using .edu or .ac.in emails can access special discounted pricing tiers.</li>
@@ -140,18 +192,14 @@ const HelpPage: React.FC = () => {
                 </div>
                 {!showFeedback ? (
                     <div className="p-4 overflow-y-auto text-sm flex-1 space-y-4">
-                        <div className="text-sm text-gray-700">
-                            <p>
-                                Welcome to the Drone Simulator Help Center. Here you can find the information you need to get the most out of our simulator platform. Whether you’re a new user or an experienced pilot, our support guides, FAQs, and contact information are designed to assist you.
-                            </p>
-                        </div>
-
+                        <p className="text-sm text-gray-700">
+                            Welcome to the Drone Simulator Help Center. Whether you’re a new user or an experienced pilot, our guides, FAQs, and support contact are here to assist you.
+                        </p>
                         <div className="flex justify-center gap-4">
                             <button onClick={expandAll} className="text-orange-600 text-xs font-semibold hover:underline">EXPAND ALL</button>
                             <span className="text-gray-300">|</span>
                             <button onClick={closeAll} className="text-orange-600 text-xs font-semibold hover:underline">CLOSE ALL</button>
                         </div>
-
                         {sections.map(({ key, title, content }) => (
                             <div key={key} className="border rounded-lg">
                                 <button
@@ -170,17 +218,13 @@ const HelpPage: React.FC = () => {
                                 )}
                             </div>
                         ))}
-
                         <div className="text-center">
-                            <a
-                                href="https://drive.google.com/uc?export=download&id=1VfPOgz_cG_4sr0_8z9_T97Pml3Twytz-"
+                            <a href="https://drive.google.com/uc?export=download&id=1VfPOgz_cG_4sr0_8z9_T97Pml3Twytz-"
                                 className="inline-block bg-orange-500 text-white px-4 py-2 rounded hover:bg-orange-600 text-sm"
-                                download
-                            >
+                                download>
                                 Download Simulator Manual
                             </a>
                         </div>
-
                         <div className="text-center mt-4">
                             <button
                                 onClick={() => setShowFeedback(true)}
@@ -196,35 +240,50 @@ const HelpPage: React.FC = () => {
                             <label className="font-medium block mb-1">Describe your feedback (required)</label>
                             <textarea
                                 rows={4}
+                                required
+                                value={description}
+                                onChange={(e) => setDescription(e.target.value)}
                                 placeholder="Tell us what prompted this feedback..."
                                 className="w-full border px-3 py-2 rounded"
                             ></textarea>
-                            <p className="text-xs text-gray-500 mt-1">
-                                Please don’t include any sensitive information <span title="What is sensitive?">❓</span>
-                            </p>
                         </div>
                         <div>
-                            <label className="block font-medium mb-1">A screenshot will help us better understand your feedback.</label>
+                            <label className="block font-medium mb-1">Upload screenshots (optional)</label>
                             <input
                                 type="file"
+                                name="images"
                                 accept="image/*"
-                                onChange={(e) => setScreenshot(e.target.files?.[0] || null)}
+                                multiple
+                                onChange={(e) => setScreenshots(Array.from(e.target.files || []))}
                             />
-                            {screenshot && <p className="text-xs mt-1 text-gray-600">Uploaded: {screenshot.name}</p>}
+
+                            {screenshots.length > 0 && (
+                                <ul className="text-xs mt-1 text-gray-600 list-disc pl-4">
+                                    {screenshots.map((file, i) => (
+                                        <li key={i}>{file.name}</li>
+                                    ))}
+                                </ul>
+                            )}
                         </div>
                         <div>
                             <label className="flex items-center gap-2 text-sm">
-                                <input type="checkbox" className="mr-2" />
+                                <input
+                                    type="checkbox"
+                                    checked={allowEmail}
+                                    onChange={(e) => setAllowEmail(e.target.checked)}
+                                />
                                 We may email you for more information or updates
                             </label>
                         </div>
                         <div className="text-xs text-gray-500">
                             Some <span className="text-blue-600 underline">account and system information</span> may be sent to DroneSimulator.
-                            We use it to fix issues and improve our service. See our{' '}
-                            <Link to="/privacy-policy" className="text-blue-600 underline">Privacy Policy</Link> and{' '}
+                            See our <Link to="/privacy-policy" className="text-blue-600 underline">Privacy Policy</Link> and{' '}
                             <Link to="/terms" className="text-blue-600 underline">Terms of Service</Link>.
                         </div>
-                        <button className="mt-4 w-full bg-orange-500 hover:bg-orange-600 text-white font-semibold py-2 rounded">
+                        <button
+                            onClick={handleFeedbackSubmit}
+                            className="mt-4 w-full bg-orange-500 hover:bg-orange-600 text-white font-semibold py-2 rounded"
+                        >
                             Send
                         </button>
                     </div>
