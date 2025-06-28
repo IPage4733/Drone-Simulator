@@ -1,7 +1,24 @@
 import React from 'react';
 import { NavLink } from 'react-router-dom';
 import { useAuth } from '../../hooks/useAuth';
-import { LayoutDashboard, Users, CreditCard, FileText, UserCog, TrendingUp, Download, Search, Bone as Drone, X, BarChart3, Package, PieChart } from 'lucide-react';
+import {
+  LayoutDashboard,
+  Users,
+  CreditCard,
+  FileText,
+  UserCog,
+  TrendingUp,
+  Download,
+  Search,
+  Bone as Drone,
+  X,
+  BarChart3,
+  Package,
+  PieChart,
+  MessageCircle,
+  Mail,
+  ThumbsUp
+} from 'lucide-react';
 
 interface SidebarProps {
   isOpen: boolean;
@@ -21,6 +38,9 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
     { path: '/Dash/master/income', label: 'Income Reports', icon: TrendingUp },
     { path: '/Dash/master/metrics', label: 'User Metrics', icon: BarChart3 },
     // { path: '/Dash/master/analytics', label: 'Analytics', icon: PieChart },
+    { path: '/Dash/master/cont', label: 'Contact Submissions', icon: MessageCircle },
+    { path: '/Dash/master/inqui', label: 'Training Inquiries', icon: Mail },
+    { path: '/Dash/master/feed', label: 'User Feedbacks', icon: ThumbsUp },
   ];
 
   const adminNavItems = [

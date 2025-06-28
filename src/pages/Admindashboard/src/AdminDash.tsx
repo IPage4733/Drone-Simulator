@@ -20,7 +20,9 @@ import { MasterEmployees } from './pages/master/Employees';
 import { MasterIncome } from './pages/master/Income';
 import { MasterUserMetrics } from './pages/master/UserMetrics';
 import { MasterAnalytics } from './pages/master/Analytics';
-
+import AdminInquiries from './pages/master/AdminInquiries';
+import AdminFeedbacks from './pages/master/AdminFeedbacks';
+import AdminContacts from './pages/master/AdminContacts';
 // Admin Pages
 import { AdminDashboard } from './pages/admin/Dashboard';
 import { AdminUsers } from './pages/admin/Users';
@@ -60,7 +62,9 @@ function AdminDash() {
           <Route path="master/income" element={<ProtectedRoute requiredRole="master"><MasterIncome /></ProtectedRoute>} />
           <Route path="master/metrics" element={<ProtectedRoute requiredRole="master"><MasterUserMetrics /></ProtectedRoute>} />
           <Route path="master/analytics" element={<ProtectedRoute requiredRole="master"><MasterAnalytics /></ProtectedRoute>} />
-
+<Route path="master/cont" element={<ProtectedRoute requiredRole="master"><AdminContacts /></ProtectedRoute>} />
+<Route path="master/inqui" element={<ProtectedRoute requiredRole="master"><AdminInquiries /></ProtectedRoute>} />
+<Route path="master/feed" element={<ProtectedRoute requiredRole="master"><AdminFeedbacks/></ProtectedRoute>} />
           {/* Admin Routes */}
           <Route path="admin/dashboard" element={<ProtectedRoute requiredRole="admin"><AdminDashboard /></ProtectedRoute>} />
           <Route path="admin/users" element={<ProtectedRoute requiredRole="admin"><AdminUsers /></ProtectedRoute>} />

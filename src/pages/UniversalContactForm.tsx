@@ -7,7 +7,6 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
-import emailjs from "@emailjs/browser";
 
 const UniversalContactForm = () => {
   const [formData, setFormData] = useState({
@@ -56,77 +55,82 @@ const UniversalContactForm = () => {
     e.preventDefault();
     setIsLoading(true);
 
-    // Ensure form reference exists
-    if (!formRef.current) return;
+    const token = sessionStorage.getItem("auth_token");
+
+    if (!token) {
+      toast({
+        title: "Authentication Required",
+        description: "Please log in before submitting the form.",
+        variant: "destructive"
+      });
+      setIsLoading(false);
+      return;
+    }
 
     try {
-      const form = formRef.current;
-      const formData = {
-        name: form.name.valueOf,
-        email: form.email.value,
-        phone: form.phone.value,
-        organization: form.organization.value,
-        userType: form.userType.value,
-        purpose: form.purpose.value,
-        message: form.message.value,
-        studentsOrTeam: form.studentsOrTeam.value,
-        website: form.website.value,
-        dgcaId: form.dgcaId.value,
-        droneModels: form.droneModels.value,
-        serviceArea: form.serviceArea.value,
-        pilotCertified: form.pilotCertified.value,
-        useCaseDescription: form.useCaseDescription.value,
-        interestedInDGCA: form.interestedInDGCA.checked
-      };
-
-      // Send form data to EmailJS
-      await emailjs.send(
-        "your_service_id", // Replace with your EmailJS service ID
-        "your_template_id", // Replace with your EmailJS template ID
-        formData, // Send the form data as the email content
-        "your_user_id" // Replace with your EmailJS user ID
-      );
-
-      // Send thank-you email to user (optional)
-      await emailjs.send(
-        "your_service_id", // Same as above
-        "your_template_id", // Replace with your thank-you email template ID
-        {
-          to_name: formData.name,
-          to_email: formData.email
+      const response = await fetch("https://34-93-79-185.nip.io/api/inquiry/", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Token ${token}`
         },
-        "your_user_id" // Same user ID
-      );
-
-      toast({
-        title: "Submission Successful!",
-        description: "Thank you. Our team will contact you shortly."
+        body: JSON.stringify({
+          full_name: formData.name,
+          email: formData.email,
+          phone_number: formData.phone,
+          organization: formData.organization,
+          i_a: formData.userType,
+          purpose_of_contact: formData.purpose.join(", "),
+          message: formData.message,
+          students_or_team: formData.studentsOrTeam,
+          website: formData.website,
+          dgca_id: formData.dgcaId,
+          drone_models: formData.droneModels,
+          service_area: formData.serviceArea,
+          pilot_certified: formData.pilotCertified,
+          use_case_description: formData.useCaseDescription,
+          interested_in_dgca: formData.interestedInDGCA
+        })
       });
 
-      // Reset form data after successful submission
-      setFormData({
-        name: "",
-        email: "",
-        phone: "",
-        organization: "",
-        userType: "",
-        purpose: [],
-        message: "",
-        studentsOrTeam: "",
-        website: "",
-        dgcaId: "",
-        droneModels: "",
-        serviceArea: "",
-        pilotCertified: "",
-        useCaseDescription: "",
-        interestedInDGCA: false
-      });
+
+      if (response.ok) {
+        toast({
+          title: "Submission Successful!",
+          description: "Thank you. Our team will contact you shortly."
+        });
+
+        setFormData({
+          name: "",
+          email: "",
+          phone: "",
+          organization: "",
+          userType: "",
+          purpose: [],
+          message: "",
+          studentsOrTeam: "",
+          website: "",
+          dgcaId: "",
+          droneModels: "",
+          serviceArea: "",
+          pilotCertified: "",
+          useCaseDescription: "",
+          interestedInDGCA: false
+        });
+      } else {
+        const error = await response.json();
+        toast({
+          title: "Submission Failed",
+          description: error?.detail || error?.message || "Please try again later.",
+          variant: "destructive"
+        });
+      }
     } catch (error) {
-      console.error("EmailJS error:", error);
+      console.error("API Error:", error);
       toast({
         title: "Error",
-        description: "There was an issue sending your message. Please try again later.",
-        variant: "destructive",
+        description: "There was a problem submitting your inquiry.",
+        variant: "destructive"
       });
     } finally {
       setIsLoading(false);
@@ -178,7 +182,6 @@ const UniversalContactForm = () => {
                 </select>
               </div>
 
-              {/* Purpose of Contact */}
               <div>
                 <Label>Purpose of Contact *</Label>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
@@ -204,9 +207,6 @@ const UniversalContactForm = () => {
                 </div>
               </div>
 
-              {/* Additional Fields for Specific User Types */}
-              {/* Conditionally render additional input fields here as per the original form */}
-              {/* For example: */}
               {formData.userType === "Pilot" && (
                 <div>
                   <Label>Pilot Certification Status</Label>
