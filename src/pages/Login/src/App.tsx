@@ -8,6 +8,7 @@ import Profile from './pages/Profile'
 import { AuthProvider } from './context/AuthContext'
 import Studentregister from './pages/studentregister'
 
+
 function AppAuth() {
   return (
     <AuthProvider>
