@@ -27,34 +27,15 @@ const Download = () => {
   const { toast } = useToast();
 
 const handleDownload = () => {
-  // 1. Download EXE
-  const exeLink = document.createElement('a');
-  exeLink.href = "https://storage.cloud.google.com/ipagedronesimulator/IPAGE%20Drone%20Simulator%20Beta%20v1.0.exe?authuser=8";
-  exeLink.download = "IPAGE_Drone_Simulator.exe";
-  document.body.appendChild(exeLink);
-  exeLink.click();
-  document.body.removeChild(exeLink);
-
-  // 2. Download APK after 2 seconds
-  setTimeout(() => {
-    const apkLink = document.createElement('a');
-    apkLink.href = "https://storage.cloud.google.com/ipagedronesimulator/IPAGE%20DroneMobileController%20Beta%20v1.apk?authuser=8";
-    apkLink.download = "Dronesimulator_DroneMobileController.apk";
-    document.body.appendChild(apkLink);
-    apkLink.click();
-    document.body.removeChild(apkLink);
-  }, 2000);
-
-  // 3. Download additional file from Google Drive after 4 seconds
-  setTimeout(() => {
-    const driveLink = document.createElement('a');
-    driveLink.href = "https://drive.google.com/uc?export=download&id=1YEJTbvjTP_5xcrcYLfdnf05lNcS6mmB8";
-    driveLink.download = "Simulator_tutorial.pdf"; // Optional: set name for the downloaded file
-    document.body.appendChild(driveLink);
-    driveLink.click();
-    document.body.removeChild(driveLink);
-  }, 4000);
+  const link = document.createElement('a');
+  link.href = "https://www.dropbox.com/scl/fi/dg0m80gsxfx6akq6s6ijo/IPage-Drone-Simulator.zip?rlkey=5ubqselael5ijjoyyvu1p9qdf&st=q6hzf64p&dl=1";
+  link.download = "IPage_Drone_Simulator.zip"; // Optional: sets download filename
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
 };
+
+
 
 
 
