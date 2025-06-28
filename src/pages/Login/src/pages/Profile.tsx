@@ -194,10 +194,19 @@ const Profile: React.FC = () => {
         })
 
         if (stripeRes.ok) {
-          const stripeResult = await stripeRes.json()
-          const transactions = Array.isArray(stripeResult.transactions) ? stripeResult.transactions : []
-          setStripePurchases(transactions)
-        }
+  const stripeResult = await stripeRes.json()
+  const transactions = Array.isArray(stripeResult.transactions) ? stripeResult.transactions.map(tx => ({
+    id: tx.transaction_id,
+    product_name: tx.plan_display_name || tx.plan_name_display || 'Subscription',
+    product_type: 'subscription',
+    amount: tx.amount,
+    currency: tx.currency_display || tx.currency,
+    payment_date: tx.payment_date,
+    status: tx.payment_status,
+    description: `Plan: ${tx.plan_display_name || tx.plan_name}. Auto Renew: ${tx.is_auto_renew ? 'Yes' : 'No'}`,
+  })) : []
+  setStripePurchases(transactions)
+}
       } catch (error) {
         console.error('API error:', error)
         setApiError(true)
@@ -559,7 +568,7 @@ const Profile: React.FC = () => {
               </div>
               <div className="text-center">
                 <div className="text-2xl font-bold text-gray-900 mb-1">
-                  {currentUser.statistics?.total_scenarios_completed || 47}
+                  {currentUser.statistics?.total_scenarios_completed || 0}
                 </div>
                 <div className="text-xs text-gray-500 font-medium">Scenarios</div>
               </div>
@@ -594,7 +603,7 @@ const Profile: React.FC = () => {
                   <p className="text-gray-500 text-xs font-medium mb-1">Total Spent</p>
                   <p className="text-lg lg:text-xl font-bold text-gray-900">
                     ${currentPurchases
-                      .filter(p => p.status === 'completed')
+                      .filter(p => p.status === 'succeeded')
                       .reduce((sum, p) => sum + parseFloat(p.amount || '0'), 0)
                       .toFixed(2)}
                   </p>
@@ -1030,7 +1039,7 @@ const Profile: React.FC = () => {
                   <h3 className="text-lg lg:text-xl font-bold text-gray-900">Purchase History</h3>
                   <div className="text-sm lg:text-base text-gray-600 font-semibold">
                     Total: ${currentPurchases
-                      .filter(p => p.status === 'completed')
+                      .filter(p => p.status === 'succeeded')
                       .reduce((sum, p) => sum + parseFloat(p.amount || '0'), 0)
                       .toFixed(2)}
                   </div>
@@ -1038,7 +1047,7 @@ const Profile: React.FC = () => {
 
                 <div className="space-y-3 lg:space-y-4 w-full">
                   {currentPurchases
-                    .filter(p => p.status === 'completed')
+                    .filter(p => p.status === 'succeeded')
                     .map((purchase, index) => (
                       <div key={purchase.id} className="bg-gray-50 rounded-xl p-3 lg:p-4 border border-gray-200 w-full">
                         <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-3 w-full">
@@ -1070,7 +1079,7 @@ const Profile: React.FC = () => {
                       </div>
                     ))}
 
-                  {currentPurchases.filter(p => p.status === 'completed').length === 0 && (
+                  {currentPurchases.filter(p => p.status === 'succeeded').length === 0 && (
                     <div className="text-center py-8 lg:py-12 w-full">
                       <ShoppingBag className="w-8 lg:w-12 h-8 lg:h-12 text-gray-400 mx-auto mb-3" />
                       <p className="text-gray-500 text-sm lg:text-base">No completed purchases found.</p>
