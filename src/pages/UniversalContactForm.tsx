@@ -93,7 +93,6 @@ const UniversalContactForm = () => {
         })
       });
 
-
       if (response.ok) {
         toast({
           title: "Submission Successful!",
@@ -138,16 +137,19 @@ const UniversalContactForm = () => {
   };
 
   return (
-    <div className="min-h-screen flex flex-col justify-between bg-white font-poppins">
+    <div className="min-h-screen bg-white font-poppins">
       <Navigation />
-      <main className="flex-grow flex items-center justify-center px-4 pt-32 pb-16">
-        <Card className="w-full max-w-3xl shadow-xl border border-gray-200 animate-fade-in">
-          <CardContent className="p-8">
+      <main className="flex justify-center items-center px-4 pt-32 pb-16">
+        <Card className="w-full max-w-5xl flex flex-col sm:flex-row shadow-xl rounded-2xl overflow-hidden bg-gradient-to-br from-orange-500 via-orange-400 to-orange-300">
+          <div className="w-full sm:w-1/2">
+            <img src="/images/contact.png" alt="Students" className="w-full h-full object-cover" />
+          </div>
+          <CardContent className="w-full sm:w-1/2 bg-white p-8">
             <h2 className="text-3xl font-bold text-gray-900 mb-6 text-center">Connect With Us</h2>
             <form ref={formRef} onSubmit={handleSubmit} className="space-y-6">
               <div>
                 <Label htmlFor="name">Full Name *</Label>
-                <Input id="name" type="text" required value={formData.name} onChange={(e) => handleInputChange("name", e.target.value)} placeholder="John Doe" />
+                <Input id="name" type="text" required value={formData.name} onChange={(e) => handleInputChange("name", e.target.value)} placeholder="John" />
               </div>
               <div>
                 <Label htmlFor="email">Email Address *</Label>
@@ -159,7 +161,7 @@ const UniversalContactForm = () => {
               </div>
               <div>
                 <Label htmlFor="organization">Organization / Institution Name *</Label>
-                <Input id="organization" type="text" required value={formData.organization} onChange={(e) => handleInputChange("organization", e.target.value)} placeholder="ABC Institute of Technology" />
+                <Input id="organization" type="text" required value={formData.organization} onChange={(e) => handleInputChange("organization", e.target.value)} placeholder="Institute of Technology" />
               </div>
               <div>
                 <Label htmlFor="userType">I am a... <span className="text-red-500">*</span></Label>
@@ -173,40 +175,25 @@ const UniversalContactForm = () => {
                   <option value="">Select</option>
                   <option value="Institution">Educational Institution</option>
                   <option value="University">University / Research Center</option>
-                  <option value="RPTO">RPTO</option>
-                  <option value="Pilot">Drone Pilot</option>
-                  <option value="ServiceProvider">Drone Service Provider</option>
+                  <option value="RPTO">Drone Training Academy (RPTO)</option>
+                  <option value="Pilot"> Business Consultant/ Reseller</option>
+                  <option value="ServiceProvider">Drone Service Provider/ Pilot</option>
                   <option value="Manufacturer">Drone Manufacturer</option>
                   <option value="Corporate">Corporate / Government</option>
                   <option value="Student">Student</option>
                 </select>
               </div>
-
               <div>
                 <Label>Purpose of Contact *</Label>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                  {[
-                    "Purchase Simulator",
-                    "Request a Demo",
-                    "Integrate in Curriculum",
-                    "Add Drone Model",
-                    "Use for Research",
-                    "Train My Team",
-                    "Collaborate / Resell"
-                  ].map((item, idx) => (
+                  {["Purchase Simulator", "Request a Demo", "Integrate in Curriculum", "Add Drone Model/ Scenario", "Use for Research", "Train My Team", "Collaborate / Resell"].map((item, idx) => (
                     <label key={idx} className="flex items-center space-x-2 px-2 py-2 border rounded-md hover:bg-gray-50">
-                      <input
-                        type="checkbox"
-                        checked={formData.purpose.includes(item)}
-                        onChange={() => handleCheckboxChange(item)}
-                        className="form-checkbox h-4 w-4 text-orange-600"
-                      />
+                      <input type="checkbox" checked={formData.purpose.includes(item)} onChange={() => handleCheckboxChange(item)} className="form-checkbox h-4 w-4 text-orange-600" />
                       <span className="text-sm text-gray-800">{item}</span>
                     </label>
                   ))}
                 </div>
               </div>
-
               {formData.userType === "Pilot" && (
                 <div>
                   <Label>Pilot Certification Status</Label>
@@ -220,8 +207,18 @@ const UniversalContactForm = () => {
                   </div>
                 </div>
               )}
-
-              <Button type="submit" className="w-full bg-primary hover:bg-primary/90 text-white py-6 text-lg" disabled={isLoading}>
+              <div>
+                <Label htmlFor="message">Message</Label>
+                <Textarea
+                  id="message"
+                  rows={4}
+                  value={formData.message}
+                  onChange={(e) => handleInputChange("message", e.target.value)}
+                  placeholder="Let us know more about your inquiry or requirements"
+                  className="mt-1"
+                />
+              </div>
+              <Button type="submit" className="w-full bg-orange-600 hover:bg-orange-700 text-white py-4 text-md" disabled={isLoading}>
                 {isLoading ? "Submitting..." : "Submit Inquiry"}
               </Button>
             </form>

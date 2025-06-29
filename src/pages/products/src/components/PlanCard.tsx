@@ -27,7 +27,7 @@ const PlanCard: React.FC<PlanCardProps> = ({ plan }) => {
   const [studentEmail, setStudentEmail] = useState('');
   const [error, setError] = useState('');
 
-const user = JSON.parse(sessionStorage.getItem('auth_user') || '{}');
+  const user = JSON.parse(sessionStorage.getItem('auth_user') || '{}');
 
   const handleVerifyStudentEmail = () => {
     const isEducational = /@[\w.-]+\.(edu|ac)(\.[a-z]{2,})?$|\.university$/i.test(studentEmail);
@@ -54,12 +54,25 @@ const user = JSON.parse(sessionStorage.getItem('auth_user') || '{}');
 
 
     // ✅ Skip check for institution plan
-    if (plan.id !== 'institution' && currentPlan?.trim().toLowerCase() === 'premium') {
-      console.log('✅ Premium plan detected — showing taken modal');
-      setModalMode('taken');
-      setShowModal(true);
-      return;
+    {
+      plan.id !== 'institution' && (
+        <div className="mb-4">
+          {plan.id === 'Student' ? (
+            <>
+              <span className="text-gray-400 line-through text-lg mr-2">$99.99</span>
+              <span className="text-3xl font-bold text-green-600">${plan.price}</span>
+              <span className="text-gray-500 ml-1">{plan.billing}</span>
+            </>
+          ) : (
+            <>
+              <span className="text-3xl font-bold">${plan.price}</span>
+              <span className="text-gray-500 ml-1">{plan.billing}</span>
+            </>
+          )}
+        </div>
+      )
     }
+
     const alreadyInCart = cartItems.find((item: any) => item.id === plan.id);
     if (alreadyInCart) return;
 
@@ -135,21 +148,127 @@ const user = JSON.parse(sessionStorage.getItem('auth_user') || '{}');
           </div>
         )}
         <div className="p-6 flex flex-col h-full">
-          <h3 className="text-xl font-bold mb-2">{plan.name}</h3>
+          <div className="flex items-center justify-between mb-2">
+            <h3 className="text-xl font-bold">{plan.name}</h3>
+            {(plan.id === 'Student' || plan.id === 'pro') && (
+              <span className="bg-green-500 text-white text-xs font-semibold px-3 py-1 rounded-full shadow-sm">
+                90% OFF
+              </span>
+            )}
+          </div>
+
+
           {plan.id !== 'institution' && (
-            <div className="mb-4">
-              <span className="text-3xl font-bold">${plan.price}</span>
-              <span className="text-gray-500 ml-1">{plan.billing}</span>
+            <div className="mb-4 flex items-baseline space-x-2">
+              {(plan.id === 'Student' || plan.id === 'pro') ? (
+                <>
+                  <span className="text-2xl font-bold text-black">
+                    ${plan.price}
+                  </span>
+                  <span className="text-sm text-gray-1000 ml-1">
+                    /year
+                  </span>
+
+                  <span className="text-gray-600 line-through text-base">
+                    {plan.id === 'Student' ? '$99.99' : '$349.99'}
+                  </span>
+
+
+                </>
+              ) : (
+                <>
+                  <span className="text-3xl font-bold">${plan.price}</span>
+                  <span className="text-gray-500 ml-1">{plan.billing}</span>
+                </>
+              )}
             </div>
+
           )}
-          <ul className="mb-6 flex-grow">
+
+
+          <ul className="mb-6 flex-grow space-y-3">
+            {/* ✅ Shared List Format for All Items */}
+            {plan.id === 'free' && (
+              <>
+                <li className="flex items-start">
+                  <CheckCircle size={18} className="text-orange-500 mr-2 flex-shrink-0 mt-0.5" />
+
+                  <span className="text-gray-700"><strong>Available Drones:</strong> Agriculture Drone, Racing Drone, DJI Marvic</span>
+                </li>
+                <li className="flex items-start">
+                  <CheckCircle size={18} className="text-orange-500 mr-2 flex-shrink-0 mt-0.5" />
+
+                  <span className="text-gray-700"><strong>Permitted Zones:</strong> RPTO Ground, Agriculture Zone, City Road or Free Flight Zone</span>
+                </li>
+              </>
+            )}
+
+            {plan.id === 'Student' && (
+              <>
+                <li className="flex items-start">
+                  <CheckCircle size={18} className="text-orange-500 mr-2 flex-shrink-0 mt-0.5" />
+                  <span className="text-gray-700">
+                    <strong>Available Drones:</strong> All from Free Plan, DJI MATRICE 350 RTK, Crystalball<br />
+                     Model V
+                  </span>
+                </li>
+
+                <li className="flex items-start">
+                  <CheckCircle size={18} className="text-orange-500 mr-2 flex-shrink-0 mt-0.5" />
+
+                  <span className="text-gray-700"><strong>Permitted Zones:</strong> RPTO Ground, Agriculture, City Road, HV Lines, Solar Panel Zones, Basic Urban Factory Zone
+                  </span>
+                </li>
+              </>
+            )}
+
+            {plan.id === 'pro' && ( 
+              <>
+                <li className="flex items-start">
+                  <CheckCircle size={18} className="text-orange-500 mr-2 flex-shrink-0 mt-0.5" />
+
+                  <span className="text-gray-700"><strong>Available Drones:</strong> All Drones + Fighter-VTOL</span>
+                </li>
+                <li className="flex items-start">
+                  <CheckCircle size={18} className="text-orange-500 mr-2 flex-shrink-0 mt-0.5" />
+
+                  <span className="text-gray-700"><strong>Permitted Zones:</strong> All Zones Except Defence, Full Training & Analytics</span>
+                </li>
+              </>
+            )}
+
+            {plan.id === 'institution' && (
+              <>
+                <li className="flex items-start">
+                  <CheckCircle size={18} className="text-orange-500 mr-2 flex-shrink-0 mt-0.5" />
+
+                  <span className="text-gray-700"><strong></strong> Advanced Scenario Customization</span>
+                </li>
+                <li className="flex items-start">
+                  <CheckCircle size={18} className="text-orange-500 mr-2 flex-shrink-0 mt-0.5" />
+
+                  <span className="text-gray-700"><strong>Available Drones:</strong> All 6 Drones including Fighter-VTOL</span>
+                </li>
+                <li className="flex items-start">
+                  <CheckCircle size={18} className="text-orange-500 mr-2 flex-shrink-0 mt-0.5" />
+
+                  <span className="text-gray-700"><strong>Permitted Zones:</strong> RPTO, Agriculture, Defence, HV Lines, Bridges, City </span>
+                </li>
+              </>
+            )}
+
+            {/* 💡 Common Feature Loop */}
             {plan.features.map((feature, index) => (
-              <li key={index} className="flex items-start mb-3">
+              <li key={index} className="flex items-start">
                 <CheckCircle size={18} className="text-orange-500 mr-2 flex-shrink-0 mt-0.5" />
+
                 <span className="text-gray-700">{feature}</span>
               </li>
             ))}
           </ul>
+
+
+
           <Button variant={plan.buttonVariant} onClick={handleAddToCart} fullWidth>
             {plan.buttonText}
           </Button>
@@ -170,11 +289,12 @@ const user = JSON.parse(sessionStorage.getItem('auth_user') || '{}');
                   />
                   <div className="space-y-2 z-10">
                     <div className="bg-white bg-opacity-20 backdrop-blur-sm rounded-lg px-4 py-1 flex items-center space-x-2">
-                      <CheckCircle size={16} />
+                      <CheckCircle size={18} className="text-orange-500 mr-2 flex-shrink-0 mt-0.5" />
+
                       <span className="text-sm">Quick Verification</span>
                     </div>
                     <div className="bg-white bg-opacity-20 backdrop-blur-sm rounded-lg px-4 py-1 flex items-center space-x-2">
-                      <GraduationCap size={16} />
+                      <GraduationCap size={18} />
                       <span className="text-sm">Student Discount</span>
                     </div>
                   </div>
@@ -264,7 +384,8 @@ const user = JSON.parse(sessionStorage.getItem('auth_user') || '{}');
                       : 'bg-white/30 border-red-300 text-red-800'
                       }`}>
                       {error.includes('Verification') ? (
-                        <CheckCircle size={18} className="mt-0.5 text-green-100" />
+                        <CheckCircle size={18} className="text-orange-500 mr-2 flex-shrink-0 mt-0.5" />
+
                       ) : (
                         <X size={18} className="mt-0.5 text-red-600" />
                       )}
