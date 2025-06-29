@@ -5,7 +5,7 @@ const plans: Plan[] = [
     id: 'free',
     name: 'Free Basic Plan',
     price: 0,
-    billing: 'Forever Free',
+    billing: 'Free',
     features: [
       'Access to 3 basic drones',
       'Free Flight Mode Only',
@@ -24,7 +24,7 @@ const plans: Plan[] = [
     price: 9.99,
     billing: 'USD per year',
     features: [
-      'ALL scenarios and drones are included',
+      
       'Free, Drawing & Automation modes',
       'Digital Certificate',
       'Only .edu or .ac emails are allowed.',
@@ -40,8 +40,8 @@ const plans: Plan[] = [
     price: 34.99,
     billing: 'USD per year',
     features: [
-      'Access to ALL drones',
-      'ALL scenarios included',
+      
+     
       'Free, Drawing & Automation modes',
       'Digital Certificate',
     ],
@@ -52,15 +52,14 @@ const plans: Plan[] = [
   },
   {
     id: 'institution',
-    name: 'Institution Plan',
+    name: 'Enterprise Plan',
     price: 29000 ,
     billing: ' USD per year',
     features: [
-      '30 user accounts',
-      'ALL features included',
       'Admin Panel & Monitoring',
       'Bulk Certificate Generation',
       'Analytics Included',
+      'Module-Based Pricing '
     ],
     buttonText: 'Contact Us',
     buttonVariant: 'secondary',
