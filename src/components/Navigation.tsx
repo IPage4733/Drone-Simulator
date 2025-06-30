@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import { Menu, X } from "lucide-react";
+import { HelpCircle, Menu, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 const Navigation = () => {
@@ -94,7 +94,14 @@ const handleLogout = async () => {
                 Login
               </Link>
             )}
-
+  <Link
+  to="/contact"
+  className="flex items-center gap-1 text-sm font-medium text-gray-600 hover:text-primary transition-colors"
+  title="Help & Support"
+>
+  <HelpCircle className="w-4 h-4" />
+  Help
+</Link>
             <Link to="/download">
   <Button className="bg-primary hover:bg-primary/90 text-white">
     Download Now
@@ -157,7 +164,14 @@ const handleLogout = async () => {
                   Login
                 </Link>
               )}
-
+<Link
+  to="/contact"
+  className="flex items-center gap-1 text-sm font-medium text-gray-600 hover:text-primary transition-colors"
+  title="Help & Support"
+>
+  <HelpCircle className="w-4 h-4" />
+  Help
+</Link>
               <div className="px-3 py-2">
                 <Button className="w-full bg-primary hover:bg-primary/90 text-white">
                   Download Now

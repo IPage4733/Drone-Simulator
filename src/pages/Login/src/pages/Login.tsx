@@ -5,6 +5,7 @@ import { jwtDecode } from 'jwt-decode'
 import { useAuth } from '../context/AuthContext'
 import Navigation from '@/components/Navigation'
 import Logo from '../components/Logo'
+import { Eye, EyeOff } from 'lucide-react'
 
 interface CustomJwtPayload {
   email: string
@@ -12,6 +13,7 @@ interface CustomJwtPayload {
 }
 
 const Login: React.FC = () => {
+  const [showPassword, setShowPassword] = useState(false);
   const [formData, setFormData] = useState({ email: '', password: '' })
   const [errors, setErrors] = useState<{ [key: string]: string }>({})
   const [isLoading, setIsLoading] = useState(false)
@@ -140,19 +142,24 @@ const Login: React.FC = () => {
               {errors.email && <p className="text-red-500 mt-1">{errors.email}</p>}
             </div>
 
-            <div>
-              <label htmlFor="password" className="block text-[11px] font-medium text-gray-700 mb-1">Password</label>
-              <input
-                type="password"
-                id="password"
-                name="password"
-                value={formData.password}
-                onChange={handleChange}
-                className={`form-input text-[12px] px-2 py-1 w-full ${errors.password ? 'border-red-500' : ''}`}
-                placeholder="Enter password"
-              />
-              {errors.password && <p className="text-red-500 mt-1">{errors.password}</p>}
-            </div>
+            <div className="relative">
+  <input
+    type={showPassword ? 'text' : 'password'}
+    id="password"
+    name="password"
+    value={formData.password}
+    onChange={handleChange}
+    className={`form-input text-[12px] px-2 py-1 pr-8 w-full ${errors.password ? 'border-red-500' : ''}`}
+    placeholder="Enter password"
+  />
+  <button
+    type="button"
+    onClick={() => setShowPassword(prev => !prev)}
+    className="absolute right-2 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-gray-700 focus:outline-none"
+  >
+    {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+  </button>
+</div>
 
             {errors.submit && <p className="text-red-500 text-center mt-1">{errors.submit}</p>}
 
