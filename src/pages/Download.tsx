@@ -26,14 +26,15 @@ const Download = () => {
   const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast();
 
-  const handleDownload = () => {
-    const link = document.createElement('a');
-    link.href = "https://www.dropbox.com/scl/fi/i9j64qouthlj371njt5h3/IPage-Simulator.zip?rlkey=kpjgk7vp8jv13k9njd08ezd40&st=tq2ctomg&dl=1";
-    link.download = "IPage_Drone_Simulator.zip"; // Optional: sets download filename
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-  };
+
+const handleDownload = () => {
+  const link = document.createElement('a');
+  link.href = "https://www.dl.dropboxusercontent.com/scl/fi/in6botc48xxzn1tm9yhxn/IPAGE-DRONE-SIMULATOR.zip?rlkey=5xb1z84dvlkk64ptlbg7wygqr&dl=1";
+  link.download = "IPage_Drone_Simulator.zip"; // Optional: sets download filename
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+};
 
 
 
