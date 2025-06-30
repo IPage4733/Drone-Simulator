@@ -54,7 +54,7 @@ const handleEditUser = async (
 
   try {
     const token = sessionStorage.getItem('drone_auth_token') || '';
-    await axios.put('https://34-93-79-185.nip.io/api/update-user-details/', updatePayload, {
+    await axios.put('https://34-47-194-149.nip.io/api/update-user-details/', updatePayload, {
       headers: {
         Authorization: `Token ${token}`,
       },
@@ -149,7 +149,7 @@ useEffect(() => {
 
       const [usersRes, transactionsRes] = await Promise.all([
         axiosInstance.get('/get-all-users/'),
-        axios.get('https://34-93-79-185.nip.io/api/stripe/transactions/', {
+        axios.get('https://34-47-194-149.nip.io/api/stripe/transactions/', {
           headers: {
             Authorization: `Token ${token}`,
           },

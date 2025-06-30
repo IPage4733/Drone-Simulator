@@ -123,7 +123,7 @@ useEffect(() => {
 
   const fetchPremiumData = async () => {
     try {
-      const res = await fetch('https://34-93-79-185.nip.io/api/stripe/transactions/?plan_name=premium', {
+      const res = await fetch('https://34-47-194-149.nip.io/api/stripe/transactions/?plan_name=premium', {
         headers: { Authorization: `Token ${token}` }
       });
 

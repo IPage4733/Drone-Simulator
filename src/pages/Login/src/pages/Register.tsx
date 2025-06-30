@@ -256,7 +256,7 @@ const Register: React.FC = () => {
     }
 
     try {
-      const response = await fetch('https://34-93-79-185.nip.io/api/register/', {
+      const response = await fetch('https://34-47-194-149.nip.io/api/register/', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
