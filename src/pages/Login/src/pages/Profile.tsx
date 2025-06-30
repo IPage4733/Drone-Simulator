@@ -92,7 +92,7 @@ const Profile: React.FC = () => {
           duration_formatted: '25 minutes'
         },
         {
-          scenario_name: 'Night Flight Training',
+          scenario_name: 'https://34-47-194-149.nip.io Flight Training',
           drone_name: 'Autel EVO II',
           location_name: 'Golden Gate Park',
           start_time: '2024-01-14T20:15:00Z',
