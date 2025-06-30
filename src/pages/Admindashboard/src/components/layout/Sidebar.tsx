@@ -37,10 +37,10 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
     { path: '/Dash/master/employees', label: 'Employee Management', icon: UserCog },
     { path: '/Dash/master/income', label: 'Income Reports', icon: TrendingUp },
     { path: '/Dash/master/metrics', label: 'User Metrics', icon: BarChart3 },
-    // { path: '/Dash/master/analytics', label: 'Analytics', icon: PieChart },
-    // { path: '/Dash/master/cont', label: 'Contact Submissions', icon: MessageCircle },
-    // { path: '/Dash/master/inqui', label: 'Training Inquiries', icon: Mail },
-    // { path: '/Dash/master/feed', label: 'User Feedbacks', icon: ThumbsUp },
+    { path: '/Dash/master/analytics', label: 'Analytics', icon: PieChart },
+    { path: '/Dash/master/cont', label: 'Contact Submissions', icon: MessageCircle },
+    { path: '/Dash/master/inqui', label: 'Training Inquiries', icon: Mail },
+    { path: '/Dash/master/feed', label: 'User Feedbacks', icon: ThumbsUp },
   ];
 
   const adminNavItems = [
