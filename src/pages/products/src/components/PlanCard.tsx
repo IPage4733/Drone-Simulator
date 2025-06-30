@@ -40,74 +40,63 @@ const PlanCard: React.FC<PlanCardProps> = ({ plan }) => {
 
 
 
-  const handleAddToCart = () => {
-    const userEmail = sessionStorage.getItem('auth_email');
-    const user = JSON.parse(sessionStorage.getItem('auth_user') || '{}');
-    const currentPlan = user.plan; // ✅ Extracted correctly
-    const cartItems = JSON.parse(sessionStorage.getItem('cart') || '[]');
+ const handleAddToCart = () => {
+  const userEmail = sessionStorage.getItem('auth_email');
+  const user = JSON.parse(sessionStorage.getItem('auth_user') || '{}');
+  const currentPlan = user.plan;
+  const cartItems = JSON.parse(sessionStorage.getItem('cart') || '[]');
 
-    if (!userEmail) {
-      setModalMode('login');
+  // Redirect immediately for institution
+  if (plan.id === 'institution') {
+    window.location.href = '/salesform';
+    return;
+  }
+
+  // ✅ Block switching from Pro or Student plan
+  const blockedPlans = ['pro', 'student'];
+  if (user?.plan && blockedPlans.includes(user.plan.toLowerCase())) {
+    setModalMode('taken');
+    setShowModal(true);
+    return;
+  }
+
+  if (!userEmail) {
+    setModalMode('login');
+    setShowModal(true);
+    return;
+  }
+
+  // Student email check
+  if (plan.id === 'Student') {
+    const isEducational = /@[\w.-]+\.(edu|ac)(\.[a-z]{2,})?$|\.university$/i.test(userEmail);
+    if (!isEducational) {
+      setModalMode('restricted');
       setShowModal(true);
       return;
     }
+  }
 
+  if (plan.id === 'free') {
+    window.location.href = '/auth/register';
+    return;
+  }
 
-    // ✅ Skip check for institution plan
-    {
-      plan.id !== 'institution' && (
-        <div className="mb-4">
-          {plan.id === 'Student' ? (
-            <>
-              <span className="text-gray-400 line-through text-lg mr-2">$99.99</span>
-              <span className="text-3xl font-bold text-green-600">${plan.price}</span>
-              <span className="text-gray-500 ml-1">{plan.billing}</span>
-            </>
-          ) : (
-            <>
-              <span className="text-3xl font-bold">${plan.price}</span>
-              <span className="text-gray-500 ml-1">{plan.billing}</span>
-            </>
-          )}
-        </div>
-      )
-    }
+  const alreadyInCart = cartItems.find((item: any) => item.id === plan.id);
+  if (alreadyInCart) return;
 
-    const alreadyInCart = cartItems.find((item: any) => item.id === plan.id);
-    if (alreadyInCart) return;
-
-    if (plan.id === 'institution') {
-      window.location.href = '/salesform';
-      return;
-    }
-
-    if (plan.id === 'Student') {
-
-      const isEducational = /@[\w.-]+\.(edu|ac)(\.[a-z]{2,})?$|\.university$/i.test(userEmail);
-      if (!isEducational) {
-        setModalMode('restricted');
-        setShowModal(true);
-        return;
-      }
-    }
-
-    if (plan.id === 'free') {
-      window.location.href = '/auth/register';
-      return;
-    }
-
-    const newItem = {
-      id: plan.id,
-      name: plan.name,
-      price: plan.price,
-      type: 'plan' as 'plan',
-      stripe_price_id: plan.stripe_price_id,
-    };
-
-    const updatedCart = [...cartItems, newItem];
-    sessionStorage.setItem('cart', JSON.stringify(updatedCart));
-    addItem(newItem);
+  const newItem = {
+    id: plan.id,
+    name: plan.name,
+    price: plan.price,
+    type: 'plan' as 'plan',
+    stripe_price_id: plan.stripe_price_id,
   };
+
+  const updatedCart = [...cartItems, newItem];
+  sessionStorage.setItem('cart', JSON.stringify(updatedCart));
+  addItem(newItem);
+};
+
 
 
 
