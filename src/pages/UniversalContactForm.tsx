@@ -68,7 +68,7 @@ const UniversalContactForm = () => {
     }
 
     try {
-      const response = await fetch("https://34-93-79-185.nip.io/api/inquiry/", {
+      const response = await fetch("https://34-47-194-149.nip.io/api/inquiry/", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
