@@ -151,7 +151,7 @@ const Download = () => {
             </h1>
 
             <p className="text-xl text-gray-600 mb-8">
-              Your download request has been processed successfully. Check your email for the download link and installation instructions.
+              Your download request has been processed successfully. Click Below download button to download the software and installation instructions.
             </p>
 
             <Card className="bg-gradient-to-r from-primary to-accent text-white mb-8">
