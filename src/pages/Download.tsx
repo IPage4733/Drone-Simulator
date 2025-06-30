@@ -26,6 +26,7 @@ const Download = () => {
   const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast();
 
+
 const handleDownload = () => {
   const link = document.createElement('a');
   link.href = "https://www.dl.dropboxusercontent.com/scl/fi/in6botc48xxzn1tm9yhxn/IPAGE-DRONE-SIMULATOR.zip?rlkey=5xb1z84dvlkk64ptlbg7wygqr&dl=1";
@@ -45,80 +46,80 @@ const handleDownload = () => {
       [field]: value
     }));
   };
-const handleSubmit = async (e: React.FormEvent) => {
-  e.preventDefault();
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
 
-  const errors: { [key: string]: string } = {};
+    const errors: { [key: string]: string } = {};
 
-  if (!formData.name.trim()) errors.name = "Full name is required.";
-  if (!formData.email.trim()) errors.email = "Email is required.";
-  if (!formData.phone.trim()) errors.phone = "Phone number is required.";
-  if (!formData.city.trim()) errors.city = "City is required.";
-  if (!formData.state.trim()) errors.state = "State/Province is required.";
-  if (!formData.country.trim()) errors.country = "Country is required.";
-  if (!formData.purpose.trim()) errors.purpose = "Please select a purpose.";
-  if (!formData.termsAccepted) errors.termsAccepted = "Please accept the terms and conditions.";
+    if (!formData.name.trim()) errors.name = "Full name is required.";
+    if (!formData.email.trim()) errors.email = "Email is required.";
+    if (!formData.phone.trim()) errors.phone = "Phone number is required.";
+    if (!formData.city.trim()) errors.city = "City is required.";
+    if (!formData.state.trim()) errors.state = "State/Province is required.";
+    if (!formData.country.trim()) errors.country = "Country is required.";
+    if (!formData.purpose.trim()) errors.purpose = "Please select a purpose.";
+    if (!formData.termsAccepted) errors.termsAccepted = "Please accept the terms and conditions.";
 
-  if (Object.keys(errors).length > 0) {
-    setFormErrors(errors);
-    toast({
-      title: "Form Incomplete",
-      description: "Please correct the highlighted fields before submitting.",
-      variant: "destructive",
-    });
-    return;
-  }
-
-  setFormErrors({});
-  setIsLoading(true);
-
-  const safePassword = `${formData.name.replace(/\s/g, '')}@1234`;
-
-  const payload = {
-    email: formData.email,
-    username: formData.name.split(' ')[0] || formData.name,
-    password: safePassword,
-    password_confirm: safePassword,
-    full_name: formData.name,
-    phone_number: formData.phone,
-    city: formData.city,
-    state_province: formData.state,
-    country: formData.country,
-    purpose_of_use: formData.purpose.toLowerCase()
-  };
-
-  try {
-    const response = await fetch("https://34-47-194-149.nip.io/api/download-app/", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify(payload)
-    });
-
-    const result = await response.json();
-
-    if (!response.ok) {
-      throw new Error(result.message || "Submission failed");
+    if (Object.keys(errors).length > 0) {
+      setFormErrors(errors);
+      toast({
+        title: "Form Incomplete",
+        description: "Please correct the highlighted fields before submitting.",
+        variant: "destructive",
+      });
+      return;
     }
 
-    console.log("Success:", result);
-    setIsSubmitted(true);
-    toast({
-      title: "Download Ready!",
-      description: "Your download link has been generated successfully.",
-    });
-  } catch (error: any) {
-    console.error("API Error:", error);
-    toast({
-      title: "Error",
-      description: error.message || "Something went wrong.",
-      variant: "destructive"
-    });
-  } finally {
-    setIsLoading(false);
-  }
-};
+    setFormErrors({});
+    setIsLoading(true);
+
+    const safePassword = `${formData.name.replace(/\s/g, '')}@1234`;
+
+    const payload = {
+      email: formData.email,
+      username: formData.name.split(' ')[0] || formData.name,
+      password: safePassword,
+      password_confirm: safePassword,
+      full_name: formData.name,
+      phone_number: formData.phone,
+      city: formData.city,
+      state_province: formData.state,
+      country: formData.country,
+      purpose_of_use: formData.purpose.toLowerCase()
+    };
+
+    try {
+      const response = await fetch("https://34-47-194-149.nip.io/api/download-app/", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify(payload)
+      });
+
+      const result = await response.json();
+
+      if (!response.ok) {
+        throw new Error(result.message || "Submission failed");
+      }
+
+      console.log("Success:", result);
+      setIsSubmitted(true);
+      toast({
+        title: "Download Ready!",
+        description: "Your download link has been generated successfully.",
+      });
+    } catch (error: any) {
+      console.error("API Error:", error);
+      toast({
+        title: "Error",
+        description: error.message || "Something went wrong.",
+        variant: "destructive"
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
 
 
@@ -214,7 +215,7 @@ const handleSubmit = async (e: React.FormEvent) => {
       </section>
 
       {/* Download Form */}
-    <section className="pt-0 pb-10">
+      <section className="pt-0 pb-10">
 
 
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -222,11 +223,11 @@ const handleSubmit = async (e: React.FormEvent) => {
             {/* Form */}
             <Card className="shadow-2xl animate-fade-in">
               <CardHeader>
- <CardHeader className="pt-2 pb-0">
-  <CardTitle className="text-2xl font-bold text-gray-900 text-center mb-0 leading-tight">
-    Download Form
-  </CardTitle>
-</CardHeader>
+                <CardHeader className="pt-2 pb-0">
+                  <CardTitle className="text-2xl font-bold text-gray-900 text-center mb-0 leading-tight">
+                    Download Form
+                  </CardTitle>
+                </CardHeader>
 
 
               </CardHeader>
@@ -243,7 +244,7 @@ const handleSubmit = async (e: React.FormEvent) => {
                         onChange={(e) => handleInputChange("name", e.target.value)}
                         className="mt-1"
                       />
-                       {formErrors.name && <p className="text-sm text-red-600 mt-1">{formErrors.name}</p>}
+                      {formErrors.name && <p className="text-sm text-red-600 mt-1">{formErrors.name}</p>}
                     </div>
                     <div>
                       <Label htmlFor="email">Email Address *</Label>
@@ -270,7 +271,7 @@ const handleSubmit = async (e: React.FormEvent) => {
                         onChange={(e) => handleInputChange("phone", e.target.value)}
                         className="mt-1"
                       />
-                       {formErrors.phone && <p className="text-sm text-red-600 mt-1">{formErrors.phone}</p>}
+                      {formErrors.phone && <p className="text-sm text-red-600 mt-1">{formErrors.phone}</p>}
                     </div>
                     <div>
                       <Label htmlFor="city">City *</Label>
@@ -289,17 +290,17 @@ const handleSubmit = async (e: React.FormEvent) => {
                   <div>
 
 
-  <Label htmlFor="country">Country *</Label>
-  <Input
-    id="country"
-    type="text"
-    required
-    value={formData.country}
-    onChange={(e) => handleInputChange("country", e.target.value)}
-    className="mt-1"
-  />
-    {formErrors.country && <p className="text-sm text-red-600 mt-1">{formErrors.country}</p>}
-</div>
+                    <Label htmlFor="country">Country *</Label>
+                    <Input
+                      id="country"
+                      type="text"
+                      required
+                      value={formData.country}
+                      onChange={(e) => handleInputChange("country", e.target.value)}
+                      className="mt-1"
+                    />
+                    {formErrors.country && <p className="text-sm text-red-600 mt-1">{formErrors.country}</p>}
+                  </div>
 
 
                   <div className="grid md:grid-cols-2 gap-4">
@@ -313,7 +314,7 @@ const handleSubmit = async (e: React.FormEvent) => {
                         onChange={(e) => handleInputChange("state", e.target.value)}
                         className="mt-1"
                       />
-                       {formErrors.state && <p className="text-sm text-red-600 mt-1">{formErrors.state}</p>}
+                      {formErrors.state && <p className="text-sm text-red-600 mt-1">{formErrors.state}</p>}
                     </div>
                     <div>
                       <Label htmlFor="purpose">Purpose of Use *</Label>
@@ -329,7 +330,7 @@ const handleSubmit = async (e: React.FormEvent) => {
                           ))}
                         </SelectContent>
                       </Select>
-                        {formErrors.purpose && <p className="text-sm text-red-600 mt-1">{formErrors.purpose}</p>}
+                      {formErrors.purpose && <p className="text-sm text-red-600 mt-1">{formErrors.purpose}</p>}
                     </div>
                   </div>
 
@@ -362,9 +363,9 @@ const handleSubmit = async (e: React.FormEvent) => {
             <div className="space-y-8 animate-fade-in" style={{ animationDelay: '0.3s' }}>
               <Card>
                 <CardContent className="p-8">
-                 <h3 className="text-2xl font-bold text-gray-900 mb-4 text-center">
-  What You'll Get
-</h3>
+                  <h3 className="text-2xl font-bold text-gray-900 mb-4 text-center">
+                    What You'll Get
+                  </h3>
 
                   <ul className="space-y-3">
                     <li className="flex items-center space-x-3">
@@ -383,28 +384,28 @@ const handleSubmit = async (e: React.FormEvent) => {
 
                   <h3 className="text-xl font-semibold text-gray-900 mt-6 mb-4">System Requirements</h3>
                   <ul className="space-y-6">
-  <li>
-    <div className="flex items-center space-x-2">
-      <div className="w-2 h-2 bg-orange-500 rounded-full"></div>
-      <p className="text-black font-semibold">IPage Drone Simulator</p>
-    </div>
-    <div className="ml-5 mt-2 space-y-1 text-black">
-      <p><span >Operating System:</span> Windows 10 or above</p>
-      <p><span >Storage:</span> 500 MB of available space</p>
-    </div>
-  </li>
+                    <li>
+                      <div className="flex items-center space-x-2">
+                        <div className="w-2 h-2 bg-orange-500 rounded-full"></div>
+                        <p className="text-black font-semibold">IPage Drone Simulator</p>
+                      </div>
+                      <div className="ml-5 mt-2 space-y-1 text-black">
+                        <p><span >Operating System:</span> Windows 10 or above</p>
+                        <p><span >Storage:</span> 500 MB of available space</p>
+                      </div>
+                    </li>
 
-  <li>
-    <div className="flex items-center space-x-2">
-      <div className="w-2 h-2 bg-orange-500 rounded-full"></div>
-      <p className="text-black font-semibold">IPage Drone Mobile Controller</p>
-    </div>
-    <div className="ml-5 mt-2 space-y-1 text-black">
-      <p><span >Operating System:</span> Android 6.0 or higher</p>
-      <p><span >Storage:</span> 100 MB of available space</p>
-    </div>
-  </li>
-</ul>
+                    <li>
+                      <div className="flex items-center space-x-2">
+                        <div className="w-2 h-2 bg-orange-500 rounded-full"></div>
+                        <p className="text-black font-semibold">IPage Drone Mobile Controller</p>
+                      </div>
+                      <div className="ml-5 mt-2 space-y-1 text-black">
+                        <p><span >Operating System:</span> Android 6.0 or higher</p>
+                        <p><span >Storage:</span> 100 MB of available space</p>
+                      </div>
+                    </li>
+                  </ul>
 
 
 
