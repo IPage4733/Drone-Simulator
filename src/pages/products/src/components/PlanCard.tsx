@@ -53,7 +53,8 @@ const PlanCard: React.FC<PlanCardProps> = ({ plan }) => {
   }
 
   // ✅ Block switching from Pro or Student plan
-  const blockedPlans = ['pro', 'student'];
+const blockedPlans = ['pro', 'student', 'premium'];
+
   if (user?.plan && blockedPlans.includes(user.plan.toLowerCase())) {
     setModalMode('taken');
     setShowModal(true);
