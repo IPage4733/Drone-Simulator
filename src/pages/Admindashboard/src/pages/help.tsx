@@ -12,10 +12,9 @@ const HelpPage: React.FC = () => {
     const [expandedSections, setExpandedSections] = useState<Record<string, boolean>>({});
 
     useEffect(() => {
-        const params = new URLSearchParams(location.search);
-        setVisible(params.get('open') === 'help');
-    }, [location.search]);
-
+        setVisible(location.pathname === '/contact');
+    }, [location.pathname]);
+    
     const toggleSection = (key: string) => {
         setExpandedSections(prev => ({ ...prev, [key]: !prev[key] }));
     };

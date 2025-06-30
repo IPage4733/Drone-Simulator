@@ -41,7 +41,7 @@ const Footer = () => {
               <li><Link to="/features" className="text-gray-400 hover:text-white transition-colors">Features</Link></li>
               {/* <li><Link to="/tutorials" className="text-gray-400 hover:text-white transition-colors">Tutorials</Link></li> */}
               <li><Link to="/download" className="text-gray-400 hover:text-white transition-colors">Download</Link></li>
-              <li><Link to="/contact" className="text-gray-400 hover:text-white transition-colors">Contact Us</Link></li>
+              <li><Link to="/contactus" className="text-gray-400 hover:text-white transition-colors">Contact Us</Link></li>
             </ul>
           </div>
 
@@ -74,7 +74,7 @@ const Footer = () => {
             <Link to="/cookie" className="text-gray-400 hover:text-white text-sm transition-colors">Cookie Policy</Link>
             <Link to="/refund" className="text-gray-400 hover:text-white text-sm transition-colors">Refund  Policy</Link>
             <Link to="/general" className="text-gray-400 hover:text-white text-sm transition-colors">General  Policy</Link>
-           <Link to="/?open=help" className="text-sm text-gray-400 hover:text-white">Help</Link>
+           <Link to="/contact" className="text-sm text-gray-400 hover:text-white">Help</Link>
           </div>
         </div>
       </div>
