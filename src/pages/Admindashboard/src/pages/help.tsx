@@ -12,10 +12,9 @@ const HelpPage: React.FC = () => {
     const [expandedSections, setExpandedSections] = useState<Record<string, boolean>>({});
 
     useEffect(() => {
-        const params = new URLSearchParams(location.search);
-        setVisible(params.get('open') === 'help');
-    }, [location.search]);
-
+        setVisible(location.pathname === '/contact');
+    }, [location.pathname]);
+    
     const toggleSection = (key: string) => {
         setExpandedSections(prev => ({ ...prev, [key]: !prev[key] }));
     };
@@ -169,11 +168,13 @@ const HelpPage: React.FC = () => {
             title: "Technical Support",
             content: (
                 <>
-                    <ul className="list-disc pl-4 text-gray-600">
-                        <li>Simulator not launching? Check drivers & requirements.</li>
-                        <li>Freezing? Restart or reinstall simulator.</li>
-                        <li>Login issues? Try password reset or contact support.</li>
-                    </ul>
+                   <ul className="list-disc pl-4 text-gray-600">
+  <li>Simulator not launching? Check drivers & requirements.</li>
+  <li>Freezing? Restart or reinstall simulator.</li>
+  <li>Login issues? Try password reset or contact support.</li>
+  <li>To report a problem, click on <strong>Send Feedback</strong> and fill out the form. Our team will resolve it as soon as possible.</li>
+</ul>
+
                     <p className="mt-2 text-gray-600">
                         Contact support at <a href="mailto:support@dronesimulator.pro" className="text-blue-600">support@dronesimulator.pro</a>
                     </p>
@@ -218,13 +219,7 @@ const HelpPage: React.FC = () => {
                                 )}
                             </div>
                         ))}
-                        <div className="text-center">
-                            <a href="https://drive.google.com/uc?export=download&id=1VfPOgz_cG_4sr0_8z9_T97Pml3Twytz-"
-                                className="inline-block bg-orange-500 text-white px-4 py-2 rounded hover:bg-orange-600 text-sm"
-                                download>
-                                Download Simulator Manual
-                            </a>
-                        </div>
+                        
                         <div className="text-center mt-4">
                             <button
                                 onClick={() => setShowFeedback(true)}
@@ -232,6 +227,13 @@ const HelpPage: React.FC = () => {
                             >
                                 Send Feedback
                             </button>
+                        </div>
+                        <div className="text-center">
+                            <a href="https://drive.google.com/uc?export=download&id=1VfPOgz_cG_4sr0_8z9_T97Pml3Twytz-"
+                                className="inline-block bg-orange-500 text-white px-4 py-2 rounded hover:bg-orange-600 text-sm"
+                                download>
+                                Download Simulator Manual
+                            </a>
                         </div>
                     </div>
                 ) : (

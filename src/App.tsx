@@ -38,7 +38,7 @@ const App = () => (
             <Route path="/features" element={<Features />} />
             <Route path="/tutorials" element={<Tutorials />} />
             <Route path="/download" element={<Download />} />
-            <Route path="/contact" element={<Contact />} />
+            <Route path="/contactus" element={<Contact />} />
             <Route path="/product/*" element={<ProductApp />} />
             <Route path="/Dash/*" element={<AdminDash />} />
             <Route path="/auth/*" element={<AppAuth />} />
@@ -49,6 +49,7 @@ const App = () => (
             <Route path="/refund" element={<RefundPolicy />} />
             <Route path="/general" element={<GeneralPolicy />} />
             <Route path="*" element={<NotFound />} />
+              <Route path="/contact" element={<><Index /><HelpPage /></>} />
           </Routes>
           <HelpPage /> {/* ✅ Always mounted drawer */}
         </CartProvider>

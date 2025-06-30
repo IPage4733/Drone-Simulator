@@ -79,7 +79,7 @@ const UniversalContactForm = () => {
           email: formData.email,
           phone_number: formData.phone,
           organization: formData.organization,
-          i_a: formData.userType,
+          i_am: formData.userType,
           purpose_of_contact: formData.purpose.join(", "),
           message: formData.message,
           students_or_team: formData.studentsOrTeam,
@@ -141,9 +141,7 @@ const UniversalContactForm = () => {
       <Navigation />
       <main className="flex justify-center items-center px-4 pt-32 pb-16">
         <Card className="w-full max-w-5xl flex flex-col sm:flex-row shadow-xl rounded-2xl overflow-hidden bg-gradient-to-br from-orange-500 via-orange-400 to-orange-300">
-          <div className="w-full sm:w-1/2">
-            <img src="/images/contact.png" alt="Students" className="w-full h-full object-cover" />
-          </div>
+          {/* Contact Form on Left */}
           <CardContent className="w-full sm:w-1/2 bg-white p-8">
             <h2 className="text-3xl font-bold text-gray-900 mb-6 text-center">Connect With Us</h2>
             <form ref={formRef} onSubmit={handleSubmit} className="space-y-6">
@@ -176,8 +174,8 @@ const UniversalContactForm = () => {
                   <option value="Institution">Educational Institution</option>
                   <option value="University">University / Research Center</option>
                   <option value="RPTO">Drone Training Academy (RPTO)</option>
-                  <option value="Pilot"> Business Consultant/ Reseller</option>
-                  <option value="ServiceProvider">Drone Service Provider/ Pilot</option>
+                  <option value="Pilot">Business Consultant / Reseller</option>
+                  <option value="ServiceProvider">Drone Service Provider / Pilot</option>
                   <option value="Manufacturer">Drone Manufacturer</option>
                   <option value="Corporate">Corporate / Government</option>
                   <option value="Student">Student</option>
@@ -223,6 +221,11 @@ const UniversalContactForm = () => {
               </Button>
             </form>
           </CardContent>
+
+          {/* Image on Right */}
+          <div className="w-full sm:w-1/2">
+            <img src="/images/contact.png" alt="Students" className="w-full h-full object-cover" />
+          </div>
         </Card>
       </main>
       <Footer />
