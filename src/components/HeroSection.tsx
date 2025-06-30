@@ -17,16 +17,15 @@ const HeroSection = () => {
         <div className="grid lg:grid-cols-2 gap-12 items-center">
           {/* Content */}
           <div className="text-center lg:text-left animate-fade-in">
-            <h1 className="text-4xl md:text-6xl font-bold text-gray-900 mb-6 leading-tight">
-              Experience Realistic
-              <span className="text-primary"> Drone Flight</span>
-              <br />from Your Screen!
+            <h1 className="text-3xl md:text-5xl font-bold text-gray-900 mb-6 leading-snug">
+              Drone Simulator Pro:
+              <span className="text-primary"> Realistic Training </span>
+              <br />for Enthusiasts & Defense Professionals
             </h1>
 
+
             <p className="text-xl text-gray-600 mb-8 leading-relaxed">
-              Master drone piloting with our advanced simulator featuring realistic physics,
-              geofencing, and smooth RTL capabilities. Perfect for beginners
-              and professionals alike.
+              Discover the ultimate drone flying experience with Drone Simulator Pro. Our advanced simulator offers realistic training for drone enthusiasts and defense professionals and beyond. Start your flight journey today!
             </p>
 
             <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
@@ -74,7 +73,7 @@ const HeroSection = () => {
             </div>
           </div>
         </div>
-          {/* <div className="max-w-3xl mx-auto grid grid-cols-3 gap-8 text-center mt-12 pt-8 border-t border-gray-200">
+        {/* <div className="max-w-3xl mx-auto grid grid-cols-3 gap-8 text-center mt-12 pt-8 border-t border-gray-200">
   <div>
     <div className="text-3xl font-bold text-primary">2K+</div>
     <div className="text-gray-600">Downloads</div>

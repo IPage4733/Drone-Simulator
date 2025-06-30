@@ -1,6 +1,6 @@
 import React from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
-import AuthProvider  from './components/auth/AuthProvider';
+import AuthProvider from './components/auth/AuthProvider';
 import { ProtectedRoute } from './components/auth/ProtectedRoute';
 import { MainLayout } from './components/layout/MainLayout';
 import { useAuth } from './hooks/useAuth';
@@ -45,11 +45,11 @@ function AdminDash() {
 
         {/* Protected Routes */}
         <Route path="/" element={<ProtectedRoute><MainLayout /></ProtectedRoute>}>
-         <Route index element={
-  <ProtectedRoute>
-    <DashboardRedirect />
-  </ProtectedRoute>
-} />
+          <Route index element={
+            <ProtectedRoute>
+              <DashboardRedirect />
+            </ProtectedRoute>
+          } />
 
           {/* Master Admin Routes */}
           <Route path="master/dashboard" element={<ProtectedRoute requiredRole="master"><MasterDashboard /></ProtectedRoute>} />
@@ -62,9 +62,9 @@ function AdminDash() {
           <Route path="master/income" element={<ProtectedRoute requiredRole="master"><MasterIncome /></ProtectedRoute>} />
           <Route path="master/metrics" element={<ProtectedRoute requiredRole="master"><MasterUserMetrics /></ProtectedRoute>} />
           <Route path="master/analytics" element={<ProtectedRoute requiredRole="master"><MasterAnalytics /></ProtectedRoute>} />
-<Route path="master/cont" element={<ProtectedRoute requiredRole="master"><AdminContacts /></ProtectedRoute>} />
-<Route path="master/inqui" element={<ProtectedRoute requiredRole="master"><AdminInquiries /></ProtectedRoute>} />
-<Route path="master/feed" element={<ProtectedRoute requiredRole="master"><AdminFeedbacks/></ProtectedRoute>} />
+          <Route path="master/cont" element={<ProtectedRoute requiredRole="master"><AdminContacts /></ProtectedRoute>} />
+          <Route path="master/inqui" element={<ProtectedRoute requiredRole="master"><AdminInquiries /></ProtectedRoute>} />
+          <Route path="master/feed" element={<ProtectedRoute requiredRole="master"><AdminFeedbacks /></ProtectedRoute>} />
           {/* Admin Routes */}
           <Route path="admin/dashboard" element={<ProtectedRoute requiredRole="admin"><AdminDashboard /></ProtectedRoute>} />
           <Route path="admin/users" element={<ProtectedRoute requiredRole="admin"><AdminUsers /></ProtectedRoute>} />
