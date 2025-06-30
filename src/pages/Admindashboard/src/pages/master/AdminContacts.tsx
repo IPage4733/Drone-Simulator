@@ -11,7 +11,7 @@ const AdminContacts: React.FC = () => {
   const fetchContacts = async () => {
     try {
       const token = sessionStorage.getItem('auth_token');
-      const response = await axios.get('https://34-47-194-149.nip.io/api/contact/', {
+      const response = await axios.get('https://34-47-194-149.nip.io/api/contact/admin/all/', {
         headers: {
           Authorization: `Token ${token}`,
         },
@@ -28,7 +28,7 @@ const AdminContacts: React.FC = () => {
     if (!window.confirm('Are you sure you want to delete this contact?')) return;
     try {
       const token = sessionStorage.getItem('auth_token');
-      await axios.delete(`https://34-47-194-149.nip.io/api/contact/${id}/`, {
+      await axios.delete(`https://34-47-194-149.nip.io/api/contact/${id}/delete`, {
         headers: { Authorization: `Token ${token}` },
       });
       setContacts(prev => prev.filter(c => c.id !== id));
