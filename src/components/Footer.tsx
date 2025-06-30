@@ -18,18 +18,46 @@ const Footer = () => {
               and mastering drone piloting skills safely from your device.
             </p>
             <div className="flex space-x-4">
-              <div className="w-10 h-10 bg-primary rounded-full flex items-center justify-center hover:bg-primary/80 transition-colors cursor-pointer">
+              <a
+                href="https://www.facebook.com/dronesimulatorpro/"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="w-10 h-10 bg-primary rounded-full flex items-center justify-center hover:bg-primary/80 transition-colors cursor-pointer"
+              >
                 <span className="text-white font-bold">f</span>
-              </div>
-              <div className="w-10 h-10 bg-primary rounded-full flex items-center justify-center hover:bg-primary/80 transition-colors cursor-pointer">
-                <span className="text-white font-bold">t</span>
-              </div>
-              <div className="w-10 h-10 bg-primary rounded-full flex items-center justify-center hover:bg-primary/80 transition-colors cursor-pointer">
+              </a>
+              <a
+                href="https://x.com/Drone_Simulator"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="w-10 h-10 bg-primary rounded-full flex items-center justify-center hover:bg-primary/80 transition-colors cursor-pointer"
+              >
+                <span className="text-white font-bold">x</span>
+              </a>
+              <a
+                href="https://www.linkedin.com/company/dronesimulatorpro"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="w-10 h-10 bg-primary rounded-full flex items-center justify-center hover:bg-primary/80 transition-colors cursor-pointer"
+              >
                 <span className="text-white font-bold">in</span>
-              </div>
-              <div className="w-10 h-10 bg-primary rounded-full flex items-center justify-center hover:bg-primary/80 transition-colors cursor-pointer">
+              </a>
+              <a
+                href="https://www.youtube.com/@DroneSimulatorPro"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="w-10 h-10 bg-primary rounded-full flex items-center justify-center hover:bg-primary/80 transition-colors cursor-pointer"
+              >
                 <span className="text-white font-bold">yt</span>
-              </div>
+              </a>
+              <a
+                href="https://www.instagram.com/dronesimulatorpro/"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="w-10 h-10 bg-primary rounded-full flex items-center justify-center hover:bg-primary/80 transition-colors cursor-pointer"
+              >
+                <span className="text-white font-bold">ig</span>
+              </a>
             </div>
           </div>
 
@@ -75,6 +103,7 @@ const Footer = () => {
             <Link to="/refund" className="text-gray-400 hover:text-white text-sm transition-colors">Refund  Policy</Link>
             <Link to="/general" className="text-gray-400 hover:text-white text-sm transition-colors">General  Policy</Link>
            <Link to="/contact" className="text-sm text-gray-400 hover:text-white">Help</Link>
+
           </div>
         </div>
       </div>
