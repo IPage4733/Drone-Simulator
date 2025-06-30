@@ -79,7 +79,7 @@ const UniversalContactForm = () => {
           email: formData.email,
           phone_number: formData.phone,
           organization: formData.organization,
-          i_a: formData.userType,
+          i_am: formData.userType,
           purpose_of_contact: formData.purpose.join(", "),
           message: formData.message,
           students_or_team: formData.studentsOrTeam,
