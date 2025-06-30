@@ -31,7 +31,7 @@ const handleLogout = async () => {
 
   try {
     if (token) {
-      await fetch('https://34-93-79-185.nip.io/api/logout/', {
+      await fetch('https://34-47-194-149.nip.io/api/logout/', {
         method: 'POST',
         headers: {
           'Authorization': `Token ${token}`,

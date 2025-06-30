@@ -80,7 +80,7 @@ export const MasterUserMetrics: React.FC = () => {
 useEffect(() => {
   const fetchDownloads = async () => {
     try {
-      const response = await fetch('https://34-93-79-185.nip.io/api/get-all-downloads/');
+      const response = await fetch('https://34-47-194-149.nip.io/api/get-all-downloads/');
       if (response.ok) {
         const data = await response.json();
         const raw = Array.isArray(data.data) ? data.data : [data.data];
