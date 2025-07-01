@@ -275,7 +275,7 @@ const FeaturesPage: React.FC = () => {
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 mb-12">
             {[
               {
-                image: "/images/FlySky CT6B.jpg",
+                image: "/images/FlySkyCT6B.jpg",
                 title: "FlySky CT6B",
                 description: "A beginner-friendly RC controller with 6 channels, ideal for basic drone training and familiarization.",
               },
@@ -285,7 +285,7 @@ const FeaturesPage: React.FC = () => {
                 description: "Simulate drone control directly from your smartphone. Great for training on the go or without RC gear.",
               },
               {
-                image: "/images/Flysky FS-i6S.jpg",
+                image: "/images/FlyskyFS-i6S.jpg",
                 title: "Flysky FS-i6S",
                 description: "A versatile 10-channel RC controller with a compact design and iBus/PPM support—ideal for professional simulator training.",
               },
