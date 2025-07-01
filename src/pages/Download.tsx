@@ -28,25 +28,12 @@ const Download = () => {
 
 
 const handleDownload = () => {
-  const files = [
-    {
-      url: "https://www.dropbox.com/scl/fi/7xncy4wn5e0m2o0v4nk79/IPAGE-DRONE-SIMULATOR.zip?rlkey=0n1810l7afgfh4lgr2tjseu7h&dl=1",
-      filename: "IPage_Drone_Simulator.zip",
-    },
-    {
-      url: "https://www.dropbox.com/scl/fi/mh3qop1sie7ymo8qw6aq4/platform-tools.zip?rlkey=k1g9zhdp76gax7lucyo64m35i&dl=1",
-      filename: "Platform_Tools.zip",
-    },
-  ];
-
-  files.forEach((file) => {
-    const link = document.createElement("a");
-    link.href = file.url;
-    link.download = file.filename;
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-  });
+  const link = document.createElement("a");
+  link.href = "https://www.dropbox.com/scl/fi/yourfileid/Drone_Simulator_Bundle.zip?rlkey=yourkey&dl=1";
+  link.download = "Drone_Simulator_Bundle.zip";
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
 };
 
 
