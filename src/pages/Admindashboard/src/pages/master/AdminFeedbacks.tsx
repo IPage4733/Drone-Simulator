@@ -1,5 +1,3 @@
-// File: AdminFeedbacks.tsx
-
 import React, { useState, useEffect, Fragment } from 'react';
 import axios from 'axios';
 import { Trash2, Eye } from 'lucide-react';
@@ -16,6 +14,32 @@ interface Feedback {
   };
 }
 
+// 🔧 Export utility
+const exportToCSV = (data: Feedback[], filename: string) => {
+  if (!data.length) return;
+
+  const headers = ['Username', 'Email', 'Description', 'Images'];
+  const csvRows = [headers.join(',')];
+
+  data.forEach((fb) => {
+    const row = [
+      fb.user?.username || 'Anonymous',
+      fb.user?.email || 'N/A',
+      fb.description,
+      fb.image_urls?.join('; ')
+    ].map((val) => `"${String(val).replace(/"/g, '""')}"`);
+    csvRows.push(row.join(','));
+  });
+
+  const blob = new Blob([csvRows.join('\n')], { type: 'text/csv' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = filename;
+  a.click();
+  URL.revokeObjectURL(url);
+};
+
 const AdminFeedbacks: React.FC = () => {
   const [feedbacks, setFeedbacks] = useState<Feedback[]>([]);
   const [loading, setLoading] = useState(true);
@@ -25,7 +49,7 @@ const AdminFeedbacks: React.FC = () => {
 
   const fetchFeedbacks = async () => {
     try {
-      const token = sessionStorage.getItem('auth_token');
+      const token = sessionStorage.getItem('drone_auth_token');
       const response = await axios.get('https://34-47-194-149.nip.io/api/feedback/admin/all/', {
         headers: { Authorization: `Token ${token}` },
       });
@@ -40,7 +64,7 @@ const AdminFeedbacks: React.FC = () => {
   const handleDelete = async (id: string) => {
     if (!window.confirm('Are you sure you want to delete this feedback?')) return;
     try {
-      const token = sessionStorage.getItem('auth_token');
+      const token = sessionStorage.getItem('drone_auth_token');
       await axios.delete(`https://34-47-194-149.nip.io/api/feedback/admin/${id}/delete/`, {
         headers: { Authorization: `Token ${token}` },
       });
@@ -59,7 +83,6 @@ const AdminFeedbacks: React.FC = () => {
     setSelectedFeedback(feedback);
     setIsOpen(true);
   };
-
   const closeImageModal = () => setImageModalUrl(null);
 
   if (loading) return <div className="p-6">Loading feedback...</div>;
@@ -67,6 +90,16 @@ const AdminFeedbacks: React.FC = () => {
   return (
     <div className="p-6 space-y-4">
       <h2 className="text-xl font-bold">User Feedback</h2>
+
+      <div className="flex justify-end">
+        <button
+          onClick={() => exportToCSV(feedbacks, 'feedbacks.csv')}
+          className="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700"
+        >
+          Export to CSV
+        </button>
+      </div>
+
       <table className="min-w-full divide-y divide-gray-200 bg-white shadow-sm rounded-md">
         <thead className="bg-gray-100">
           <tr>

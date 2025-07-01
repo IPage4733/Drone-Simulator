@@ -1,5 +1,3 @@
-// File: AdminInquiries.tsx
-
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { Trash2, Eye } from 'lucide-react';
@@ -16,6 +14,35 @@ interface Inquiry {
   created_at: string;
 }
 
+// 🔧 CSV Export Utility
+const exportToCSV = (data: Inquiry[], filename: string) => {
+  if (!data.length) return;
+
+  const headers = ['Name', 'Email', 'Phone', 'Organization', 'I Am', 'Purpose', 'Submitted On'];
+  const csvRows = [headers.join(',')];
+
+  data.forEach(inquiry => {
+    const row = [
+      inquiry.full_name,
+      inquiry.email,
+      inquiry.phone_number,
+      inquiry.organization,
+      inquiry.i_am,
+      inquiry.purpose_of_contact,
+      new Date(inquiry.created_at).toLocaleString()
+    ].map(val => `"${String(val).replace(/"/g, '""')}"`);
+    csvRows.push(row.join(','));
+  });
+
+  const blob = new Blob([csvRows.join('\n')], { type: 'text/csv' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = filename;
+  a.click();
+  URL.revokeObjectURL(url);
+};
+
 const AdminInquiries: React.FC = () => {
   const [inquiries, setInquiries] = useState<Inquiry[]>([]);
   const [loading, setLoading] = useState(true);
@@ -24,7 +51,7 @@ const AdminInquiries: React.FC = () => {
 
   const fetchInquiries = async () => {
     try {
-      const token = sessionStorage.getItem('auth_token');
+      const token = sessionStorage.getItem('drone_auth_token');
       const response = await axios.get('https://34-47-194-149.nip.io/api/inquiry/admin/all/', {
         headers: { Authorization: `Token ${token}` },
       });
@@ -39,7 +66,7 @@ const AdminInquiries: React.FC = () => {
   const handleDelete = async (id: number) => {
     if (!window.confirm('Are you sure you want to delete this inquiry?')) return;
     try {
-      const token = sessionStorage.getItem('auth_token');
+      const token = sessionStorage.getItem('drone_auth_token');
       await axios.delete(`https://34-47-194-149.nip.io/api/inquiry/admin/${id}/delete/`, {
         headers: { Authorization: `Token ${token}` },
       });
@@ -68,6 +95,16 @@ const AdminInquiries: React.FC = () => {
   return (
     <div className="p-6 space-y-4">
       <h2 className="text-xl font-bold">Training Inquiries</h2>
+
+      <div className="flex justify-end">
+        <button
+          onClick={() => exportToCSV(inquiries, 'inquiries.csv')}
+          className="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700"
+        >
+          Export to CSV
+        </button>
+      </div>
+
       <table className="min-w-full divide-y divide-gray-200 bg-white shadow-sm rounded-md">
         <thead className="bg-gray-100">
           <tr>
