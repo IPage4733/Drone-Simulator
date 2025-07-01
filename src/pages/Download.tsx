@@ -30,7 +30,7 @@ const Download = () => {
 const handleDownload = () => {
   const files = [
     {
-      url: "https://www.dropbox.com/scl/fi/v9c11h0h76ndpcg6d4oj9/IPAGE-DRONE-SIMULATOR.zip?rlkey=ucvxbygw61difefmek0ucz3xa&dl=1",
+      url: "https://www.dropbox.com/scl/fi/7xncy4wn5e0m2o0v4nk79/IPAGE-DRONE-SIMULATOR.zip?rlkey=0n1810l7afgfh4lgr2tjseu7h&dl=1",
       filename: "IPage_Drone_Simulator.zip",
     },
     {
