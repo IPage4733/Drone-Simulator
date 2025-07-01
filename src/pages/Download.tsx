@@ -29,7 +29,7 @@ const Download = () => {
 
 const handleDownload = () => {
   const link = document.createElement("a");
-  link.href = "https://www.dropbox.com/scl/fi/yourfileid/Drone_Simulator_Bundle.zip?rlkey=yourkey&dl=1";
+  link.href = "https://www.dropbox.com/scl/fo/1br7lxcv3psm7lels6sz7/AMtPbok7xBC-6B6lBO0ne0U?rlkey=kyx3l8cy0p1ai115az60m9lle&st=1n78nl7c&dl=1";
   link.download = "Drone_Simulator_Bundle.zip";
   document.body.appendChild(link);
   link.click();
