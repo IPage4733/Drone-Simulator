@@ -279,16 +279,17 @@ const FeaturesPage: React.FC = () => {
                 title: "FlySky CT6B",
                 description: "A beginner-friendly RC controller with 6 channels, ideal for basic drone training and familiarization.",
               },
+               {
+                image: "/images/mobile.jpg",
+                title: "Mobile RC App",
+                description: "Simulate drone control directly from your smartphone. Great for training on the go or without RC gear.",
+              },
               {
                 image: "/images/Flysky FS-i6S.jpg",
                 title: "Flysky FS-i6S",
                 description: "A versatile 10-channel RC controller with a compact design and iBus/PPM support—ideal for professional simulator training.",
               },
-              {
-                image: "/images/mobile.jpg",
-                title: "Mobile RC App",
-                description: "Simulate drone control directly from your smartphone. Great for training on the go or without RC gear.",
-              },
+             
             ].map((item, i) => (
               <Card
                 key={i}
