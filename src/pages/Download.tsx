@@ -1,5 +1,5 @@
 
-import { useState } from "react";
+import { useState, useRef } from "react";
 import Navigation from "@/components/Navigation";
 import Footer from "@/components/Footer";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -9,6 +9,7 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
 import { useToast } from "@/hooks/use-toast";
+import { useNavigate } from 'react-router-dom';
 import {
   CheckCircle,
   X,
@@ -32,18 +33,24 @@ const Download = () => {
   const [formErrors, setFormErrors] = useState<{ [key: string]: string }>({});
   const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast();
+  const navigate = useNavigate();
 
 
+  const capabilitiesRef = useRef<HTMLDivElement | null>(null);
 
-const handleDownload = () => {
+  const scrollToCapabilities = () => {
+    capabilitiesRef.current?.scrollIntoView({ behavior: 'smooth' });
+  };
 
-  const link = document.createElement("a");
-  link.href = "https://www.dropbox.com/scl/fo/1br7lxcv3psm7lels6sz7/AMtPbok7xBC-6B6lBO0ne0U?rlkey=kyx3l8cy0p1ai115az60m9lle&st=1n78nl7c&dl=1";
-  link.download = "Drone_Simulator_Bundle.zip";
-  document.body.appendChild(link);
-  link.click();
-  document.body.removeChild(link);
-};
+  const handleDownload = () => {
+
+    const link = document.createElement("a");
+    link.href = "https://www.dropbox.com/scl/fo/1br7lxcv3psm7lels6sz7/AMtPbok7xBC-6B6lBO0ne0U?rlkey=kyx3l8cy0p1ai115az60m9lle&st=1n78nl7c&dl=1";
+    link.download = "Drone_Simulator_Bundle.zip";
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
 
 
 
@@ -179,34 +186,45 @@ const handleDownload = () => {
               </CardContent>
             </Card>
 
-            <div className="bg-blue-50 rounded-lg p-6 text-left">
+            <div className="bg-blue-50 rounded-lg p-6 text-left mt-2 mb-12">
               <h4 className="font-semibold text-gray-900 mb-4">Next Steps:</h4>
-              <ul className="space-y-4 text-[17px] text-gray-800">
+              <ul className="space-y-4 text-[12px] text-gray-800">
                 <li className="flex items-start">
                   <CheckCircle size={20} className="text-orange-500 mr-3 mt-1 flex-shrink-0" />
-
                   <span>
-                    Download and install <strong>IPage Drone Simulator</strong> on your Windows 10 or above PC
-                    (or <strong>IPage Drone Simulator for ARM-based systems</strong>) to begin your training sessions.
+                    Download and install IPage Drone Simulator on your Windows 10 or above PC
+                    (or IPage Drone Simulator for ARM-based systems) to begin your training sessions.
                   </span>
                 </li>
                 <li className="flex items-start">
                   <CheckCircle size={20} className="text-orange-500 mr-3 mt-1 flex-shrink-0" />
-
                   <span>
-                    Download and install the APK <strong>IPAGE Drone Mobile Controller</strong> on your Android device for remote control simulation.
+                    Download and install the APK <strong>IPAGE Drone Mobile Controller</strong> on your Android device for remote control simulation,
+                    or use one of the compatible RC controllers shown above —
+                    <button
+                      onClick={() => navigate('/features#capabilities')}
+                      className="text-blue-600 underline hover:text-blue-800"
+                    >
+                      FlySky CT6B
+                    </button> for basic training or
+                    <button
+                      onClick={() => navigate('/features#capabilities')}
+                      className="text-blue-600 underline hover:text-blue-800"
+                    >
+                      FlySky FS-i6S
+                      </button> for advanced simulator sessions. <br />
+                    Once you're set up, launch the <strong>IPage Drone Simulator</strong> and start flying!
                   </span>
                 </li>
                 <li className="flex items-start">
-                 <CheckCircle size={20} className="text-orange-500 mr-3 mt-1 flex-shrink-0" />
-
+                  <CheckCircle size={20} className="text-orange-500 mr-3 mt-1 flex-shrink-0" />
                   <span>
-                    Check out the <strong>IPage Drone Simulator Tutorial PDF</strong> to get started with step-by-step instructions.
+                    Check out the IPage Drone Simulator Tutorial PDF to get started with step-by-step instructions.
                   </span>
                 </li>
               </ul>
-
             </div>
+
           </div>
         </section>
       </div>
@@ -339,7 +357,10 @@ const handleDownload = () => {
                     </div>
                     <div>
                       <Label htmlFor="purpose">Purpose of Use *</Label>
-                      <Select onValueChange={(value) => handleInputChange("purpose", value)}>
+                      <Select
+                        value={formData.purpose}
+                        onValueChange={(value) => handleInputChange("purpose", value)}
+                      >
                         <SelectTrigger className="mt-1">
                           <SelectValue placeholder="Select purpose" />
                         </SelectTrigger>
@@ -351,6 +372,7 @@ const handleDownload = () => {
                           ))}
                         </SelectContent>
                       </Select>
+
                       {formErrors.purpose && <p className="text-sm text-red-600 mt-1">{formErrors.purpose}</p>}
                     </div>
                   </div>

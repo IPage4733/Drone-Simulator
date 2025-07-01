@@ -1,9 +1,9 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import Footer from '../components/Footer';
 import { Card, CardContent } from "@/components/ui/card";
 import Navigation from '@/components/Navigation';
-
+import { useLocation } from 'react-router-dom';
 
 interface Feature {
   title: string;
@@ -13,8 +13,23 @@ interface Feature {
 }
 
 const FeaturesPage: React.FC = () => {
+  const location = useLocation();
   const [currentImageIndex, setCurrentImageIndex] = useState<{ [key: number]: number }>({});
+  const capabilitiesRef = useRef<HTMLDivElement | null>(null);
 
+  const scrollToCapabilities = () => {
+    capabilitiesRef.current?.scrollIntoView({ behavior: 'smooth' });
+  };
+  useEffect(() => {
+  if (location.hash) {
+    const target = document.querySelector(location.hash);
+    if (target) {
+      setTimeout(() => {
+        target.scrollIntoView({ behavior: 'smooth' });
+      }, 100); // Delay ensures it scrolls after load
+    }
+  }
+}, [location]);
   const mainFeatures: Feature[] = [
     {
       title: "RPTO Ground Training (DGCA Compliant)",
@@ -263,69 +278,75 @@ const FeaturesPage: React.FC = () => {
       </section>
 
       {/* Additional Features Grid */}
-      <section className="py-20 bg-gray-50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-16">
-            <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-6">
-              Additional
-              <span className="text-orange-500"> Capabilities</span>
-            </h2>
-          </div>
-          {/* Controller Cards */}
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 mb-12">
-            {[
-              {
-                image: "/images/FlySkyCT6B.jpg",
-                title: "FlySky CT6B",
-                description: "A beginner-friendly RC controller with 6 channels, ideal for basic drone training and familiarization.",
-              },
-               {
-                image: "/images/mobile.jpg",
-                title: "Mobile RC App",
-                description: "Simulate drone control directly from your smartphone. Great for training on the go or without RC gear.",
-              },
-              {
-                image: "/images/FlyskyFS-i6S.jpg",
-                title: "Flysky FS-i6S",
-                description: "A versatile 10-channel RC controller with a compact design and iBus/PPM support—ideal for professional simulator training.",
-              },
-             
-            ].map((item, i) => (
-              <Card
-                key={i}
-                className="overflow-hidden transition-transform duration-300 transform hover:-translate-y-1 hover:border-4 hover:border-orange-500 hover:shadow-xl border border-transparent rounded-xl"
-              >
-                <img
-                  src={item.image}
-                  alt={item.title}
-                  className="w-full h-48 object-contain bg-white border-b"
-                />
-                <CardContent className="p-4">
-                  <h3 className="text-xl font-semibold text-gray-900 group-hover:text-orange-500">
+     <section id="capabilities" ref={capabilitiesRef} className="py-20 bg-gray-50">
+  <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div className="text-center mb-16">
+      <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-6">
+        Additional
+        <span className="text-orange-500"> Capabilities</span>
+      </h2>
+    </div>
 
-                    {item.title}</h3>
-                  <p className="text-base text-gray-700 mt-2">{item.description}</p>
-                </CardContent>
-              </Card>
-
-            ))}
-          </div>
-
-
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {additionalFeatures.map((item, index) => (
-              <Card key={index} className="group hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1">
-                <div className="p-6">
-                  <h3 className="text-xl font-semibold text-gray-900 mb-3 group-hover:text-orange-500 transition-colors">
-                    {item.title}
-                  </h3>
-                  <p className="text-gray-600">{item.desc}</p>
-                </div>
-              </Card>
-            ))}
-          </div>
+    {/* Controller Cards */}
+    <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 mb-12">
+      {[
+        {
+          id: "flysky-ct6b",
+          image: "/images/FlySkyCT6B.jpg",
+          title: "FlySky CT6B",
+          description: "A beginner-friendly RC controller with 6 channels, ideal for basic drone training and familiarization.",
+        },
+        {
+          id: "mobile-app",
+          image: "/images/mobile.png",
+          title: "Mobile RC App",
+          description: "Simulate drone control directly from your smartphone. Great for training on the go or without RC gear.",
+        },
+        {
+          id: "flysky-fs-i6s",
+          image: "/images/FlyskyFS-i6S.jpg",
+          title: "Flysky FS-i6S",
+          description: "A versatile 10-channel RC controller with a compact design and iBus/PPM support—ideal for professional simulator training.",
+        },
+      ].map((item, i) => (
+        <div key={i} id={item.id}>
+          <Card className="overflow-hidden transition-transform duration-300 transform hover:-translate-y-1 hover:border-4 hover:border-orange-500 hover:shadow-xl border border-transparent rounded-xl">
+            <img
+              src={item.image}
+              alt={item.title}
+              className="w-full h-48 object-contain bg-white border-b"
+            />
+            <CardContent className="p-4">
+              <h3 className="text-xl font-semibold text-gray-900 group-hover:text-orange-500">
+                {item.title}
+              </h3>
+              <p className="text-base text-gray-700 mt-2">{item.description}</p>
+            </CardContent>
+          </Card>
         </div>
-      </section>
+      ))}
+    </div>
+
+    {/* Additional Feature Cards */}
+    <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+      {additionalFeatures.map((item, index) => (
+        <Card
+          key={index}
+          className="group hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1"
+        >
+          <div className="p-6">
+            <h3 className="text-xl font-semibold text-gray-900 mb-3 group-hover:text-orange-500 transition-colors">
+              {item.title}
+            </h3>
+            <p className="text-gray-600">{item.desc}</p>
+          </div>
+        </Card>
+      ))}
+    </div>
+  </div>
+</section>
+
+
 
       <Footer />
     </div>
