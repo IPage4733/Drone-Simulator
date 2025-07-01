@@ -9,7 +9,14 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
 import { useToast } from "@/hooks/use-toast";
-
+import {
+  CheckCircle,
+  X,
+  GraduationCap,
+  Airplay,
+  Satellite,
+  Mail
+} from 'lucide-react';
 const Download = () => {
   const [formData, setFormData] = useState({
     name: "",
@@ -27,14 +34,14 @@ const Download = () => {
   const { toast } = useToast();
 
 
-const handleDownload = () => {
-  const link = document.createElement('a');
-  link.href = "https://www.dl.dropboxusercontent.com/scl/fi/in6botc48xxzn1tm9yhxn/IPAGE-DRONE-SIMULATOR.zip?rlkey=5xb1z84dvlkk64ptlbg7wygqr&dl=1";
-  link.download = "IPage_Drone_Simulator.zip"; // Optional: sets download filename
-  document.body.appendChild(link);
-  link.click();
-  document.body.removeChild(link);
-};
+  const handleDownload = () => {
+    const link = document.createElement('a');
+    link.href = "https://www.dl.dropboxusercontent.com/scl/fi/in6botc48xxzn1tm9yhxn/IPAGE-DRONE-SIMULATOR.zip?rlkey=5xb1z84dvlkk64ptlbg7wygqr&dl=1";
+    link.download = "IPage_Drone_Simulator.zip"; // Optional: sets download filename
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
 
 
 
@@ -158,7 +165,7 @@ const handleDownload = () => {
             <Card className="bg-gradient-to-r from-primary to-accent text-white mb-8">
               <CardContent className="p-8">
                 <h3 className="text-2xl font-bold mb-4">Download Your Software</h3>
-                <p className="mb-6 opacity-90">Click the button below to download the IPAGE Drone Simulator and Mobile Controller.</p>
+                <p className="mb-6 opacity-90">Click the button below to download the IPAGE Drone Simulators, Mobile Controller and IPage Drone Simulator Tutorial.</p>
                 <Button
                   onClick={handleDownload}
                   className="bg-white text-primary hover:bg-gray-100 font-semibold px-8 py-3"
@@ -171,20 +178,31 @@ const handleDownload = () => {
 
             <div className="bg-blue-50 rounded-lg p-6 text-left">
               <h4 className="font-semibold text-gray-900 mb-4">Next Steps:</h4>
-              <ul className="space-y-2 text-gray-700">
-                <li className="flex items-center space-x-2">
-                  <span className="w-2 h-2 bg-primary rounded-full"></span>
-                  <span>Download and install the APK on your Android device</span>
+              <ul className="space-y-4 text-[17px] text-gray-800">
+                <li className="flex items-start">
+                  <CheckCircle size={20} className="text-orange-500 mr-3 mt-1 flex-shrink-0" />
+
+                  <span>
+                    Download and install <strong>IPage Drone Simulator</strong> on your Windows 10 or above PC
+                    (or <strong>IPage Drone Simulator for ARM-based systems</strong>) to begin your training sessions.
+                  </span>
                 </li>
-                <li className="flex items-center space-x-2">
-                  <span className="w-2 h-2 bg-primary rounded-full"></span>
-                  <span>Check out our beginner tutorials to get started</span>
+                <li className="flex items-start">
+                  <CheckCircle size={20} className="text-orange-500 mr-3 mt-1 flex-shrink-0" />
+
+                  <span>
+                    Download and install the APK <strong>IPAGE Drone Mobile Controller</strong> on your Android device for remote control simulation.
+                  </span>
                 </li>
-                <li className="flex items-center space-x-2">
-                  <span className="w-2 h-2 bg-primary rounded-full"></span>
-                  <span>Join our community for tips and support</span>
+                <li className="flex items-start">
+                 <CheckCircle size={20} className="text-orange-500 mr-3 mt-1 flex-shrink-0" />
+
+                  <span>
+                    Check out the <strong>IPage Drone Simulator Tutorial PDF</strong> to get started with step-by-step instructions.
+                  </span>
                 </li>
               </ul>
+
             </div>
           </div>
         </section>
