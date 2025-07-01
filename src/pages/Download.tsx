@@ -29,7 +29,9 @@ const Download = () => {
 
 const handleDownload = () => {
   const link = document.createElement('a');
-  link.href = "https://www.dl.dropboxusercontent.com/scl/fi/c65rfdqo5s9ybaq7yghne/IPAGE-DRONE-SIMULATOR.zip?rlkey=ps0xmspqbfrnxn9dhfm4a5gih&st=47mpzw82";
+
+  link.href = "https://www.dropbox.com/scl/fi/v9c11h0h76ndpcg6d4oj9/IPAGE-DRONE-SIMULATOR.zip?rlkey=ucvxbygw61difefmek0ucz3xa&dl=1";
+
   link.download = "IPage_Drone_Simulator.zip"; // Optional: sets download filename
   document.body.appendChild(link);
   link.click();
