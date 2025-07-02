@@ -48,6 +48,9 @@ const AdminInquiries: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [selectedInquiry, setSelectedInquiry] = useState<Inquiry | null>(null);
   const [isOpen, setIsOpen] = useState(false);
+  const [startDate, setStartDate] = useState('');
+  const [endDate, setEndDate] = useState('');
+  const [quickFilter, setQuickFilter] = useState('');
 
   const fetchInquiries = async () => {
     try {
@@ -86,6 +89,34 @@ const AdminInquiries: React.FC = () => {
     setSelectedInquiry(null);
   };
 
+  const isWithin = (dateStr: string, days: number): boolean => {
+    const now = new Date();
+    const date = new Date(dateStr);
+    const diffTime = now.getTime() - date.getTime();
+    const diffDays = diffTime / (1000 * 60 * 60 * 24);
+    return diffDays <= days;
+  };
+
+  const filteredInquiries = inquiries.filter((inq) => {
+    const createdAt = new Date(inq.created_at);
+    const from = startDate ? new Date(startDate) : null;
+    const to = endDate ? new Date(endDate) : null;
+    const matchesDateRange = (!from || createdAt >= from) && (!to || createdAt <= to);
+
+    const today = new Date();
+    if (quickFilter === 'today') {
+      return (
+        createdAt.getDate() === today.getDate() &&
+        createdAt.getMonth() === today.getMonth() &&
+        createdAt.getFullYear() === today.getFullYear()
+      );
+    } else if (quickFilter === '7days') return isWithin(inq.created_at, 7);
+    else if (quickFilter === '1month') return isWithin(inq.created_at, 30);
+    else if (quickFilter === '1year') return isWithin(inq.created_at, 365);
+
+    return matchesDateRange;
+  });
+
   useEffect(() => {
     fetchInquiries();
   }, []);
@@ -96,10 +127,46 @@ const AdminInquiries: React.FC = () => {
     <div className="p-6 space-y-4">
       <h2 className="text-xl font-bold">Training Inquiries</h2>
 
-      <div className="flex justify-end">
+      <div className="flex flex-wrap gap-4 items-center">
+        <label className="text-sm text-gray-700">
+          From:
+          <input
+            type="date"
+            value={startDate}
+            onChange={(e) => setStartDate(e.target.value)}
+            className="ml-2 border border-gray-300 rounded px-2 py-1"
+          />
+        </label>
+        <label className="text-sm text-gray-700">
+          To:
+          <input
+            type="date"
+            value={endDate}
+            onChange={(e) => setEndDate(e.target.value)}
+            className="ml-2 border border-gray-300 rounded px-2 py-1"
+          />
+        </label>
+        <div className="flex gap-2">
+          {['today', '7days', '1month', '1year'].map((key) => (
+            <button
+              key={key}
+              onClick={() => setQuickFilter(key)}
+              className={`px-4 py-1.5 rounded-md text-sm font-medium transition ${
+                quickFilter === key ? 'bg-orange-600 text-white shadow' : 'bg-gray-100 text-gray-800 hover:bg-gray-200'
+              }`}
+            >
+              {{
+                today: 'Today',
+                '7days': 'Last 7 Days',
+                '1month': 'Last 1 Month',
+                '1year': 'Last 1 Year',
+              }[key]}
+            </button>
+          ))}
+        </div>
         <button
-          onClick={() => exportToCSV(inquiries, 'inquiries.csv')}
-          className="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700"
+          onClick={() => exportToCSV(filteredInquiries, 'inquiries.csv')}
+          className="ml-auto bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700"
         >
           Export to CSV
         </button>
@@ -112,16 +179,18 @@ const AdminInquiries: React.FC = () => {
             <th className="px-4 py-3 text-left text-sm font-medium text-gray-700">Email</th>
             <th className="px-4 py-3 text-left text-sm font-medium text-gray-700">Phone</th>
             <th className="px-4 py-3 text-left text-sm font-medium text-gray-700">Purpose</th>
+            <th className="px-4 py-3 text-left text-sm font-medium text-gray-700">Date</th>
             <th className="px-4 py-3 text-left text-sm font-medium text-gray-700">Actions</th>
           </tr>
         </thead>
         <tbody className="bg-white divide-y divide-gray-200">
-          {inquiries.map(inquiry => (
+          {filteredInquiries.map(inquiry => (
             <tr key={inquiry.id}>
               <td className="px-4 py-3 text-sm text-gray-900">{inquiry.full_name}</td>
               <td className="px-4 py-3 text-sm text-gray-600">{inquiry.email}</td>
               <td className="px-4 py-3 text-sm text-gray-600">{inquiry.phone_number}</td>
               <td className="px-4 py-3 text-sm text-gray-700">{inquiry.purpose_of_contact}</td>
+              <td className="px-4 py-3 text-sm text-gray-500">{new Date(inquiry.created_at).toLocaleDateString()}</td>
               <td className="px-4 py-3 text-sm">
                 <button onClick={() => openDialog(inquiry)} className="text-blue-500 hover:text-blue-700 mr-2">
                   <Eye size={16} />

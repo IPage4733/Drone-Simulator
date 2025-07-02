@@ -8,6 +8,7 @@ interface Contact {
   name: string;
   email: string;
   message: string;
+  created_at: string;
   user_details: {
     id: number;
     username: string;
@@ -31,14 +32,11 @@ interface Contact {
   };
 }
 
-// 🔧 CSV Export Utility
 const exportToCSV = (data: Contact[], filename: string) => {
   if (!data.length) return;
 
   const headers = ['Name', 'Email', 'Message', 'Full Name', 'Phone', 'City', 'State', 'Country', 'Purpose', 'Plan'];
-  const csvRows = [
-    headers.join(',')
-  ];
+  const csvRows = [headers.join(',')];
 
   data.forEach(contact => {
     const row = [
@@ -70,6 +68,9 @@ const AdminContacts: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [selectedContact, setSelectedContact] = useState<Contact | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [startDate, setStartDate] = useState('');
+  const [endDate, setEndDate] = useState('');
+  const [quickFilter, setQuickFilter] = useState('');
 
   const fetchContacts = async () => {
     try {
@@ -105,6 +106,34 @@ const AdminContacts: React.FC = () => {
     setIsModalOpen(true);
   };
 
+  const isWithin = (dateStr: string, days: number): boolean => {
+    const now = new Date();
+    const date = new Date(dateStr);
+    const diffTime = now.getTime() - date.getTime();
+    const diffDays = diffTime / (1000 * 60 * 60 * 24);
+    return diffDays <= days;
+  };
+
+  const filteredContacts = contacts.filter((c) => {
+    const created = new Date(c.created_at);
+    const from = startDate ? new Date(startDate) : null;
+    const to = endDate ? new Date(endDate) : null;
+    const matchesDateRange = (!from || created >= from) && (!to || created <= to);
+
+    const today = new Date();
+    if (quickFilter === 'today') {
+      return (
+        created.getDate() === today.getDate() &&
+        created.getMonth() === today.getMonth() &&
+        created.getFullYear() === today.getFullYear()
+      );
+    } else if (quickFilter === '7days') return isWithin(c.created_at, 7);
+    else if (quickFilter === '1month') return isWithin(c.created_at, 30);
+    else if (quickFilter === '1year') return isWithin(c.created_at, 365);
+
+    return matchesDateRange;
+  });
+
   useEffect(() => {
     fetchContacts();
   }, []);
@@ -115,9 +144,48 @@ const AdminContacts: React.FC = () => {
     <div className="p-6 space-y-4">
       <h2 className="text-xl font-bold">Contact Submissions</h2>
 
-      <div className="flex justify-end">
+      <div className="flex flex-wrap gap-4 items-center justify-between">
+        <div className="flex flex-wrap gap-3 items-center">
+          <label className="text-sm text-gray-700">
+            From:
+            <input
+              type="date"
+              value={startDate}
+              onChange={(e) => setStartDate(e.target.value)}
+              className="ml-2 border border-gray-300 rounded px-2 py-1"
+            />
+          </label>
+          <label className="text-sm text-gray-700">
+            To:
+            <input
+              type="date"
+              value={endDate}
+              onChange={(e) => setEndDate(e.target.value)}
+              className="ml-2 border border-gray-300 rounded px-2 py-1"
+            />
+          </label>
+          <div className="flex gap-2">
+            {['today', '7days', '1month', '1year'].map((key) => (
+              <button
+                key={key}
+                onClick={() => setQuickFilter(key)}
+                className={`px-4 py-1.5 rounded-md text-sm font-medium transition ${
+                  quickFilter === key ? 'bg-orange-600 text-white shadow' : 'bg-gray-100 text-gray-800 hover:bg-gray-200'
+                }`}
+              >
+                {{
+                  today: 'Today',
+                  '7days': 'Last 7 Days',
+                  '1month': 'Last 1 Month',
+                  '1year': 'Last 1 Year',
+                }[key]}
+              </button>
+            ))}
+          </div>
+        </div>
+
         <button
-          onClick={() => exportToCSV(contacts, 'contacts.csv')}
+          onClick={() => exportToCSV(filteredContacts, 'contacts.csv')}
           className="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700"
         >
           Export to CSV
@@ -130,15 +198,17 @@ const AdminContacts: React.FC = () => {
             <th className="px-4 py-3 text-left text-sm font-medium text-gray-700">Name</th>
             <th className="px-4 py-3 text-left text-sm font-medium text-gray-700">Email</th>
             <th className="px-4 py-3 text-left text-sm font-medium text-gray-700">Message</th>
+            <th className="px-4 py-3 text-left text-sm font-medium text-gray-700">Submitted On</th>
             <th className="px-4 py-3 text-left text-sm font-medium text-gray-700">Actions</th>
           </tr>
         </thead>
         <tbody className="bg-white divide-y divide-gray-200">
-          {contacts.map(contact => (
+          {filteredContacts.map(contact => (
             <tr key={contact.id}>
               <td className="px-4 py-3 text-sm text-gray-900">{contact.name}</td>
               <td className="px-4 py-3 text-sm text-gray-600">{contact.email}</td>
               <td className="px-4 py-3 text-sm text-gray-700">{contact.message}</td>
+              <td className="px-4 py-3 text-sm text-gray-500">{new Date(contact.created_at).toLocaleString()}</td>
               <td className="px-4 py-3 text-sm">
                 <button
                   onClick={() => handleView(contact)}
