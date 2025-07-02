@@ -12,13 +12,14 @@ interface Feedback {
     email?: string;
     full_name?: string;
   };
+  created_at: string;
 }
 
 // 🔧 Export utility
 const exportToCSV = (data: Feedback[], filename: string) => {
   if (!data.length) return;
 
-  const headers = ['Username', 'Email', 'Description', 'Images'];
+  const headers = ['Username', 'Email', 'Description', 'Images', 'Date'];
   const csvRows = [headers.join(',')];
 
   data.forEach((fb) => {
@@ -26,7 +27,8 @@ const exportToCSV = (data: Feedback[], filename: string) => {
       fb.user?.username || 'Anonymous',
       fb.user?.email || 'N/A',
       fb.description,
-      fb.image_urls?.join('; ')
+      fb.image_urls?.join('; '),
+      new Date(fb.created_at).toLocaleString()
     ].map((val) => `"${String(val).replace(/"/g, '""')}"`);
     csvRows.push(row.join(','));
   });
@@ -46,6 +48,9 @@ const AdminFeedbacks: React.FC = () => {
   const [selectedFeedback, setSelectedFeedback] = useState<Feedback | null>(null);
   const [isOpen, setIsOpen] = useState(false);
   const [imageModalUrl, setImageModalUrl] = useState<string | null>(null);
+  const [startDate, setStartDate] = useState('');
+  const [endDate, setEndDate] = useState('');
+  const [quickFilter, setQuickFilter] = useState('');
 
   const fetchFeedbacks = async () => {
     try {
@@ -85,16 +90,81 @@ const AdminFeedbacks: React.FC = () => {
   };
   const closeImageModal = () => setImageModalUrl(null);
 
-  if (loading) return <div className="p-6">Loading feedback...</div>;
+  const isWithin = (dateStr: string, days: number): boolean => {
+    const now = new Date();
+    const date = new Date(dateStr);
+    const diffTime = now.getTime() - date.getTime();
+    const diffDays = diffTime / (1000 * 60 * 60 * 24);
+    return diffDays <= days;
+  };
+
+  const filteredFeedbacks = feedbacks.filter((fb) => {
+    const createdAt = new Date(fb.created_at);
+    const from = startDate ? new Date(startDate) : null;
+    const to = endDate ? new Date(endDate) : null;
+    const matchesDateRange = (!from || createdAt >= from) && (!to || createdAt <= to);
+
+    const today = new Date();
+    if (quickFilter === 'today') {
+      return (
+        createdAt.getDate() === today.getDate() &&
+        createdAt.getMonth() === today.getMonth() &&
+        createdAt.getFullYear() === today.getFullYear()
+      );
+    } else if (quickFilter === '7days') return isWithin(fb.created_at, 7);
+    else if (quickFilter === '1month') return isWithin(fb.created_at, 30);
+    else if (quickFilter === '1year') return isWithin(fb.created_at, 365);
+
+    return matchesDateRange;
+  });
 
   return (
     <div className="p-6 space-y-4">
-      <h2 className="text-xl font-bold">User Feedback</h2>
+      <div className="flex justify-between items-center">
+        <h2 className="text-xl font-bold">User Feedback</h2>
+        <div className="text-sm text-gray-600">Total: {filteredFeedbacks.length}</div>
+      </div>
 
-      <div className="flex justify-end">
+      <div className="flex flex-wrap gap-4 items-center">
+        <label className="text-sm text-gray-700">
+          From:
+          <input
+            type="date"
+            value={startDate}
+            onChange={(e) => setStartDate(e.target.value)}
+            className="ml-2 border border-gray-300 rounded px-2 py-1"
+          />
+        </label>
+        <label className="text-sm text-gray-700">
+          To:
+          <input
+            type="date"
+            value={endDate}
+            onChange={(e) => setEndDate(e.target.value)}
+            className="ml-2 border border-gray-300 rounded px-2 py-1"
+          />
+        </label>
+        <div className="flex gap-2">
+          {['today', '7days', '1month', '1year'].map((key) => (
+            <button
+              key={key}
+              onClick={() => setQuickFilter(key)}
+              className={`px-4 py-1.5 rounded-md text-sm font-medium transition ${
+                quickFilter === key ? 'bg-orange-600 text-white shadow' : 'bg-gray-100 text-gray-800 hover:bg-gray-200'
+              }`}
+            >
+              {{
+                today: 'Today',
+                '7days': 'Last 7 Days',
+                '1month': 'Last 1 Month',
+                '1year': 'Last 1 Year',
+              }[key]}
+            </button>
+          ))}
+        </div>
         <button
-          onClick={() => exportToCSV(feedbacks, 'feedbacks.csv')}
-          className="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700"
+          onClick={() => exportToCSV(filteredFeedbacks, 'feedbacks.csv')}
+          className="ml-auto bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700"
         >
           Export to CSV
         </button>
@@ -111,7 +181,7 @@ const AdminFeedbacks: React.FC = () => {
           </tr>
         </thead>
         <tbody className="bg-white divide-y divide-gray-200">
-          {feedbacks.map((feedback) => (
+          {filteredFeedbacks.map((feedback) => (
             <tr key={feedback.id}>
               <td className="px-4 py-3 text-sm text-gray-900">{feedback.user?.username || 'Anonymous'}</td>
               <td className="px-4 py-3 text-sm text-gray-600">{feedback.user?.email || 'N/A'}</td>
@@ -150,6 +220,7 @@ const AdminFeedbacks: React.FC = () => {
         </tbody>
       </table>
 
+      {/* Detail Modal */}
       <Transition appear show={isOpen} as={Fragment}>
         <Dialog as="div" className="relative z-10" onClose={closeModal}>
           <Transition.Child

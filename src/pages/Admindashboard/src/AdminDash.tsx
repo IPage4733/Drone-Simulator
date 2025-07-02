@@ -23,6 +23,7 @@ import { MasterAnalytics } from './pages/master/Analytics';
 import AdminInquiries from './pages/master/AdminInquiries';
 import AdminFeedbacks from './pages/master/AdminFeedbacks';
 import AdminContacts from './pages/master/AdminContacts';
+import DownloadAdmin from './pages/master/AdminDownload';
 // Admin Pages
 import { AdminDashboard } from './pages/admin/Dashboard';
 import { AdminUsers } from './pages/admin/Users';
@@ -65,6 +66,7 @@ function AdminDash() {
           <Route path="master/cont" element={<ProtectedRoute requiredRole="master"><AdminContacts /></ProtectedRoute>} />
           <Route path="master/inqui" element={<ProtectedRoute requiredRole="master"><AdminInquiries /></ProtectedRoute>} />
           <Route path="master/feed" element={<ProtectedRoute requiredRole="master"><AdminFeedbacks /></ProtectedRoute>} />
+          <Route path="master/down" element={<ProtectedRoute requiredRole="master"><DownloadAdmin /></ProtectedRoute>} />
           {/* Admin Routes */}
           <Route path="admin/dashboard" element={<ProtectedRoute requiredRole="admin"><AdminDashboard /></ProtectedRoute>} />
           <Route path="admin/users" element={<ProtectedRoute requiredRole="admin"><AdminUsers /></ProtectedRoute>} />
