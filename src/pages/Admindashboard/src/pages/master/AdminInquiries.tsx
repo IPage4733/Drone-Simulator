@@ -166,7 +166,7 @@ const AdminInquiries: React.FC = () => {
         </div>
         <button
           onClick={() => exportToCSV(filteredInquiries, 'inquiries.csv')}
-          className="ml-auto bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700"
+          className="ml-auto bg-orange-600 text-white px-4 py-2 rounded hover:bg-orange-700"
         >
           Export to CSV
         </button>
