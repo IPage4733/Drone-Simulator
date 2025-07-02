@@ -186,7 +186,7 @@ const AdminContacts: React.FC = () => {
 
         <button
           onClick={() => exportToCSV(filteredContacts, 'contacts.csv')}
-          className="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700"
+          className="bg-orange-600 text-white px-4 py-2 rounded hover:bg-orange-700"
         >
           Export to CSV
         </button>
