@@ -9,7 +9,7 @@ const Footer = () => {
           {/* Logo and Description */}
           <div className="md:col-span-2">
             <img
-              src="/images/logo.jpg"
+              src="/images/footerlogo1.png"
               alt="DroneSimulator Logo"
               className="w-[200px] h-auto object-contain"
             />
