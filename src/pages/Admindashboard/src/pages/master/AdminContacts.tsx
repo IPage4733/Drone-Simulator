@@ -139,10 +139,41 @@ const AdminContacts: React.FC = () => {
   }, []);
 
   if (loading) return <div className="p-6">Loading contacts...</div>;
+  const clearAllFilters = () => {
+    setStartDate('');
+    setEndDate('');
+    setQuickFilter('');
+  };
 
   return (
     <div className="p-6 space-y-4">
-      <h2 className="text-xl font-bold">Contact Submissions</h2>
+      <div className="flex items-center justify-between">
+  <h2 className="text-xl font-bold text-gray-900">Contact Submissions</h2>
+
+  <div className="flex items-center gap-3">
+    <button
+      onClick={() => exportToCSV(filteredContacts, 'contacts.csv')}
+      className="bg-orange-600 hover:bg-orange-700 text-white px-4 py-2 rounded-md text-sm font-medium flex items-center"
+    >
+      <svg
+        className="w-4 h-4 mr-2"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="2"
+        viewBox="0 0 24 24"
+      >
+        <path
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          d="M4 4v16h16V4H4zm8 4v8m0 0l-3-3m3 3l3-3"
+        />
+      </svg>
+      Export CSV
+    </button>
+    <span className="text-sm text-gray-600">Total: {filteredContacts.length}</span>
+  </div>
+</div>
+
 
       <div className="flex flex-wrap gap-4 items-center justify-between">
         <div className="flex flex-wrap gap-3 items-center">
@@ -168,10 +199,11 @@ const AdminContacts: React.FC = () => {
             {['today', '7days', '1month', '1year'].map((key) => (
               <button
                 key={key}
-                onClick={() => setQuickFilter(key)}
-                className={`px-4 py-1.5 rounded-md text-sm font-medium transition ${
-                  quickFilter === key ? 'bg-orange-600 text-white shadow' : 'bg-gray-100 text-gray-800 hover:bg-gray-200'
-                }`}
+                onClick={() => setQuickFilter(prev => (prev === key ? '' : key))}
+                className={`px-4 py-1.5 rounded-md text-sm font-medium transition ${quickFilter === key
+                    ? 'bg-orange-600 text-white shadow'
+                    : 'bg-gray-100 text-gray-800 hover:bg-gray-200'
+                  }`}
               >
                 {{
                   today: 'Today',
@@ -181,15 +213,19 @@ const AdminContacts: React.FC = () => {
                 }[key]}
               </button>
             ))}
+
+            {/* ✅ Clear All Button */}
+            <button
+              onClick={clearAllFilters}
+              className="px-4 py-1.5 rounded-md text-sm font-medium bg-gray-200 text-gray-700 hover:bg-gray-300"
+            >
+              Clear All
+            </button>
           </div>
+
         </div>
 
-        <button
-          onClick={() => exportToCSV(filteredContacts, 'contacts.csv')}
-          className="bg-orange-600 text-white px-4 py-2 rounded hover:bg-orange-700"
-        >
-          Export to CSV
-        </button>
+        
       </div>
 
       <table className="min-w-full divide-y divide-gray-200 bg-white shadow-sm rounded-md">

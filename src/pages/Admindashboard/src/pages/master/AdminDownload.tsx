@@ -119,6 +119,11 @@ const DownloadAdmin: React.FC = () => {
 
     return matchesDateRange;
   });
+  const clearAllFilters = () => {
+    setQuickFilter('');
+    setStartDate('');
+    setEndDate('');
+  };
 
   useEffect(() => {
     fetchDownloads();
@@ -143,49 +148,58 @@ const DownloadAdmin: React.FC = () => {
           <div className="text-sm text-gray-600">Total: {filteredDownloads.length}</div>
         </div>
       </div>
+<div className="flex flex-wrap items-center gap-3">
+  <label className="text-sm text-gray-700 flex items-center gap-2">
+    From:
+    <input
+      type="date"
+      value={startDate}
+      onChange={(e) => setStartDate(e.target.value)}
+      className="border border-gray-300 rounded px-2 py-1"
+    />
+  </label>
 
-      <div className="flex flex-wrap items-center gap-4">
-        <label className="text-sm text-gray-700">
-          From:
-          <input
-            type="date"
-            value={startDate}
-            onChange={(e) => setStartDate(e.target.value)}
-            className="ml-2 border border-gray-300 rounded px-2 py-1"
-          />
-        </label>
-        <label className="text-sm text-gray-700">
-          To:
-          <input
-            type="date"
-            value={endDate}
-            onChange={(e) => setEndDate(e.target.value)}
-            className="ml-2 border border-gray-300 rounded px-2 py-1"
-          />
-        </label>
-        <div className="flex gap-2">
-          {['today', '7days', '1month', '1year'].map((key) => (
-            <button
-              key={key}
-              onClick={() => setQuickFilter(key)}
-              className={`px-4 py-1.5 rounded-md text-sm font-medium transition ${
-                quickFilter === key ? 'bg-orange-600 text-white shadow' : 'bg-gray-100 text-gray-800 hover:bg-gray-200'
-              }`}
-            >
-              {{
-                today: 'Today',
-                '7days': 'Last 7 Days',
-                '1month': 'Last 1 Month',
-                '1year': 'Last 1 Year',
-              }[key]}
-            </button>
-          ))}
-        </div>
-      </div>
+  <label className="text-sm text-gray-700 flex items-center gap-2">
+    To:
+    <input
+      type="date"
+      value={endDate}
+      onChange={(e) => setEndDate(e.target.value)}
+      className="border border-gray-300 rounded px-2 py-1"
+    />
+  </label>
+
+  {['today', '7days', '1month', '1year'].map((key) => (
+    <button
+      key={key}
+      onClick={() => setQuickFilter(prev => (prev === key ? '' : key))}
+      className={`text-sm font-medium px-3 py-1.5 rounded ${quickFilter === key
+        ? 'bg-gray-800 text-white shadow'
+        : 'bg-gray-100 text-gray-800 hover:bg-gray-200'
+      }`}
+    >
+      {{
+        today: 'Today',
+        '7days': 'Last 7 Days',
+        '1month': 'Last 1 Month',
+        '1year': 'Last 1 Year',
+      }[key]}
+    </button>
+  ))}
+
+  <button
+    onClick={clearAllFilters}
+    className="text-sm font-medium px-3 py-1.5 rounded bg-gray-200 text-gray-800 hover:bg-gray-300"
+  >
+    Clear All
+  </button>
+</div>
+
 
       <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
         <div className="overflow-x-auto">
-          <table className="min-w-full divide-y divide-gray-200">
+          <table className="w-full table-auto text-xs">
+
             <thead className="bg-gray-50">
               <tr>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Name</th>
@@ -199,10 +213,10 @@ const DownloadAdmin: React.FC = () => {
             <tbody className="bg-white divide-y divide-gray-200">
               {filteredDownloads.map((download) => (
                 <tr key={download.id} className="hover:bg-gray-50 transition-colors">
-                  <td className="px-6 py-4 text-sm text-gray-900">{download.full_name || download.username || 'Anonymous'}</td>
-                  <td className="px-6 py-4 text-sm text-gray-600">{download.email || 'N/A'}</td>
-                  <td className="px-6 py-4 text-sm text-gray-600">{download.phone_number || 'N/A'}</td>
-                  <td className="px-6 py-4 text-sm text-gray-700">
+                  <td className="px-2 py-2 text-sm text-gray-900">{download.full_name || download.username || 'Anonymous'}</td>
+                  <td className="px-2 py-2 text-sm text-gray-600">{download.email || 'N/A'}</td>
+                  <td className="px-2 py-2 text-sm text-gray-600">{download.phone_number || 'N/A'}</td>
+                  <td className="px-2 py-2 text-sm text-gray-700">
                     {download.city}, {download.state_province}, {download.country}
                   </td>
                   <td className="px-6 py-4 text-sm text-gray-700">
