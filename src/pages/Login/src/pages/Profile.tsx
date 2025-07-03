@@ -149,7 +149,7 @@ const Profile: React.FC = () => {
       description: 'Additional weather scenarios including storms, fog, and extreme conditions'
     }
   ]
-
+  const [showFullTable, setShowFullTable] = useState(false)
   // Use authenticated user data if available, otherwise use mock data
   const currentUser = detailedUser || mockUser
   const currentPurchases = stripePurchases.length > 0 ? stripePurchases : mockPurchases
@@ -179,7 +179,13 @@ const Profile: React.FC = () => {
         if (userRes.ok) {
           const userResult = await userRes.json()
           if (userResult.data) {
-            setDetailedUser(userResult.data)
+            const enrichedData = {
+              ...userResult.data,
+              recent_activity: {
+                recent_scenarios: userResult.data.all_scenarios?.scenarios || []
+              }
+            }
+            setDetailedUser(enrichedData)
             setApiError(false)
           }
         } else {
@@ -194,19 +200,19 @@ const Profile: React.FC = () => {
         })
 
         if (stripeRes.ok) {
-  const stripeResult = await stripeRes.json()
-  const transactions = Array.isArray(stripeResult.transactions) ? stripeResult.transactions.map(tx => ({
-    id: tx.transaction_id,
-    product_name: tx.plan_display_name || tx.plan_name_display || 'Subscription',
-    product_type: 'subscription',
-    amount: tx.amount,
-    currency: tx.currency_display || tx.currency,
-    payment_date: tx.payment_date,
-    status: tx.payment_status,
-    description: `Plan: ${tx.plan_display_name || tx.plan_name}. Auto Renew: ${tx.is_auto_renew ? 'Yes' : 'No'}`,
-  })) : []
-  setStripePurchases(transactions)
-}
+          const stripeResult = await stripeRes.json()
+          const transactions = Array.isArray(stripeResult.transactions) ? stripeResult.transactions.map(tx => ({
+            id: tx.transaction_id,
+            product_name: tx.plan_display_name || tx.plan_name_display || 'Subscription',
+            product_type: 'subscription',
+            amount: tx.amount,
+            currency: tx.currency_display || tx.currency,
+            payment_date: tx.payment_date,
+            status: tx.payment_status,
+            description: `Plan: ${tx.plan_display_name || tx.plan_name}. Auto Renew: ${tx.is_auto_renew ? 'Yes' : 'No'}`,
+          })) : []
+          setStripePurchases(transactions)
+        }
       } catch (error) {
         console.error('API error:', error)
         setApiError(true)
@@ -350,13 +356,17 @@ const Profile: React.FC = () => {
 
     scenarios.forEach((s) => {
       if (s.duration_formatted) {
-        const [hh, mm, ss] = s.duration_formatted.split(':').map(Number)
-        totalSeconds += (hh * 3600 + mm * 60 + ss)
+        const parts = s.duration_formatted.split(':').map(Number)
+        if (parts.length === 3) {
+          const [hh, mm, ss] = parts
+          totalSeconds += (hh * 3600 + mm * 60 + ss)
+        }
       }
     })
 
-    return (totalSeconds / 3600).toFixed(1) // return in hours
+    return (totalSeconds / 3600).toFixed(1)
   }
+
 
   const handleLogout = () => {
     sessionStorage.clear(); // ✅ Clears auth_token and auth_user
@@ -426,7 +436,7 @@ const Profile: React.FC = () => {
   return (
 
     <div className="min-h-screen bg-gray-50 w-full overflow-x-hidden">
-     <header className="lg:hidden bg-white border-b border-gray-200 sticky top-0 z-50 w-full">
+      <header className="lg:hidden bg-white border-b border-gray-200 sticky top-0 z-50 w-full">
         <div className="w-full px-3 py-3">
           <div className="flex items-center justify-between w-full">
             <div className="flex items-center gap-2 min-w-0 flex-1">
@@ -700,41 +710,59 @@ const Profile: React.FC = () => {
                   <div className="grid grid-cols-1 xl:grid-cols-2 gap-4 lg:gap-6 w-full">
                     {/* Recent Activity */}
                     <div className="bg-gray-50 rounded-xl p-3 lg:p-4 w-full">
-                      <h4 className="text-base font-semibold text-gray-900 mb-3 lg:mb-4">Recent Scenarios</h4>
-                      <div className="space-y-3 w-full">
-                        {(currentUser.recent_activity?.recent_scenarios || [])
-                          .slice(0, showAllScenarios ? undefined : 4)
-                          .map((scenario: any, index: number) => (
-                            <div key={index} className="bg-white rounded-lg p-3 border border-gray-200 w-full">
-                              <div className="flex items-start justify-between mb-2 w-full">
-                                <h5 className="font-semibold text-gray-900 text-sm truncate flex-1 min-w-0">{scenario.scenario_name}</h5>
-                                <span className="text-xs text-gray-500 bg-gray-100 px-2 py-1 rounded-full ml-2 flex-shrink-0">
-                                  {scenario.duration_formatted}
-                                </span>
+                      <h4 className="text-base font-semibold text-gray-900 mb-3 lg:mb-4">All Scenarios</h4>
 
-                              </div>
-                              <p className="text-sm text-gray-600 mb-1 truncate">{scenario.drone_name}</p>
-                              <p className="text-sm text-gray-500 mb-1 truncate">{scenario.location_name}</p>
-                              <p className="text-xs text-gray-400">
-                                {new Date(scenario.start_time).toLocaleDateString()}
-                              </p>
-                            </div>
-                          ))}
+                      <div className="overflow-x-auto w-full">
+                        <table className="min-w-full text-sm text-left text-gray-600">
+                          <thead className="bg-gray-100 text-gray-700 text-xs uppercase">
+                            <tr>
+                              <th className="px-4 py-3">#</th>
+                              <th className="px-4 py-3">Scenario Name</th>
+                              <th className="px-4 py-3">Drone</th>
+                              <th className="px-4 py-3">Location</th>
+                              <th className="px-4 py-3">Duration</th>
+                              <th className="px-4 py-3">Date</th>
+                            </tr>
+                          </thead>
+                          <tbody className="bg-white divide-y divide-gray-200">
+                            {(showFullTable
+                              ? currentUser.all_scenarios?.scenarios
+                              : (currentUser.all_scenarios?.scenarios || []).slice(-10) // latest 10
+                            )
+                              ?.map((scenario: any, index: number) => (
+                                <tr key={index}>
+                                  <td className="px-4 py-3 font-medium text-gray-900">{index + 1}</td>
+                                  <td className="px-4 py-3">{scenario.scenario_name}</td>
+                                  <td className="px-4 py-3">{scenario.drone_name}</td>
+                                  <td className="px-4 py-3">{scenario.location_name}</td>
+                                  <td className="px-4 py-3">{scenario.duration_formatted}</td>
+                                  <td className="px-4 py-3">{new Date(scenario.start_time).toLocaleDateString()}</td>
+                                </tr>
+                              ))}
 
-                        {currentUser.recent_activity?.recent_scenarios?.length > 4 && (
-                          <button
-                            onClick={() => setShowAllScenarios(!showAllScenarios)}
-                            className="text-orange-600 hover:text-orange-700 text-sm font-medium transition-colors"
-                          >
-                            {showAllScenarios ? 'Show Less' : 'Show More'}
-                          </button>
-                        )}
-
-                        {(!currentUser.recent_activity?.recent_scenarios || currentUser.recent_activity.recent_scenarios.length === 0) && (
-                          <p className="text-gray-500 text-sm">No recent scenarios available.</p>
-                        )}
+                            {(!currentUser.all_scenarios?.scenarios || currentUser.all_scenarios.scenarios.length === 0) && (
+                              <tr>
+                                <td colSpan={6} className="px-4 py-4 text-center text-gray-500">
+                                  No scenarios available.
+                                </td>
+                              </tr>
+                            )}
+                          </tbody>
+                        </table>
                       </div>
+
+                      {(currentUser.all_scenarios?.scenarios?.length || 0) > 10 && (
+                        <div className="mt-3 text-right">
+                          <button
+                            onClick={() => setShowFullTable(!showFullTable)}
+                            className="text-orange-600 hover:text-orange-700 font-medium text-sm transition"
+                          >
+                            {showFullTable ? 'Show Less' : 'Show All'}
+                          </button>
+                        </div>
+                      )}
                     </div>
+
 
                     {/* Account Details */}
                     <div className="bg-gray-50 rounded-xl p-3 lg:p-4 w-full">
