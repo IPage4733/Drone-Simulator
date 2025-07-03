@@ -16,7 +16,6 @@ export const LoginAdmin: React.FC = () => {
     e.preventDefault();
     setIsLoading(true);
     setError('');
-
     try {
       const success = await login(email, password, 'admin');
       if (success) {

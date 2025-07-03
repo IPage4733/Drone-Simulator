@@ -175,25 +175,25 @@ const Download = () => {
             <div className="relative w-full mb-8">
               {/* YouTube Video Floating in Corner */}
               <div className="fixed top-[160px] right-[30px] w-[240px] z-40 rounded-lg overflow-hidden shadow-md bg-white">
-  <iframe
-    width="100%"
-    height="150"
-    src="https://www.youtube.com/embed/aWdmp_pTXmo"
-    title="Agri Mapping Masterclass"
-    frameBorder="0"
-    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-    allowFullScreen
-  ></iframe>
+                <iframe
+                  width="100%"
+                  height="150"
+                  src="https://www.youtube.com/embed/aWdmp_pTXmo"
+                  title="Agri Mapping Masterclass"
+                  frameBorder="0"
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                  allowFullScreen
+                ></iframe>
 
-  <div className="p-3 flex justify-center">
-    <button
-      onClick={() => window.open("https://youtu.be/aWdmp_pTXmo", "_blank")}
-      className="bg-primary text-white px-4 py-2 rounded hover:bg-primary/90 text-sm font-semibold"
-    >
-      Watch this tutorial
-    </button>
-  </div>
-</div>
+                <div className="p-3 flex justify-center">
+                  <button
+                    onClick={() => window.open("https://youtu.be/aWdmp_pTXmo", "_blank")}
+                    className="bg-primary text-white px-4 py-2 rounded hover:bg-primary/90 text-sm font-semibold"
+                  >
+                    Watch this tutorial
+                  </button>
+                </div>
+              </div>
 
 
               {/* Original Download Card (untouched) */}
@@ -332,14 +332,14 @@ const Download = () => {
                     <div>
                       <Label htmlFor="phone">Phone Number *</Label>
                       <Input
-  id="phone"
-  type="tel"
-  required
-  placeholder="+91 9876543210"
-  value={formData.phone}
-  onChange={(e) => handleInputChange("phone", e.target.value)}
-  className="mt-1"
-/>
+                        id="phone"
+                        type="tel"
+                        required
+                        placeholder="+91 9876543210"
+                        value={formData.phone}
+                        onChange={(e) => handleInputChange("phone", e.target.value)}
+                        className="mt-1"
+                      />
 
                       {formErrors.phone && <p className="text-sm text-red-600 mt-1">{formErrors.phone}</p>}
                     </div>
