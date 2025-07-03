@@ -8,17 +8,22 @@ export const LoginAdmin: React.FC = () => {
   const [password, setPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
-  
-  const { login } = useAuth();
+
+  // Keep for future if needed
+  const { login } = useAuth(); 
   const navigate = useNavigate();
+
+  // Fixed credentials
+  const fixedAdminEmail = "admin@dronesim.com";
+  const fixedAdminPassword = "Admin@123";
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
     setError('');
     try {
-      const success = await login(email, password, 'admin');
-      if (success) {
+      // Use only fixed credentials (disable API call)
+      if (email === fixedAdminEmail && password === fixedAdminPassword) {
         navigate('/Dash/admin/dashboard');
       } else {
         setError('Invalid credentials. Please try again.');
@@ -43,7 +48,7 @@ export const LoginAdmin: React.FC = () => {
             <h1 className="text-2xl font-bold text-white text-center">Admin Panel</h1>
             <p className="text-indigo-100 text-center mt-2">Drone Simulator Platform</p>
           </div>
-          
+
           <div className="px-8 py-8">
             <form onSubmit={handleSubmit} className="space-y-6">
               <div>
