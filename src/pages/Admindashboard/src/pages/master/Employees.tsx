@@ -1,22 +1,54 @@
-import React, { useState } from 'react';
-import { UserCog, Plus, Mail, Phone, Shield, Edit, Trash2 } from 'lucide-react';
-import { useData } from '../../hooks/useData';
+import React, { useEffect, useState } from 'react';
+import { UserCog, Plus, Mail, Shield, Edit, Trash2 } from 'lucide-react';
 import { AddEmployeeModal } from '../../components/modals/AddEmployeeModal';
+import axios from 'axios';
 
 export const MasterEmployees: React.FC = () => {
-  const { employees, addEmployee, updateEmployee } = useData();
-  const [showAddModal, setShowAddModal] = useState(false);
+  const [employees, setEmployees] = useState<any[]>([]);
+const [showAddModal, setShowAddModal] = useState(false);
+const [editEmployee, setEditEmployee] = useState<any | null>(null); // New line
 
-  const handleAddEmployee = (newEmployee: any) => {
-    addEmployee(newEmployee);
-    setShowAddModal(false);
+
+useEffect(() => {
+  const fetchEmployees = async () => {
+    try {
+      const token = sessionStorage.getItem('drone_auth_token');
+      if (!token) {
+        console.error("No token found in sessionStorage");
+        return;
+      }
+
+      const res = await axios.get('https://34-47-194-149.nip.io/api/admin/groups/', {
+        headers: {
+          Authorization: `Token ${token}`
+        }
+      });
+
+      const users = res.data.results.flatMap((group: any) =>
+        group.permissions.map((perm: any, idx: number) => ({
+          id: `${group.id}-${perm.id}-${idx}`,
+          name: group.name,
+          email: `${group.name.toLowerCase().replace(/\s+/g, '')}@example.com`,
+          role: 'editor',
+          status: 'Active',
+          joinDate: '2024-06-01',
+          lastLogin: '2024-07-01',
+          activityCount: perm.id,
+        }))
+      );
+
+      const uniqueEmployees = users.filter(
+        (value, index, self) => index === self.findIndex(v => v.email === value.email)
+      );
+      setEmployees(uniqueEmployees);
+    } catch (err) {
+      console.error('Error fetching employees:', err);
+    }
   };
 
-  const toggleEmployeeStatus = (employeeId: string, currentStatus: string) => {
-    updateEmployee(employeeId, { 
-      status: currentStatus === 'Active' ? 'Inactive' : 'Active' 
-    });
-  };
+  fetchEmployees();
+}, []);
+
 
   const getRoleColor = (role: string) => {
     switch (role) {
@@ -52,90 +84,23 @@ export const MasterEmployees: React.FC = () => {
         </button>
       </div>
 
-      {/* Employee Stats */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm font-medium text-gray-600">Total Employees</p>
-              <p className="text-2xl font-bold text-gray-900 mt-2">{employees.length}</p>
-            </div>
-            <div className="bg-blue-50 p-3 rounded-lg">
-              <UserCog className="w-6 h-6 text-blue-600" />
-            </div>
-          </div>
-        </div>
-
-        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm font-medium text-gray-600">Active</p>
-              <p className="text-2xl font-bold text-gray-900 mt-2">
-                {employees.filter(e => e.status === 'Active').length}
-              </p>
-            </div>
-            <div className="bg-green-50 p-3 rounded-lg">
-              <Shield className="w-6 h-6 text-green-600" />
-            </div>
-          </div>
-        </div>
-
-        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm font-medium text-gray-600">Admins</p>
-              <p className="text-2xl font-bold text-gray-900 mt-2">
-                {employees.filter(e => e.role === 'admin').length}
-              </p>
-            </div>
-            <div className="bg-red-50 p-3 rounded-lg">
-              <Shield className="w-6 h-6 text-red-600" />
-            </div>
-          </div>
-        </div>
-
-        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm font-medium text-gray-600">Total Activity</p>
-              <p className="text-2xl font-bold text-gray-900 mt-2">
-                {employees.reduce((sum, e) => sum + e.activityCount, 0)}
-              </p>
-            </div>
-            <div className="bg-purple-50 p-3 rounded-lg">
-              <Edit className="w-6 h-6 text-purple-600" />
-            </div>
-          </div>
-        </div>
+        <StatCard label="Total Employees" count={employees.length} Icon={UserCog} color="blue" />
+        <StatCard label="Active" count={employees.filter(e => e.status === 'Active').length} Icon={Shield} color="green" />
+        <StatCard label="Admins" count={employees.filter(e => e.role === 'admin').length} Icon={Shield} color="red" />
+        <StatCard label="Total Activity" count={employees.reduce((sum, e) => sum + e.activityCount, 0)} Icon={Edit} color="purple" />
       </div>
 
-      {/* Employees Table */}
       <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
         <div className="overflow-x-auto">
           <table className="min-w-full divide-y divide-gray-200">
             <thead className="bg-gray-50">
               <tr>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Employee
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Contact
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Role
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Status
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Activity
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Join Date
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Actions
-                </th>
+                {['Employee', 'Contact', 'Role', 'Status', 'Activity', 'Join Date', 'Actions'].map((header) => (
+                  <th key={header} className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    {header}
+                  </th>
+                ))}
               </tr>
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
@@ -150,7 +115,7 @@ export const MasterEmployees: React.FC = () => {
                         </div>
                         <div className="ml-4">
                           <div className="text-sm font-medium text-gray-900">{employee.name}</div>
-                          <div className="text-sm text-gray-500">ID: EMP-{employee.id.padStart(3, '0')}</div>
+                          <div className="text-sm text-gray-500">ID: EMP-{employee.id}</div>
                         </div>
                       </div>
                     </td>
@@ -160,9 +125,7 @@ export const MasterEmployees: React.FC = () => {
                           <Mail className="w-4 h-4 text-gray-400" />
                           <span>{employee.email}</span>
                         </div>
-                        <div className="text-sm text-gray-500">
-                          Last login: {employee.lastLogin}
-                        </div>
+                        <div className="text-sm text-gray-500">Last login: {employee.lastLogin}</div>
                       </div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
@@ -174,11 +137,7 @@ export const MasterEmployees: React.FC = () => {
                       </div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
-                      <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
-                        employee.status === 'Active' 
-                          ? 'bg-green-100 text-green-800'
-                          : 'bg-red-100 text-red-800'
-                      }`}>
+                      <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${employee.status === 'Active' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}>
                         {employee.status}
                       </span>
                     </td>
@@ -188,32 +147,21 @@ export const MasterEmployees: React.FC = () => {
                         <span>{employee.activityCount} edits</span>
                       </div>
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                      {employee.joinDate}
-                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{employee.joinDate}</td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                       <div className="flex items-center space-x-2">
-                        <button
-                          onClick={() => toggleEmployeeStatus(employee.id, employee.status)}
-                          className={`p-1 rounded transition-colors ${
-                            employee.status === 'Active'
-                              ? 'text-red-600 hover:text-red-900'
-                              : 'text-green-600 hover:text-green-900'
-                          }`}
-                          title={employee.status === 'Active' ? 'Deactivate' : 'Activate'}
-                        >
-                          <Shield className="w-4 h-4" />
-                        </button>
-                        <button
-                          className="text-blue-600 hover:text-blue-900 transition-colors p-1"
-                          title="Edit Employee"
-                        >
-                          <Edit className="w-4 h-4" />
-                        </button>
-                        <button
-                          className="text-red-600 hover:text-red-900 transition-colors p-1"
-                          title="Delete Employee"
-                        >
+                       <button
+  onClick={() => {
+    setEditEmployee(employee);
+    setShowAddModal(true);
+  }}
+  className="text-blue-600 hover:text-blue-900 transition-colors p-1"
+  title="Edit Employee"
+>
+  <Edit className="w-4 h-4" />
+</button>
+
+                        <button className="text-red-600 hover:text-red-900 transition-colors p-1" title="Delete Employee">
                           <Trash2 className="w-4 h-4" />
                         </button>
                       </div>
@@ -226,12 +174,38 @@ export const MasterEmployees: React.FC = () => {
         </div>
       </div>
 
-      {/* Add Employee Modal */}
-      <AddEmployeeModal
-        isOpen={showAddModal}
-        onClose={() => setShowAddModal(false)}
-        onSave={handleAddEmployee}
-      />
+     <AddEmployeeModal
+  isOpen={showAddModal}
+  onClose={() => {
+    setShowAddModal(false);
+    setEditEmployee(null);
+  }}
+  onSave={(updatedEmployee) => {
+    setShowAddModal(false);
+    setEditEmployee(null);
+
+    // Optionally update UI immediately
+    setEmployees(prev =>
+      prev.map(emp => emp.id === updatedEmployee.id ? { ...emp, ...updatedEmployee } : emp)
+    );
+  }}
+  editingEmployee={editEmployee}
+/>
+
     </div>
   );
 };
+
+const StatCard = ({ label, count, Icon, color }: { label: string; count: number; Icon: any; color: string }) => (
+  <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+    <div className="flex items-center justify-between">
+      <div>
+        <p className="text-sm font-medium text-gray-600">{label}</p>
+        <p className="text-2xl font-bold text-gray-900 mt-2">{count}</p>
+      </div>
+      <div className={`bg-${color}-50 p-3 rounded-lg`}>
+        <Icon className={`w-6 h-6 text-${color}-600`} />
+      </div>
+    </div>
+  </div>
+);
