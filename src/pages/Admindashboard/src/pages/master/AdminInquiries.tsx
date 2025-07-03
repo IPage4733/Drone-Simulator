@@ -43,6 +43,7 @@ const exportToCSV = (data: Inquiry[], filename: string) => {
   URL.revokeObjectURL(url);
 };
 
+
 const AdminInquiries: React.FC = () => {
   const [inquiries, setInquiries] = useState<Inquiry[]>([]);
   const [loading, setLoading] = useState(true);
@@ -122,55 +123,89 @@ const AdminInquiries: React.FC = () => {
   }, []);
 
   if (loading) return <div className="p-6">Loading inquiries...</div>;
+  const clearAllFilters = () => {
+    setStartDate('');
+    setEndDate('');
+    setQuickFilter('');
+  };
 
   return (
     <div className="p-6 space-y-4">
-      <h2 className="text-xl font-bold">Training Inquiries</h2>
+      <div className="flex items-center justify-between">
+        <h2 className="text-xl font-bold text-gray-900">Training Inquiries</h2>
 
-      <div className="flex flex-wrap gap-4 items-center">
-        <label className="text-sm text-gray-700">
-          From:
-          <input
-            type="date"
-            value={startDate}
-            onChange={(e) => setStartDate(e.target.value)}
-            className="ml-2 border border-gray-300 rounded px-2 py-1"
-          />
-        </label>
-        <label className="text-sm text-gray-700">
-          To:
-          <input
-            type="date"
-            value={endDate}
-            onChange={(e) => setEndDate(e.target.value)}
-            className="ml-2 border border-gray-300 rounded px-2 py-1"
-          />
-        </label>
-        <div className="flex gap-2">
-          {['today', '7days', '1month', '1year'].map((key) => (
-            <button
-              key={key}
-              onClick={() => setQuickFilter(key)}
-              className={`px-4 py-1.5 rounded-md text-sm font-medium transition ${
-                quickFilter === key ? 'bg-orange-600 text-white shadow' : 'bg-gray-100 text-gray-800 hover:bg-gray-200'
-              }`}
+        <div className="flex items-center gap-3">
+          <button
+            onClick={() => exportToCSV(filteredInquiries, 'inquiries.csv')}
+            className="bg-orange-600 hover:bg-orange-700 text-white px-4 py-2 rounded-md text-sm font-medium flex items-center"
+          >
+            <svg
+              className="w-4 h-4 mr-2"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              viewBox="0 0 24 24"
             >
-              {{
-                today: 'Today',
-                '7days': 'Last 7 Days',
-                '1month': 'Last 1 Month',
-                '1year': 'Last 1 Year',
-              }[key]}
-            </button>
-          ))}
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="M4 4v16h16V4H4zm8 4v8m0 0l-3-3m3 3l3-3"
+              />
+            </svg>
+            Export CSV
+          </button>
+          <span className="text-sm text-gray-600">Total: {filteredInquiries.length}</span>
         </div>
-        <button
-          onClick={() => exportToCSV(filteredInquiries, 'inquiries.csv')}
-          className="ml-auto bg-orange-600 text-white px-4 py-2 rounded hover:bg-orange-700"
-        >
-          Export to CSV
-        </button>
       </div>
+
+<div className="flex flex-wrap items-center gap-3">
+  <label className="text-sm text-gray-700 flex items-center gap-2">
+    From:
+    <input
+      type="date"
+      value={startDate}
+      onChange={(e) => setStartDate(e.target.value)}
+      className="border border-gray-300 rounded px-2 py-1"
+    />
+  </label>
+
+  <label className="text-sm text-gray-700 flex items-center gap-2">
+    To:
+    <input
+      type="date"
+      value={endDate}
+      onChange={(e) => setEndDate(e.target.value)}
+      className="border border-gray-300 rounded px-2 py-1"
+    />
+  </label>
+
+  {['today', '7days', '1month', '1year'].map((key) => (
+    <button
+      key={key}
+      onClick={() => setQuickFilter(prev => (prev === key ? '' : key))}
+      className={`text-sm font-medium px-3 py-1.5 rounded ${
+        quickFilter === key
+          ? 'bg-gray-800 text-white'
+          : 'bg-gray-100 text-gray-800 hover:bg-gray-200'
+      }`}
+    >
+      {{
+        today: 'Today',
+        '7days': 'Last 7 Days',
+        '1month': 'Last 1 Month',
+        '1year': 'Last 1 Year',
+      }[key]}
+    </button>
+  ))}
+
+  <button
+    onClick={clearAllFilters}
+    className="text-sm font-medium px-3 py-1.5 rounded bg-gray-200 text-gray-800 hover:bg-gray-300"
+  >
+    Clear All
+  </button>
+</div>
+
 
       <table className="min-w-full divide-y divide-gray-200 bg-white shadow-sm rounded-md">
         <thead className="bg-gray-100">

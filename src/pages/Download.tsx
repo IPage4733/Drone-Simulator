@@ -172,19 +172,48 @@ const Download = () => {
               Your download request has been processed successfully. Click Below download button to download the software and installation instructions.
             </p>
 
-            <Card className="bg-gradient-to-r from-primary to-accent text-white mb-8">
-              <CardContent className="p-8">
-                <h3 className="text-2xl font-bold mb-4">Download Your Software</h3>
-                <p className="mb-6 opacity-90">Click the button below to download the IPAGE Drone Simulators, Mobile Controller and IPage Drone Simulator Tutorial.</p>
-                <Button
-                  onClick={handleDownload}
-                  className="bg-white text-primary hover:bg-gray-100 font-semibold px-8 py-3"
-                >
-                  Download Software
-                </Button>
+            <div className="relative w-full mb-8">
+              {/* YouTube Video Floating in Corner */}
+              <div className="fixed top-[160px] right-[30px] w-[240px] z-40 rounded-lg overflow-hidden shadow-md bg-white">
+  <iframe
+    width="100%"
+    height="150"
+    src="https://www.youtube.com/embed/aWdmp_pTXmo"
+    title="Agri Mapping Masterclass"
+    frameBorder="0"
+    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+    allowFullScreen
+  ></iframe>
 
-              </CardContent>
-            </Card>
+  <div className="p-3 flex justify-center">
+    <button
+      onClick={() => window.open("https://youtu.be/aWdmp_pTXmo", "_blank")}
+      className="bg-primary text-white px-4 py-2 rounded hover:bg-primary/90 text-sm font-semibold"
+    >
+      Watch this tutorial
+    </button>
+  </div>
+</div>
+
+
+              {/* Original Download Card (untouched) */}
+              <Card className="bg-gradient-to-r from-primary to-accent text-white">
+                <CardContent className="p-8">
+                  <h3 className="text-2xl font-bold mb-4">Download Your Software</h3>
+                  <p className="mb-6 opacity-90">
+                    Click the button below to download the IPAGE Drone Simulators, Mobile Controller and IPage Drone Simulator Tutorial.
+                  </p>
+                  <Button
+                    onClick={handleDownload}
+                    className="bg-white text-primary hover:bg-gray-100 font-semibold px-8 py-3"
+                  >
+                    Download Software
+                  </Button>
+                </CardContent>
+              </Card>
+            </div>
+
+
 
             <div className="bg-blue-50 rounded-lg p-6 text-left mt-2 mb-12">
               <h4 className="font-semibold text-gray-900 mb-4">Next Steps:</h4>
@@ -212,7 +241,7 @@ const Download = () => {
                       className="text-blue-600 underline hover:text-blue-800"
                     >
                       FlySky FS-i6S
-                      </button> for advanced simulator sessions. <br />
+                    </button> for advanced simulator sessions. <br />
                     Once you're set up, launch the <strong>IPage Drone Simulator</strong> and start flying!
                   </span>
                 </li>
@@ -303,13 +332,15 @@ const Download = () => {
                     <div>
                       <Label htmlFor="phone">Phone Number *</Label>
                       <Input
-                        id="phone"
-                        type="tel"
-                        required
-                        value={formData.phone}
-                        onChange={(e) => handleInputChange("phone", e.target.value)}
-                        className="mt-1"
-                      />
+  id="phone"
+  type="tel"
+  required
+  placeholder="+91 9876543210"
+  value={formData.phone}
+  onChange={(e) => handleInputChange("phone", e.target.value)}
+  className="mt-1"
+/>
+
                       {formErrors.phone && <p className="text-sm text-red-600 mt-1">{formErrors.phone}</p>}
                     </div>
                     <div>
