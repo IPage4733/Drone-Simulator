@@ -49,7 +49,7 @@ const App = () => (
             <Route path="/refund" element={<RefundPolicy />} />
             <Route path="/general" element={<GeneralPolicy />} />
             
-<Route path="/flytosky" element={<FlyToSkyPage />} />
+<Route path="/flytowin" element={<FlyToSkyPage />} />
             <Route path="*" element={<NotFound />} />
               <Route path="/contact" element={<><Index /><HelpPage /></>} />
           </Routes>
