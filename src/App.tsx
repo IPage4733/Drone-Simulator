@@ -21,7 +21,7 @@ import RefundPolicy from "./pages/Admindashboard/src/pages/refundpolicy";
 import GeneralPolicy from "./pages/Admindashboard/src/pages/generalpolicy";
 import HelpPage from "./pages/Admindashboard/src/pages/help"; // Always mounted
 import ScrollToTop from "./components/scrolltop";
-
+import FlyToSkyPage from "./pages/FlyToSkyPage";
 const queryClient = new QueryClient();
 
 
@@ -48,6 +48,8 @@ const App = () => (
             <Route path="/cookie" element={<CookiePolicy />} />
             <Route path="/refund" element={<RefundPolicy />} />
             <Route path="/general" element={<GeneralPolicy />} />
+            
+<Route path="/flytosky" element={<FlyToSkyPage />} />
             <Route path="*" element={<NotFound />} />
               <Route path="/contact" element={<><Index /><HelpPage /></>} />
           </Routes>

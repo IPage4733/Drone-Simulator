@@ -105,7 +105,16 @@ const Download = () => {
       purpose_of_use: formData.purpose.toLowerCase()
     };
 
+    const neodovePayload = {
+      name: formData.name,
+      phone: formData.phone,
+      email: formData.email,
+      location: `${formData.city}, ${formData.state}, ${formData.country}`,
+      remarks: `Purpose: ${formData.purpose}`
+    };
+
     try {
+      // Send to your primary API
       const response = await fetch("https://34-47-194-149.nip.io/api/download-app/", {
         method: "POST",
         headers: {
@@ -115,17 +124,29 @@ const Download = () => {
       });
 
       const result = await response.json();
+      if (!response.ok) throw new Error(result.message || "Submission failed");
 
-      if (!response.ok) {
-        throw new Error(result.message || "Submission failed");
+      // Send to NeoDove API with logging and error capture
+      const neoRes = await fetch("https://8f21b23d-d474-422c-89b2-868a67b07e89.neodove.com/integration/custom/da0b1545-0690-4f36-b538-100a870026eb/leads", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify(neodovePayload)
+      });
+
+      const neoText = await neoRes.text();
+      console.log("NeoDove API Response:", neoText);
+      if (!neoRes.ok) {
+        throw new Error("NeoDove API failed: " + neoText);
       }
 
-      console.log("Success:", result);
       setIsSubmitted(true);
       toast({
         title: "Download Ready!",
         description: "Your download link has been generated successfully.",
       });
+
     } catch (error: any) {
       console.error("API Error:", error);
       toast({
@@ -137,10 +158,6 @@ const Download = () => {
       setIsLoading(false);
     }
   };
-
-
-
-
 
   const purposeOptions = [
     "Personal/Hobby Use",
@@ -252,6 +269,16 @@ const Download = () => {
                   </span>
                 </li>
               </ul>
+              <div className="flex justify-center mt-4">
+  <button
+    onClick={() => navigate('/flytosky')}
+    className="animate-pulse bg-orange-500 hover:bg-orange-600 text-white font-semibold py-3 px-6 rounded-full text-lg shadow-md"
+  >
+    Fly to Win DGCA Certificate 🛫
+  </button>
+</div>
+
+
             </div>
 
           </div>
