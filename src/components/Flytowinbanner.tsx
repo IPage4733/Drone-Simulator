@@ -6,7 +6,7 @@ const FlyToWinBanner = () => {
   const navigate = useNavigate();
 
   const handleClick = () => {
-    navigate('/flytowin');
+    navigate('/download');
   };
 
   return (
