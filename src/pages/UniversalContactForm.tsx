@@ -51,91 +51,132 @@ const UniversalContactForm = () => {
     });
   };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    setIsLoading(true);
+const handleSubmit = async (e) => {
+  e.preventDefault();
+  setIsLoading(true);
 
-    const token = sessionStorage.getItem("auth_token");
+  const token = sessionStorage.getItem("auth_token");
 
-    if (!token) {
-      toast({
-        title: "Authentication Required",
-        description: "Please log in before submitting the form.",
-        variant: "destructive"
-      });
-      setIsLoading(false);
-      return;
-    }
+  if (!token) {
+    toast({
+      title: "Authentication Required",
+      description: "Please log in before submitting the form.",
+      variant: "destructive"
+    });
+    setIsLoading(false);
+    return;
+  }
 
-    try {
-      const response = await fetch("https://34-47-194-149.nip.io/api/inquiry/", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Token ${token}`
-        },
-        body: JSON.stringify({
-          full_name: formData.name,
-          email: formData.email,
-          phone_number: formData.phone,
-          organization: formData.organization,
-          i_am: formData.userType,
-          purpose_of_contact: formData.purpose.join(", "),
-          message: formData.message,
-          students_or_team: formData.studentsOrTeam,
-          website: formData.website,
-          dgca_id: formData.dgcaId,
-          drone_models: formData.droneModels,
-          service_area: formData.serviceArea,
-          pilot_certified: formData.pilotCertified,
-          use_case_description: formData.useCaseDescription,
-          interested_in_dgca: formData.interestedInDGCA
-        })
-      });
+  try {
+    // 🔶 Primary backend API call
+    const response = await fetch("https://34-47-194-149.nip.io/api/inquiry/", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Token ${token}`
+      },
+      body: JSON.stringify({
+        full_name: formData.name,
+        email: formData.email,
+        phone_number: formData.phone,
+        organization: formData.organization,
+        i_am: formData.userType,
+        purpose_of_contact: formData.purpose.join(", "),
+        message: formData.message,
+        students_or_team: formData.studentsOrTeam,
+        website: formData.website,
+        dgca_id: formData.dgcaId,
+        drone_models: formData.droneModels,
+        service_area: formData.serviceArea,
+        pilot_certified: formData.pilotCertified,
+        use_case_description: formData.useCaseDescription,
+        interested_in_dgca: formData.interestedInDGCA
+      })
+    });
 
-      if (response.ok) {
-        toast({
-          title: "Submission Successful!",
-          description: "Thank you. Our team will contact you shortly."
+    if (response.ok) {
+      // ✅ NeoDove API call (after backend success)
+      const neoPayload = {
+        name: formData.name,
+        phone: formData.phone,
+        email: formData.email,
+        organization: formData.organization,
+        userType: formData.userType,
+        purpose: formData.purpose.join(", "),
+        message: formData.message,
+        studentsOrTeam: formData.studentsOrTeam,
+        website: formData.website,
+        dgcaId: formData.dgcaId,
+        droneModels: formData.droneModels,
+        serviceArea: formData.serviceArea,
+        pilotCertified: formData.pilotCertified,
+        useCaseDescription: formData.useCaseDescription,
+        interestedInDGCA: formData.interestedInDGCA ? "Yes" : "No",
+        submittedAt: new Date().toISOString(),
+        status: "New Inquiry"
+      };
+
+      try {
+        const neoRes = await fetch("https://8f21b23d-d474-422c-89b2-868a67b07e89.neodove.com/integration/custom/0e4195c8-c4fd-42bd-8fc5-9b8494ebd6f6/leads", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify(neoPayload)
         });
 
-        setFormData({
-          name: "",
-          email: "",
-          phone: "",
-          organization: "",
-          userType: "",
-          purpose: [],
-          message: "",
-          studentsOrTeam: "",
-          website: "",
-          dgcaId: "",
-          droneModels: "",
-          serviceArea: "",
-          pilotCertified: "",
-          useCaseDescription: "",
-          interestedInDGCA: false
-        });
-      } else {
-        const error = await response.json();
-        toast({
-          title: "Submission Failed",
-          description: error?.detail || error?.message || "Please try again later.",
-          variant: "destructive"
-        });
+        const neoResText = await neoRes.text();
+        console.log("NeoDove Response:", neoResText);
+
+        if (!neoRes.ok) {
+          throw new Error("NeoDove API failed: " + neoResText);
+        }
+      } catch (neoError) {
+        console.error("NeoDove API Error:", neoError);
       }
-    } catch (error) {
-      console.error("API Error:", error);
+
+      // ✅ Success toast and reset
       toast({
-        title: "Error",
-        description: "There was a problem submitting your inquiry.",
+        title: "Submission Successful!",
+        description: "Thank you. Our team will contact you shortly."
+      });
+
+      setFormData({
+        name: "",
+        email: "",
+        phone: "",
+        organization: "",
+        userType: "",
+        purpose: [],
+        message: "",
+        studentsOrTeam: "",
+        website: "",
+        dgcaId: "",
+        droneModels: "",
+        serviceArea: "",
+        pilotCertified: "",
+        useCaseDescription: "",
+        interestedInDGCA: false
+      });
+    } else {
+      const error = await response.json();
+      toast({
+        title: "Submission Failed",
+        description: error?.detail || error?.message || "Please try again later.",
         variant: "destructive"
       });
-    } finally {
-      setIsLoading(false);
     }
-  };
-
+  } catch (error) {
+    console.error("API Error:", error);
+    toast({
+      title: "Error",
+      description: "There was a problem submitting your inquiry.",
+      variant: "destructive"
+    });
+  } finally {
+    setIsLoading(false);
+  }
+};
   return (
     <div className="min-h-screen bg-white font-poppins">
       <Navigation />

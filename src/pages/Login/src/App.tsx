@@ -8,7 +8,6 @@ import Profile from './pages/Profile'
 import { AuthProvider } from './context/AuthContext'
 import Studentregister from './pages/studentregister'
 
-
 function AppAuth() {
   return (
     <AuthProvider>
@@ -20,6 +19,7 @@ function AppAuth() {
           <Route path="/profile" element={<Profile />} />
           <Route path="/studentregister" element={<Studentregister />} />
           <Route path="/" element={<Navigate to="/auth/login" replace />} />
+         
         </Routes>
       </Layout>
     </AuthProvider>
