@@ -53,12 +53,6 @@ const FlyToWinBanner = () => {
                 Worth: ₹45,000. Winners: Anyone who completes 2h 30min of simulation, flies all 7 locations & scenarios, 
                 and completes the social media tasks.
               </p>
-
-              <p className="text-base md:text-lg text-white/90 max-w-2xl mx-auto leading-relaxed">
-                <span className="font-bold text-yellow-300">Note:</span> Eligible winners must pay ₹8,000 as the DGCA Certificate Registration Fee 
-                to receive the certificate.
-              </p>
-
               {/* Prize Highlights */}
               <div className="grid grid-cols-1 md:grid-cols-3 gap-3 max-w-3xl mx-auto">
                 <div className="bg-white/10 backdrop-blur-sm rounded-xl p-3 border border-white/20">
