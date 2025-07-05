@@ -270,13 +270,13 @@ const Download = () => {
                 </li>
               </ul>
               <div className="flex justify-center mt-4">
-  <button
-    onClick={() => navigate('/flytosky')}
-    className="animate-pulse bg-orange-500 hover:bg-orange-600 text-white font-semibold py-3 px-6 rounded-full text-lg shadow-md"
-  >
-    Fly to Win DGCA Certificate 🛫
-  </button>
-</div>
+                <button
+                  onClick={() => navigate('/flytowin')}
+                  className="animate-pulse bg-orange-500 hover:bg-orange-600 text-white font-semibold py-3 px-6 rounded-full text-lg shadow-md"
+                >
+                  Fly to Win DGCA Certificate 🛫
+                </button>
+              </div>
 
 
             </div>
