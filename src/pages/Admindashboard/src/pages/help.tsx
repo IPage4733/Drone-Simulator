@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useLocation } from 'react-router-dom';
 import { Link } from "react-router-dom";
 
@@ -10,11 +10,41 @@ const HelpPage: React.FC = () => {
     const [description, setDescription] = useState("");
     const [allowEmail, setAllowEmail] = useState(false);
     const [expandedSections, setExpandedSections] = useState<Record<string, boolean>>({});
+    const dropRef = useRef<HTMLDivElement>(null);
 
     useEffect(() => {
         setVisible(location.pathname === '/contact');
     }, [location.pathname]);
-    
+
+    useEffect(() => {
+        const dropArea = dropRef.current;
+        const handlePaste = (e: ClipboardEvent) => {
+            if (e.clipboardData && e.clipboardData.files.length > 0) {
+                handleFiles(e.clipboardData.files);
+            }
+        };
+        if (dropArea) {
+            dropArea.addEventListener("paste", handlePaste);
+        }
+        return () => {
+            if (dropArea) {
+                dropArea.removeEventListener("paste", handlePaste);
+            }
+        };
+    }, []);
+
+    const handleFiles = (files: FileList | File[]) => {
+        const validFiles = Array.from(files).filter(file => file.type.startsWith("image/"));
+        setScreenshots(prev => [...prev, ...validFiles]);
+    };
+
+    const handleDrop = (e: React.DragEvent) => {
+        e.preventDefault();
+        if (e.dataTransfer.files.length > 0) {
+            handleFiles(e.dataTransfer.files);
+        }
+    };
+
     const toggleSection = (key: string) => {
         setExpandedSections(prev => ({ ...prev, [key]: !prev[key] }));
     };
@@ -41,7 +71,7 @@ const HelpPage: React.FC = () => {
         const formData = new FormData();
         formData.append("description", description);
         screenshots.forEach((file) => {
-            formData.append("images", file); // ✅ must match field name in backend
+            formData.append("images", file);
         });
 
         try {
@@ -49,7 +79,6 @@ const HelpPage: React.FC = () => {
                 method: "POST",
                 headers: {
                     Authorization: `Token ${token}`,
-                    // ❌ DO NOT set Content-Type for FormData — the browser handles it
                 },
                 body: formData,
             });
@@ -69,16 +98,6 @@ const HelpPage: React.FC = () => {
             console.error("Feedback Error:", error);
             alert("An error occurred. Please try again later.");
         }
-    };
-
-
-    const toBase64 = (file: File): Promise<string> => {
-        return new Promise((resolve, reject) => {
-            const reader = new FileReader();
-            reader.readAsDataURL(file);
-            reader.onload = () => resolve(reader.result as string);
-            reader.onerror = reject;
-        });
     };
 
     if (!visible) return null;
@@ -168,13 +187,12 @@ const HelpPage: React.FC = () => {
             title: "Technical Support",
             content: (
                 <>
-                   <ul className="list-disc pl-4 text-gray-600">
-  <li>Simulator not launching? Check drivers & requirements.</li>
-  <li>Freezing? Restart or reinstall simulator.</li>
-  <li>Login issues? Try password reset or contact support.</li>
-  <li>To report a problem, click on <strong>Send Feedback</strong> and fill out the form. Our team will resolve it as soon as possible.</li>
-</ul>
-
+                    <ul className="list-disc pl-4 text-gray-600">
+                        <li>Simulator not launching? Check drivers & requirements.</li>
+                        <li>Freezing? Restart or reinstall simulator.</li>
+                        <li>Login issues? Try password reset or contact support.</li>
+                        <li>To report a problem, click on <strong>Send Feedback</strong> and fill out the form. Our team will resolve it as soon as possible.</li>
+                    </ul>
                     <p className="mt-2 text-gray-600">
                         Contact support at <a href="mailto:support@dronesimulator.pro" className="text-blue-600">support@dronesimulator.pro</a>
                     </p>
@@ -219,7 +237,6 @@ const HelpPage: React.FC = () => {
                                 )}
                             </div>
                         ))}
-                        
                         <div className="text-center mt-4">
                             <button
                                 onClick={() => setShowFeedback(true)}
@@ -237,7 +254,7 @@ const HelpPage: React.FC = () => {
                         </div>
                     </div>
                 ) : (
-                    <div className="p-4 space-y-4 text-sm flex-1 overflow-y-auto">
+                    <div className="p-4 space-y-4 text-sm flex-1 overflow-y-auto" ref={dropRef} onDrop={handleDrop} onDragOver={(e) => e.preventDefault()}>
                         <div>
                             <label className="font-medium block mb-1">Describe your feedback (required)</label>
                             <textarea
@@ -249,24 +266,42 @@ const HelpPage: React.FC = () => {
                                 className="w-full border px-3 py-2 rounded"
                             ></textarea>
                         </div>
-                        <div>
-                            <label className="block font-medium mb-1">Upload screenshots (optional)</label>
-                            <input
-                                type="file"
-                                name="images"
-                                accept="image/*"
-                                multiple
-                                onChange={(e) => setScreenshots(Array.from(e.target.files || []))}
-                            />
+                       <div className="mb-4">
+  <label className="block font-medium mb-1">Upload screenshots (optional)</label>
+  <div
+    ref={dropRef}
+    onDrop={handleDrop}
+    onDragOver={(e) => e.preventDefault()}
+    className="border-2 border-dashed border-gray-400 rounded-md p-5 text-center bg-gray-50 hover:bg-gray-100 transition-all cursor-pointer"
+  >
+    <p className="text-gray-600 text-sm">
+      <span className="font-medium">Drag & drop</span> images here, or
+      <span className="text-blue-600 underline ml-1">click to browse</span><br />
+      (You can also paste screenshots with <kbd>Ctrl</kbd> + <kbd>V</kbd>)
+    </p>
+    <input
+      type="file"
+      name="images"
+      accept="image/*"
+      multiple
+      onChange={(e) => handleFiles(e.target.files || [])}
+      className="hidden"
+      id="uploadInput"
+    />
+  </div>
 
-                            {screenshots.length > 0 && (
-                                <ul className="text-xs mt-1 text-gray-600 list-disc pl-4">
-                                    {screenshots.map((file, i) => (
-                                        <li key={i}>{file.name}</li>
-                                    ))}
-                                </ul>
-                            )}
-                        </div>
+  {/* Invisible label triggers file input click */}
+  <label htmlFor="uploadInput" className="sr-only">Upload Images</label>
+
+  {screenshots.length > 0 && (
+    <ul className="text-xs mt-2 text-gray-600 list-disc pl-4">
+      {screenshots.map((file, i) => (
+        <li key={i}>{file.name}</li>
+      ))}
+    </ul>
+  )}
+</div>
+
                         <div>
                             <label className="flex items-center gap-2 text-sm">
                                 <input
