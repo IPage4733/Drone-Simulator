@@ -291,10 +291,10 @@ const FeaturesPage: React.FC = () => {
     <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 mb-12">
       {[
         {
-          id: "flysky-ct6b",
-          image: "/images/FlySkyCT6B.jpg",
-          title: "FlySky CT6B",
-          description: "A beginner-friendly RC controller with 6 channels, ideal for basic drone training and familiarization.",
+          id: "flysky-fs-i6s",
+          image: "/images/FlyskyFS-i6S.jpg",
+          title: "Flysky FS-i6S",
+          description: "A versatile 10-channel RC controller with a compact design and iBus/PPM support—ideal for professional simulator training.",
         },
         {
           id: "mobile-app",
