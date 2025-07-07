@@ -236,13 +236,14 @@ const Register: React.FC = () => {
     return Object.keys(newErrors).length === 0
   }
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
+const handleSubmit = async (e: React.FormEvent) => {
+  e.preventDefault();
 
-    if (!validateForm()) return
+  if (!validateForm()) return;
 
-    setIsLoading(true)
+  setIsLoading(true);
 
+  try {
     const requestBody = {
       email: formData.email,
       password: formData.password,
@@ -253,32 +254,47 @@ const Register: React.FC = () => {
       state_province: formData.state_province,
       country: formData.country,
       purpose_of_use: formData.purpose_of_use === 'other' ? formData.purpose_other : formData.purpose_of_use
+    };
+
+    const response = await fetch('https://34-47-194-149.nip.io/api/register/', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(requestBody)
+    });
+
+    const data = await response.json();
+    console.log("🔴 Full registration response:", data); // For debugging
+
+    if (response.ok) {
+      setShowVerificationPopup(true);
+    } else {
+      // ✅ Extract field-level errors like: "email already exists"
+      if (data?.errors && typeof data.errors === 'object') {
+        const newErrors: { [key: string]: string } = {};
+        Object.entries(data.errors).forEach(([key, value]) => {
+          if (Array.isArray(value) && value.length > 0) {
+            newErrors[key] = value[0]; // Use the first error message
+          }
+        });
+        setErrors(newErrors);
+      } else {
+        setErrors({ submit: data?.message || 'Registration failed. Please try again.' });
+      }
     }
 
-    try {
-      const response = await fetch('https://34-47-194-149.nip.io/api/register/', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(requestBody)
-      })
-
-      const data = await response.json()
-
-      if (response.ok) {
-        setShowVerificationPopup(true); // ✅ Only show popup
-      }
-      else {
-        setErrors({ submit: data?.error || 'Registration failed. Please try again.' })
-      }
-
-    } catch (error) {
-      setErrors({ submit: 'An unexpected error occurred. Please try again.' })
-    } finally {
-      setIsLoading(false)
-    }
+  } catch (error) {
+    console.error("Registration error:", error);
+    setErrors({ submit: 'An unexpected error occurred. Please try again.' });
+  } finally {
+    setIsLoading(false);
   }
+};
+
+
+
+
 
 
 

@@ -114,11 +114,11 @@ const Login: React.FC = () => {
         <div className="bg-white rounded-lg shadow-md px-4 py-5 w-full max-w-xs text-xs">
 
 
-<img
-  src="/images/logonew.png"
-  alt="Drone Simulator Logo"
-  className="w-64 mx-auto mb-3"
-/>
+          <img
+            src="/images/logonew.png"
+            alt="Drone Simulator Logo"
+            className="w-64 mx-auto mb-3"
+          />
 
 
 
@@ -143,33 +143,33 @@ const Login: React.FC = () => {
             </div>
 
             <div className="relative">
-  <input
-    type={showPassword ? 'text' : 'password'}
-    id="password"
-    name="password"
-    value={formData.password}
-    onChange={handleChange}
-    className={`form-input text-[12px] px-2 py-1 pr-8 w-full ${errors.password ? 'border-red-500' : ''}`}
-    placeholder="Enter password"
-  />
-  <button
-    type="button"
-    onClick={() => setShowPassword(prev => !prev)}
-    className="absolute right-2 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-gray-700 focus:outline-none"
-  >
-    {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-  </button>
-</div>
+              <input
+                type={showPassword ? 'text' : 'password'}
+                id="password"
+                name="password"
+                value={formData.password}
+                onChange={handleChange}
+                className={`form-input text-[12px] px-2 py-1 pr-8 w-full ${errors.password ? 'border-red-500' : ''}`}
+                placeholder="Enter password"
+              />
+              <button
+                type="button"
+                onClick={() => setShowPassword(prev => !prev)}
+                className="absolute right-2 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-gray-700 focus:outline-none"
+              >
+                {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+              </button>
+            </div>
 
             {errors.submit && <p className="text-red-500 text-center mt-1">{errors.submit}</p>}
 
-           <button
-  type="submit"
-  disabled={isLoading}
-  className="btn-primary w-40 text-[11px] py-[6px] mt-1 mx-auto block"
->
-  {isLoading ? 'Signing in...' : 'Sign In'}
-</button>
+            <button
+              type="submit"
+              disabled={isLoading}
+              className="btn-primary w-40 text-[11px] py-[6px] mt-1 mx-auto block"
+            >
+              {isLoading ? 'Signing in...' : 'Sign In'}
+            </button>
 
           </form>
 
@@ -187,13 +187,13 @@ const Login: React.FC = () => {
             <Link to="/auth/forgot-password" className="text-orange-500 hover:text-orange-600 font-medium">
               Forgot password?
             </Link>
-           <button
-  type="button"
-  onClick={() => navigate('/auth/studentregister')}
-  className="btn-primary w-40 text-[11px] py-[6px] mt-2 mx-auto block"
->
-  Register as Student
-</button>
+            <button
+              type="button"
+              onClick={() => navigate('/auth/studentregister')}
+              className="btn-primary w-40 text-[11px] py-[6px] mt-2 mx-auto block"
+            >
+              Register as Student
+            </button>
 
             <div className="pt-3 border-t border-gray-200 mt-3">
               <p className="text-gray-600">
