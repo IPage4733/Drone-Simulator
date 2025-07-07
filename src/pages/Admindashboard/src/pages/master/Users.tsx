@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Users as UsersIcon, Search, Filter, Edit, Eye, UserX, Settings, Calendar } from 'lucide-react';
+import { Users as UsersIcon, Search, Filter, Edit, Eye, UserX, Settings, Calendar, Download} from 'lucide-react';
 import { useData } from '../../hooks/useData';
 import { EditUserModal } from '../../components/modals/EditUserModal';
 import { useAuth } from '../../hooks/useAuth';
@@ -14,16 +14,23 @@ export const MasterUsers: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
   const [planFilter, setPlanFilter] = useState('all');
+  const [startDate, setStartDate] = useState('');
+const [endDate, setEndDate] = useState('');
+
   const [editingUser, setEditingUser] = useState<string | null>(null);
+const filteredUsers = users.filter(user => {
+  const matchesSearch = user.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    user.email.toLowerCase().includes(searchTerm.toLowerCase());
+  const matchesStatus = statusFilter === 'all' || user.status === statusFilter;
+  const matchesPlan = planFilter === 'all' || user.plan === planFilter;
 
-  const filteredUsers = users.filter(user => {
-    const matchesSearch = user.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      user.email.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesStatus = statusFilter === 'all' || user.status === statusFilter;
-    const matchesPlan = planFilter === 'all' || user.plan === planFilter;
+  const joinedDate = new Date(user.registrationDate);
+  const matchesStart = startDate ? joinedDate >= new Date(startDate) : true;
+  const matchesEnd = endDate ? joinedDate <= new Date(endDate) : true;
 
-    return matchesSearch && matchesStatus && matchesPlan;
-  });
+  return matchesSearch && matchesStatus && matchesPlan && matchesStart && matchesEnd;
+});
+
 
 const handleEditUser = async (
   userId: string,
@@ -228,6 +235,44 @@ useEffect(() => {
   if (loading) {
     return <div className="text-center py-10 text-gray-500">Loading users...</div>;
   }
+  const handleExportCSV = () => {
+  const headers = [
+    'Name',
+    'Email',
+    'Status',
+    'Plan',
+    'Paid Amount',
+    'Payment Date',
+    'Next Payment Date',
+    'Simulations This Month',
+    'Total Simulations',
+    'Registration Date'
+  ];
+
+  const rows = filteredUsers.map(user => [
+    user.name,
+    user.email,
+    user.status,
+    user.plan,
+    user.paidAmount,
+    user.paymentDate || '',
+    user.nextPaymentDate || '',
+    user.usage.simulationsThisMonth,
+    user.usage.totalSimulations,
+    user.registrationDate
+  ]);
+
+  const csvContent = [headers, ...rows].map(e => e.join(',')).join('\n');
+  const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement('a');
+  link.setAttribute('href', url);
+  link.setAttribute('download', `users_${Date.now()}.csv`);
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+};
+
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
@@ -242,46 +287,70 @@ useEffect(() => {
 
       {/* Search and Filters */}
       <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-          <div className="md:col-span-2">
-            <div className="relative">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
-              <input
-                type="text"
-                placeholder="Search users by name or email..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              />
-            </div>
-          </div>
+       <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
+  <div className="md:col-span-2">
+    <div className="relative">
+      <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
+      <input
+        type="text"
+        placeholder="Search users by name or email..."
+        value={searchTerm}
+        onChange={(e) => setSearchTerm(e.target.value)}
+        className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+      />
+    </div>
+  </div>
+  <div>
+    <input
+      type="date"
+      value={startDate}
+      onChange={(e) => setStartDate(e.target.value)}
+      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+    />
+  </div>
+  <div>
+    <input
+      type="date"
+      value={endDate}
+      onChange={(e) => setEndDate(e.target.value)}
+      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+    />
+  </div>
+  <div className="flex gap-2">
+    <select
+      value={statusFilter}
+      onChange={(e) => setStatusFilter(e.target.value)}
+      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+    >
+      <option value="all">All Status</option>
+      <option value="Active">Active</option>
+      <option value="Inactive">Inactive</option>
+      <option value="Suspended">Suspended</option>
+    </select>
+  </div>
+</div>
 
-          <div>
-            <select
-              value={statusFilter}
-              onChange={(e) => setStatusFilter(e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-            >
-              <option value="all">All Status</option>
-              <option value="Active">Active</option>
-              <option value="Inactive">Inactive</option>
-              <option value="Suspended">Suspended</option>
-            </select>
-          </div>
+{/* Plan Filter and Export Button */}
+<div className="flex justify-between items-center mt-4">
+  <select
+    value={planFilter}
+    onChange={(e) => setPlanFilter(e.target.value)}
+    className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+  >
+    <option value="all">All Plans</option>
+    <option value="Demo">Demo</option>
+    <option value="Free">Free</option>
+    <option value="Premium">Premium</option>
+  </select>
 
-           <div>
-<select
-  value={planFilter}
-  onChange={(e) => setPlanFilter(e.target.value)}
-  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
->
-  <option value="all">All Plans</option>
-  <option value="Demo">Demo</option>
-  <option value="Free">Free</option>
-  <option value="Premium">Premium</option>
-</select>
-          </div>
-        </div>
+  <button
+    onClick={handleExportCSV}
+    className="flex items-center gap-2 bg-blue-600 text-white px-4 py-2 text-sm rounded hover:bg-blue-700"
+  >
+    <Download size={16} /> Export CSV
+  </button>
+</div>
+
       </div>
 
       {/* Users Table */}
