@@ -432,57 +432,57 @@ const Profile: React.FC = () => {
     { id: 'purchases', name: 'Purchases', icon: ShoppingBag },
     // { id: 'achievements', name: 'Achievements', icon: Award }
   ]
-const groupScenarioSummary = (scenarios: any[]) => {
- const timeToSeconds = (duration: string | null) => {
-  if (!duration || typeof duration !== 'string') return 0;
-  const parts = duration.split(':').map(Number);
-  return parts.reduce((acc, val) => acc * 60 + val, 0);
-};
-
-
-  const grouped = new Map();
-
-  scenarios.forEach((s) => {
-    const key = `${s.scenario_name}||${s.drone_name}||${s.location_name}`;
-    const current = grouped.get(key) || { count: 0, seconds: 0 };
-    grouped.set(key, {
-      count: current.count + 1,
-      seconds: current.seconds + timeToSeconds(s.duration_formatted),
-    });
-  });
-
-  return Array.from(grouped.entries()).map(([key, value]) => {
-    const [Scenario, Drone, Location] = key.split('||');
-    const hrs = Math.floor(value.seconds / 3600);
-    const mins = Math.floor((value.seconds % 3600) / 60) % 60;
-    const secs = value.seconds % 60;
-    return {
-      Scenario,
-      Drone,
-      Location,
-      Count: value.count,
-      Total_Duration: `${hrs.toString().padStart(2, '0')}:${mins
-        .toString()
-        .padStart(2, '0')}:${secs.toString().padStart(2, '0')}`,
+  const groupScenarioSummary = (scenarios: any[]) => {
+    const timeToSeconds = (duration: string | null) => {
+      if (!duration || typeof duration !== 'string') return 0;
+      const parts = duration.split(':').map(Number);
+      return parts.reduce((acc, val) => acc * 60 + val, 0);
     };
-  });
-};
-function sumDurations(durations: string[]): string {
-  let totalSeconds = 0;
 
-  durations.forEach((dur) => {
-    const parts = dur.split(':').map(Number);
-    if (parts.length === 3) {
-      const [hh, mm, ss] = parts;
-      totalSeconds += hh * 3600 + mm * 60 + ss;
-    }
-  });
 
-  const hours = Math.floor(totalSeconds / 3600).toString().padStart(2, '0');
-  const minutes = Math.floor((totalSeconds % 3600) / 60).toString().padStart(2, '0');
-  const seconds = (totalSeconds % 60).toString().padStart(2, '0');
-  return `${hours}:${minutes}:${seconds}`;
-}
+    const grouped = new Map();
+
+    scenarios.forEach((s) => {
+      const key = `${s.scenario_name}||${s.drone_name}||${s.location_name}`;
+      const current = grouped.get(key) || { count: 0, seconds: 0 };
+      grouped.set(key, {
+        count: current.count + 1,
+        seconds: current.seconds + timeToSeconds(s.duration_formatted),
+      });
+    });
+
+    return Array.from(grouped.entries()).map(([key, value]) => {
+      const [Scenario, Drone, Location] = key.split('||');
+      const hrs = Math.floor(value.seconds / 3600);
+      const mins = Math.floor((value.seconds % 3600) / 60) % 60;
+      const secs = value.seconds % 60;
+      return {
+        Scenario,
+        Drone,
+        Location,
+        Count: value.count,
+        Total_Duration: `${hrs.toString().padStart(2, '0')}:${mins
+          .toString()
+          .padStart(2, '0')}:${secs.toString().padStart(2, '0')}`,
+      };
+    });
+  };
+  function sumDurations(durations: string[]): string {
+    let totalSeconds = 0;
+
+    durations.forEach((dur) => {
+      const parts = dur.split(':').map(Number);
+      if (parts.length === 3) {
+        const [hh, mm, ss] = parts;
+        totalSeconds += hh * 3600 + mm * 60 + ss;
+      }
+    });
+
+    const hours = Math.floor(totalSeconds / 3600).toString().padStart(2, '0');
+    const minutes = Math.floor((totalSeconds % 3600) / 60).toString().padStart(2, '0');
+    const seconds = (totalSeconds % 60).toString().padStart(2, '0');
+    return `${hours}:${minutes}:${seconds}`;
+  }
 
   return (
 
@@ -703,6 +703,21 @@ function sumDurations(durations: string[]): string {
               </div>
             </div> */}
           </div>
+          <div className="bg-white p-6 rounded-lg shadow-lg mt-6">
+            <h3 className="text-lg font-semibold text-gray-800">Upload Your Social Media Tasks</h3>
+            <p className="text-gray-600 mt-2">
+              please click below button to upload your social media task proof:
+            </p>
+            <a
+              href="https://forms.gle/KzQGdGMqMWXoj6Dn7"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="mt-4 inline-block bg-orange-600 text-white px-4 py-2 rounded-lg text-sm hover:bg-orange-700"
+            >
+              Click here to upload tasks
+            </a>
+          </div>
+
         </div>
 
         {/* Tabs Navigation */}
@@ -1212,58 +1227,58 @@ function sumDurations(durations: string[]): string {
           </div>
         </div>
       </main>
-      
-    {/* Drone Summary Cards */}
-<div className="mt-6">
-  <h3 className="text-lg font-semibold text-gray-900 mb-4">Drone Flight Summary</h3>
-  <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
-    {Array.from(
-      new Set(groupScenarioSummary(currentUser.all_scenarios?.scenarios || []).map((x) => x.Location))
-    ).map((location, idx) => {
-      const data = groupScenarioSummary(currentUser.all_scenarios?.scenarios || []).filter(
-        (item) => item.Location === location
-      );
 
-      return (
-        <div
-  key={idx}
-  className="bg-white rounded-md shadow-sm border border-orange-500 p-3 hover:shadow-md transition duration-300"
->
-<h4 className="text-md font-bold text-orange-600 mb-4 flex justify-between">
-  <span>{location}</span>
-  <span> (Total: {sumDurations(data.map(item => item.Total_Duration))})</span>
-</h4>
+      {/* Drone Summary Cards */}
+      <div className="mt-6">
+        <h3 className="text-lg font-semibold text-gray-900 mb-4">Drone Flight Summary</h3>
+        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
+          {Array.from(
+            new Set(groupScenarioSummary(currentUser.all_scenarios?.scenarios || []).map((x) => x.Location))
+          ).map((location, idx) => {
+            const data = groupScenarioSummary(currentUser.all_scenarios?.scenarios || []).filter(
+              (item) => item.Location === location
+            );
+
+            return (
+              <div
+                key={idx}
+                className="bg-white rounded-md shadow-sm border border-orange-500 p-3 hover:shadow-md transition duration-300"
+              >
+                <h4 className="text-md font-bold text-orange-600 mb-4 flex justify-between">
+                  <span>{location}</span>
+                  <span> (Total: {sumDurations(data.map(item => item.Total_Duration))})</span>
+                </h4>
 
 
-  <table className="min-w-full text-sm">
-    <thead>
-      <tr className="bg-orange-50 text-orange-700">
-        <th className="px-2 py-1 text-left font-semibold">Drone</th>
-        <th className="px-2 py-1 text-left font-semibold">Scenario</th>
-        <th className="px-2 py-1 text-left font-semibold">Count</th>
-        <th className="px-2 py-1 text-left font-semibold">Duration</th>
-      </tr>
-    </thead>
-    <tbody>
-      {data.map((item, i) => (
-        <tr
-          key={i}
-          className="border-t hover:bg-orange-50 transition duration-200"
-        >
-          <td className="px-2 py-1 text-gray-800">{item.Drone}</td>
-          <td className="px-2 py-1 text-gray-800">{item.Scenario}</td>
-          <td className="px-2 py-1 text-gray-800">{item.Count}</td>
-          <td className="px-2 py-1 text-gray-800">{item.Total_Duration}</td>
-        </tr>
-      ))}
-    </tbody>
-  </table>
-</div>
+                <table className="min-w-full text-sm">
+                  <thead>
+                    <tr className="bg-orange-50 text-orange-700">
+                      <th className="px-2 py-1 text-left font-semibold">Drone</th>
+                      <th className="px-2 py-1 text-left font-semibold">Scenario</th>
+                      <th className="px-2 py-1 text-left font-semibold">Count</th>
+                      <th className="px-2 py-1 text-left font-semibold">Duration</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {data.map((item, i) => (
+                      <tr
+                        key={i}
+                        className="border-t hover:bg-orange-50 transition duration-200"
+                      >
+                        <td className="px-2 py-1 text-gray-800">{item.Drone}</td>
+                        <td className="px-2 py-1 text-gray-800">{item.Scenario}</td>
+                        <td className="px-2 py-1 text-gray-800">{item.Count}</td>
+                        <td className="px-2 py-1 text-gray-800">{item.Total_Duration}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
 
-      );
-    })}
-  </div>
-</div>
+            );
+          })}
+        </div>
+      </div>
 
     </div>
   )
