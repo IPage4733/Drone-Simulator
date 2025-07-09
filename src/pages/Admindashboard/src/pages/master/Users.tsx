@@ -253,7 +253,18 @@ export const MasterUsers: React.FC = () => {
     fetchUsers();
   }, []);
 
+ const [sortConfig, setSortConfig] = useState<{ key: string | null, direction: 'asc' | 'desc' }>({
+    key: null,
+    direction: 'asc'
+  });
 
+  const handleSort = (key: string) => {
+    let direction: 'asc' | 'desc' = 'asc';
+    if (sortConfig.key === key && sortConfig.direction === 'asc') {
+      direction = 'desc';
+    }
+    setSortConfig({ key, direction });
+  };
 
   //this is the 
   if (loading) {
@@ -296,6 +307,45 @@ export const MasterUsers: React.FC = () => {
     link.click();
     document.body.removeChild(link);
   };
+ 
+  const getTotalDurationSeconds = (scenarios: any[]) => {
+    let totalSeconds = 0;
+    scenarios.forEach(({ duration_formatted }) => {
+      if (typeof duration_formatted === 'string') {
+        const [h = 0, m = 0, s = 0] = duration_formatted.split(':').map(Number);
+        totalSeconds += h * 3600 + m * 60 + s;
+      }
+    });
+    return totalSeconds;
+  };
+  const sortedUsers = [...filteredUsers].sort((a, b) => {
+    if (!sortConfig.key) return 0;
+
+    let aVal: any;
+    let bVal: any;
+
+    switch (sortConfig.key) {
+      case 'name':
+        aVal = a.name.toLowerCase();
+        bVal = b.name.toLowerCase();
+        break;
+      case 'registrationDate':
+        aVal = new Date(a.registrationDate).getTime();
+        bVal = new Date(b.registrationDate).getTime();
+        break;
+      case 'usageDuration':
+        aVal = getTotalDurationSeconds(a.scenarios);
+        bVal = getTotalDurationSeconds(b.scenarios);
+        break;
+      default:
+        aVal = a[sortConfig.key];
+        bVal = b[sortConfig.key];
+    }
+
+    if (aVal < bVal) return sortConfig.direction === 'asc' ? -1 : 1;
+    if (aVal > bVal) return sortConfig.direction === 'asc' ? 1 : -1;
+    return 0;
+  });
 
   return (
     <div className="space-y-6">
@@ -384,28 +434,43 @@ export const MasterUsers: React.FC = () => {
           <table className="min-w-full divide-y divide-gray-200 text-xs">
             <thead className="bg-gray-50 text-sm">
               <tr>
-                {['User', 'Plan & Configuration', 'Status', 'Payment', 'Usage', 'Joined', 'Actions'].map((head) => (
+                {[
+                  { key: 'name', label: 'User' },
+                  { key: '', label: 'Plan & Configuration' },
+                  { key: '', label: 'Status' },
+                  { key: '', label: 'Payment' },
+                  { key: 'usageDuration', label: 'Usage' },
+                  { key: 'registrationDate', label: 'Joined' },
+                  { key: '', label: 'Actions' },
+                ].map(({ key, label }) => (
                   <th
-                    key={head}
-                    className="px-2 py-2 text-left font-medium text-gray-600 uppercase tracking-wide whitespace-nowrap text-[11px]"
+                    key={label}
+                    onClick={() => key && handleSort(key)}
+                    className={`px-2 py-2 text-left font-medium text-gray-600 uppercase tracking-wide whitespace-nowrap text-[11px] ${key ? 'cursor-pointer select-none' : ''}`}
                   >
-                    {head === 'Plan & Configuration' ? (
+                    {label === 'Plan & Configuration' ? (
                       <>
                         PLAN
                         <br />
                         & CONFIGURATION
                       </>
                     ) : (
-                      head
+                      label
+                    )}
+                    {sortConfig.key === key && (
+                      <span className="ml-1">
+                        {sortConfig.direction === 'asc' ? '▲' : '▼'}
+                      </span>
                     )}
                   </th>
                 ))}
+
               </tr>
             </thead>
 
 
             <tbody className="bg-white divide-y divide-gray-100 text-[11px]">
-              {filteredUsers.map((user) => {
+              {sortedUsers.map((user) => {
                 const paymentStatus = getPaymentStatus(user);
                 return (
                   <tr
