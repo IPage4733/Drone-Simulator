@@ -148,96 +148,96 @@ const DownloadAdmin: React.FC = () => {
           <div className="text-sm text-gray-600">Total: {filteredDownloads.length}</div>
         </div>
       </div>
-<div className="flex flex-wrap items-center gap-3">
-  <label className="text-sm text-gray-700 flex items-center gap-2">
-    From:
-    <input
-      type="date"
-      value={startDate}
-      onChange={(e) => setStartDate(e.target.value)}
-      className="border border-gray-300 rounded px-2 py-1"
-    />
-  </label>
+      <div className="flex flex-wrap items-center gap-3">
+        <label className="text-sm text-gray-700 flex items-center gap-2">
+          From:
+          <input
+            type="date"
+            value={startDate}
+            onChange={(e) => setStartDate(e.target.value)}
+            className="border border-gray-300 rounded px-2 py-1"
+          />
+        </label>
 
-  <label className="text-sm text-gray-700 flex items-center gap-2">
-    To:
-    <input
-      type="date"
-      value={endDate}
-      onChange={(e) => setEndDate(e.target.value)}
-      className="border border-gray-300 rounded px-2 py-1"
-    />
-  </label>
+        <label className="text-sm text-gray-700 flex items-center gap-2">
+          To:
+          <input
+            type="date"
+            value={endDate}
+            onChange={(e) => setEndDate(e.target.value)}
+            className="border border-gray-300 rounded px-2 py-1"
+          />
+        </label>
 
-  {['today', '7days', '1month', '1year'].map((key) => (
-    <button
-      key={key}
-      onClick={() => setQuickFilter(prev => (prev === key ? '' : key))}
-      className={`text-sm font-medium px-3 py-1.5 rounded ${quickFilter === key
-        ? 'bg-gray-800 text-white shadow'
-        : 'bg-gray-100 text-gray-800 hover:bg-gray-200'
-      }`}
-    >
-      {{
-        today: 'Today',
-        '7days': 'Last 7 Days',
-        '1month': 'Last 1 Month',
-        '1year': 'Last 1 Year',
-      }[key]}
-    </button>
-  ))}
+        {['today', '7days', '1month', '1year'].map((key) => (
+          <button
+            key={key}
+            onClick={() => setQuickFilter(prev => (prev === key ? '' : key))}
+            className={`text-sm font-medium px-3 py-1.5 rounded ${quickFilter === key
+              ? 'bg-gray-800 text-white shadow'
+              : 'bg-gray-100 text-gray-800 hover:bg-gray-200'
+              }`}
+          >
+            {{
+              today: 'Today',
+              '7days': 'Last 7 Days',
+              '1month': 'Last 1 Month',
+              '1year': 'Last 1 Year',
+            }[key]}
+          </button>
+        ))}
 
-  <button
-    onClick={clearAllFilters}
-    className="text-sm font-medium px-3 py-1.5 rounded bg-gray-200 text-gray-800 hover:bg-gray-300"
-  >
-    Clear All
-  </button>
+        <button
+          onClick={clearAllFilters}
+          className="text-sm font-medium px-3 py-1.5 rounded bg-gray-200 text-gray-800 hover:bg-gray-300"
+        >
+          Clear All
+        </button>
+      </div>
+
+
+      <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
+  <div className="overflow-x-auto">
+    <table className="w-full table-auto text-[11px]">
+      <thead className="bg-gray-50">
+        <tr>
+          <th className="px-2 py-1 text-left font-medium text-gray-500 uppercase tracking-wide">Name</th>
+          <th className="px-2 py-1 text-left font-medium text-gray-500 uppercase tracking-wide">Email</th>
+          <th className="px-2 py-1 text-left font-medium text-gray-500 uppercase tracking-wide">Phone</th>
+          <th className="px-2 py-1 text-left font-medium text-gray-500 uppercase tracking-wide">Location</th>
+          <th className="px-2 py-1 text-left font-medium text-gray-500 uppercase tracking-wide">Date</th>
+          <th className="px-2 py-1 text-left font-medium text-gray-500 uppercase tracking-wide">Actions</th>
+        </tr>
+      </thead>
+      <tbody className="bg-white divide-y divide-gray-200">
+        {filteredDownloads.map((download) => (
+          <tr key={download.id} className="hover:bg-gray-50 transition-colors">
+            <td className="px-2 py-1 text-gray-900">{download.full_name || download.username || 'Anonymous'}</td>
+            <td className="px-2 py-1 text-gray-600">{download.email || 'N/A'}</td>
+            <td className="px-2 py-1 text-gray-600">{download.phone_number || 'N/A'}</td>
+            <td className="px-2 py-1 text-gray-700">
+              {download.city || '-'}
+            </td>
+            <td className="px-2 py-1 text-gray-700">
+              {new Date(download.last_download_at || download.created_at).toLocaleDateString()}
+            </td>
+            <td className="px-2 py-1 text-gray-700">
+              <div className="flex items-center space-x-1">
+                <button onClick={() => openDialog(download)} className="text-orange-600 hover:text-orange-800" title="View">
+                  <Eye size={14} />
+                </button>
+                <button onClick={() => handleDelete(download.email)} className="text-red-600 hover:text-red-800" title="Delete">
+                  <Trash2 size={14} />
+                </button>
+              </div>
+            </td>
+          </tr>
+        ))}
+      </tbody>
+    </table>
+  </div>
 </div>
 
-
-      <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
-        <div className="overflow-x-auto">
-          <table className="w-full table-auto text-xs">
-
-            <thead className="bg-gray-50">
-              <tr>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Name</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Email</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Phone</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Location</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
-              </tr>
-            </thead>
-            <tbody className="bg-white divide-y divide-gray-200">
-              {filteredDownloads.map((download) => (
-                <tr key={download.id} className="hover:bg-gray-50 transition-colors">
-                  <td className="px-2 py-2 text-sm text-gray-900">{download.full_name || download.username || 'Anonymous'}</td>
-                  <td className="px-2 py-2 text-sm text-gray-600">{download.email || 'N/A'}</td>
-                  <td className="px-2 py-2 text-sm text-gray-600">{download.phone_number || 'N/A'}</td>
-                  <td className="px-2 py-2 text-sm text-gray-700">
-                    {download.city}, {download.state_province}, {download.country}
-                  </td>
-                  <td className="px-6 py-4 text-sm text-gray-700">
-                    {new Date(download.last_download_at || download.created_at).toLocaleString()}
-                  </td>
-                  <td className="px-6 py-4 text-sm font-medium">
-                    <div className="flex items-center space-x-2">
-                      <button onClick={() => openDialog(download)} className="text-orange-600 hover:text-orange-900" title="View">
-                        <Eye size={16} />
-                      </button>
-                      <button onClick={() => handleDelete(download.email)} className="text-red-600 hover:text-red-900" title="Delete">
-                        <Trash2 size={16} />
-                      </button>
-                    </div>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      </div>
 
       {selectedDownload && (
         <Dialog open={isOpen} onClose={closeDialog} className="fixed inset-0 z-10 flex items-center justify-center bg-black bg-opacity-50">
