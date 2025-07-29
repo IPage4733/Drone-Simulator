@@ -23,7 +23,6 @@ const HeroSection = () => {
               <br />for Enthusiasts & Defense Professionals
             </h1>
 
-
             <p className="text-xl text-gray-600 mb-8 leading-relaxed">
               Discover the ultimate drone flying experience with Drone Simulator Pro. Our advanced simulator offers realistic training for drone enthusiasts and defense professionals and beyond. Start your flight journey today!
             </p>
@@ -51,27 +50,36 @@ const HeroSection = () => {
 
           {/* Visual */}
           <div className="relative animate-fade-in" style={{ animationDelay: '0.3s' }}>
-            <div className="relative">
-              <img
-                src="/images/Feautures/home.png"
-                alt="Drone Simulator Interface"
-                className="w-full h-auto rounded-2xl shadow-2xl"
-              />
+            {/* Video Container */}
+            <div className="relative overflow-hidden rounded-2xl shadow-2xl">
+              <iframe
+                src="https://www.youtube.com/embed/h25pI6pQ_cs?autoplay=1&mute=1&rel=0&modestbranding=1"
+                title="Drone Simulator Interface"
+                className="w-full aspect-video"
+                frameBorder="0"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                allowFullScreen
+              ></iframe>
 
-              <div className="absolute inset-0 bg-gradient-to-tr from-primary/20 to-accent/20 rounded-2xl"></div>
+              {/* Optional Gradient Overlay */}
+              <div className="absolute inset-0 bg-gradient-to-tr from-primary/20 to-accent/20 pointer-events-none rounded-2xl"></div>
             </div>
 
             {/* Floating UI Elements */}
-            <div className="absolute -top-4 -right-4 bg-white rounded-lg shadow-lg p-4 animate-float">
+            <div className="absolute -top-4 -right-4 bg-white rounded-lg shadow-lg p-4 animate-float z-10">
               <div className="text-sm font-semibold text-gray-900">Flight Status</div>
-              <div className="text-primary">●  Active</div>
+              <div className="text-primary">● Active</div>
             </div>
 
-            <div className="absolute -bottom-4 -left-4 bg-white rounded-lg shadow-lg p-4 animate-float" style={{ animationDelay: '1.5s' }}>
+            <div
+              className="absolute -bottom-4 -left-4 bg-white rounded-lg shadow-lg p-4 animate-float z-10"
+              style={{ animationDelay: '1.5s' }}
+            >
               <div className="text-sm font-semibold text-gray-900">Altitude</div>
               <div className="text-accent font-bold">120m</div>
             </div>
           </div>
+
         </div>
         {/* <div className="max-w-3xl mx-auto grid grid-cols-3 gap-8 text-center mt-12 pt-8 border-t border-gray-200">
   <div>
