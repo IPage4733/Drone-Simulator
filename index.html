@@ -48,7 +48,7 @@
           button: {
             backgroundColor: "#F97316",
             right: 20,
-            bottom: 5,
+            bottom: 20,
             size: 50,
             borderRadius: 16,
             dragAndDrop: true,
@@ -71,12 +71,11 @@
             errorMessage: "Oops! Something went wrong. Please try again later.",
             backgroundColor: "#FFF7ED",
 
-            minWidth: 250,
-            maxWidth: 550,
-            minHeight: 350,
-            maxHeight: 600,
-            fontSize: "clamp(14px, 1vw, 18px)",
-            fontFamily: "'Inter', sans-serif",
+            height: 550,
+            width: 450,
+            fontSize: 16,
+
+            fontFamily: "'Poppins', sans-serif",
 
             roundedCorners: true,
             clearChatOnReload: false,
@@ -100,12 +99,12 @@
               placeholder: "Type your message here...",
               backgroundColor: "#ffffff",
               textColor: "#92400E",
-              borderRadius: 14,
+              borderRadius: 12,
               boxShadow: "inset 0 1px 3px rgba(156, 126, 82, 0.25)",
               sendButtonColor: "#F97316",
-              maxChars: 120,
+              maxChars: 200,
               maxCharsWarningMessage:
-                "Please limit your message to 120 characters.",
+                "Please limit your message to 200 characters.",
               autoFocus: true,
             },
             feedback: {
