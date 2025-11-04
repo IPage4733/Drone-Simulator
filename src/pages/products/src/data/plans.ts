@@ -37,7 +37,7 @@ const plans: Plan[] = [
   {
     id: 'pro',
     name: 'Pro Plan',
-    price: 34.99,
+    price: 99.99,
     billing: 'USD per year',
     features: [
       

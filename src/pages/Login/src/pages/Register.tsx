@@ -236,61 +236,61 @@ const Register: React.FC = () => {
     return Object.keys(newErrors).length === 0
   }
 
-const handleSubmit = async (e: React.FormEvent) => {
-  e.preventDefault();
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
 
-  if (!validateForm()) return;
+    if (!validateForm()) return;
 
-  setIsLoading(true);
+    setIsLoading(true);
 
-  try {
-    const requestBody = {
-      email: formData.email,
-      password: formData.password,
-      password_confirm: formData.password_confirm,
-      full_name: formData.full_name,
-      phone_number: formData.phone_number,
-      city: formData.city,
-      state_province: formData.state_province,
-      country: formData.country,
-      purpose_of_use: formData.purpose_of_use === 'other' ? formData.purpose_other : formData.purpose_of_use
-    };
+    try {
+      const requestBody = {
+        email: formData.email,
+        password: formData.password,
+        password_confirm: formData.password_confirm,
+        full_name: formData.full_name,
+        phone_number: formData.phone_number,
+        city: formData.city,
+        state_province: formData.state_province,
+        country: formData.country,
+        purpose_of_use: formData.purpose_of_use === 'other' ? formData.purpose_other : formData.purpose_of_use
+      };
 
-    const response = await fetch('https://34-47-194-149.nip.io/api/register/', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify(requestBody)
-    });
+      const response = await fetch('https://34-47-194-149.nip.io/api/register/', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(requestBody)
+      });
 
-    const data = await response.json();
-    console.log("🔴 Full registration response:", data); // For debugging
+      const data = await response.json();
+      console.log("🔴 Full registration response:", data); // For debugging
 
-    if (response.ok) {
-      setShowVerificationPopup(true);
-    } else {
-      // ✅ Extract field-level errors like: "email already exists"
-      if (data?.errors && typeof data.errors === 'object') {
-        const newErrors: { [key: string]: string } = {};
-        Object.entries(data.errors).forEach(([key, value]) => {
-          if (Array.isArray(value) && value.length > 0) {
-            newErrors[key] = value[0]; // Use the first error message
-          }
-        });
-        setErrors(newErrors);
+      if (response.ok) {
+        setShowVerificationPopup(true);
       } else {
-        setErrors({ submit: data?.message || 'Registration failed. Please try again.' });
+        // ✅ Extract field-level errors like: "email already exists"
+        if (data?.errors && typeof data.errors === 'object') {
+          const newErrors: { [key: string]: string } = {};
+          Object.entries(data.errors).forEach(([key, value]) => {
+            if (Array.isArray(value) && value.length > 0) {
+              newErrors[key] = value[0]; // Use the first error message
+            }
+          });
+          setErrors(newErrors);
+        } else {
+          setErrors({ submit: data?.message || 'Registration failed. Please try again.' });
+        }
       }
-    }
 
-  } catch (error) {
-    console.error("Registration error:", error);
-    setErrors({ submit: 'An unexpected error occurred. Please try again.' });
-  } finally {
-    setIsLoading(false);
-  }
-};
+    } catch (error) {
+      console.error("Registration error:", error);
+      setErrors({ submit: 'An unexpected error occurred. Please try again.' });
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
 
 
@@ -302,25 +302,42 @@ const handleSubmit = async (e: React.FormEvent) => {
   return (
     <>
       <Navigation />
-      {showVerificationPopup && (
-        <div className="fixed inset-0 z-50 bg-black bg-opacity-40 flex items-center justify-center">
-          <div className="bg-white rounded-lg shadow-lg p-6 max-w-sm w-full text-center">
-            <h3 className="text-lg font-semibold text-green-700 mb-2">Email Verification Sent</h3>
-            <p className="text-gray-700">
-              Your email is not verified. A new verification link has been sent to your email address.
-            </p>
-            <button
-              className="mt-4 px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700"
-              onClick={() => {
-                setShowVerificationPopup(false);
-                navigate('/'); // Redirect after clicking OK
-              }}
-            >
-              OK
-            </button>
-          </div>
-        </div>
-      )}
+     {showVerificationPopup && (
+  <div className="fixed inset-0 z-50 bg-black bg-opacity-40 flex items-center justify-center">
+    <div className="bg-gradient-to-r from-orange-400 to-orange-500 rounded-lg shadow-lg p-8 w-[550px] text-center text-white">
+
+      <h3 className="text-2xl font-semibold mb-2">Ready to Take Flight?</h3>
+      <p className="text-white text-sm mb-6">
+        Join thousands of pilots who have mastered drone flying with our simulator.
+      </p>
+
+      <div className="bg-white text-gray-800 rounded-md p-4 text-left text-sm">
+        <p className="font-medium">To login to the Drone Simulator application after installation, please use the demo credentials below:</p>
+
+        <p className="mt-2">
+          Email: <strong>214G1A0555@srit.ac.in</strong><br />
+          Password: <strong>Manasa@555</strong>
+        </p>
+
+        <p className="mt-4 text-gray-700 text-sm">
+          Support: +91 9059759850 / +91 8804349999
+        </p>
+      </div>
+
+      <button
+        className="mt-6 px-6 py-2 bg-white text-orange-600 font-medium rounded hover:bg-gray-100"
+        onClick={() => {
+          setShowVerificationPopup(false);
+          navigate('/');
+        }}
+      >
+        Start Your Journey
+      </button>
+
+    </div>
+  </div>
+)}
+
       <div
         className="pt-24 min-h-screen w-full bg-cover bg-center bg-no-repeat flex justify-end items-center px-2 md:px-12"
         style={{ backgroundImage: "url('/images/l1.png')" }}
@@ -429,7 +446,7 @@ const handleSubmit = async (e: React.FormEvent) => {
                     name="phone_number"
                     value={formData.phone_number}
                     onChange={handleChange}
-                     className={`w-32 px-1.5 py-1 border rounded-r text-xs focus:ring-1 focus:ring-orange-500 focus:border-transparent ${errors.phone_number ? 'border-red-500' : 'border-gray-300'}`}
+                    className={`w-32 px-1.5 py-1 border rounded-r text-xs focus:ring-1 focus:ring-orange-500 focus:border-transparent ${errors.phone_number ? 'border-red-500' : 'border-gray-300'}`}
                     placeholder="Phone number"
                   />
                 </div>
@@ -503,22 +520,22 @@ const handleSubmit = async (e: React.FormEvent) => {
 
             {/* Submit Button - Compact */}
             <button
-  type="submit"
-  disabled={isLoading}
-  className="w-40 mx-auto block bg-orange-500 hover:bg-orange-600 text-white font-medium py-[6px] px-3 rounded text-[11px] transition-colors disabled:opacity-50 disabled:cursor-not-allowed mt-2"
->
-  {isLoading ? (
-    <div className="flex items-center justify-center">
-      <svg className="animate-spin -ml-1 mr-2 h-3 w-3 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-      </svg>
-      Creating...
-    </div>
-  ) : (
-    'Create Account'
-  )}
-</button>
+              type="submit"
+              disabled={isLoading}
+              className="w-40 mx-auto block bg-orange-500 hover:bg-orange-600 text-white font-medium py-[6px] px-3 rounded text-[11px] transition-colors disabled:opacity-50 disabled:cursor-not-allowed mt-2"
+            >
+              {isLoading ? (
+                <div className="flex items-center justify-center">
+                  <svg className="animate-spin -ml-1 mr-2 h-3 w-3 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                  </svg>
+                  Creating...
+                </div>
+              ) : (
+                'Create Account'
+              )}
+            </button>
 
           </form>
 
