@@ -142,10 +142,15 @@ const blockedPlans = ['pro', 'student', 'premium'];
             <h3 className="text-xl font-bold">{plan.name}</h3>
             {(plan.id === 'Student' || plan.id === 'pro') && (
               <span className="bg-green-500 text-white text-xs font-semibold px-3 py-1 rounded-full shadow-sm">
-                90% OFF
+                70% OFF
               </span>
             )}
           </div>
+          {plan.id === 'pro' && (
+            <p className="text-base font-bold text-gray-800 mb-4">
+               $34.99/Zone/year
+            </p>
+          )}
 
 
           {plan.id !== 'institution' && (
@@ -217,7 +222,7 @@ const blockedPlans = ['pro', 'student', 'premium'];
                 <li className="flex items-start">
                   <CheckCircle size={18} className="text-orange-500 mr-2 flex-shrink-0 mt-0.5" />
 
-                  <span className="text-gray-700"><strong>Available Drones:</strong> All Drones + Fighter-VTOL</span>
+                  <span className="text-gray-700"><strong>Available Drones:</strong> All Drones except Fighter-VTOL</span>
                 </li>
                 <li className="flex items-start">
                   <CheckCircle size={18} className="text-orange-500 mr-2 flex-shrink-0 mt-0.5" />
