@@ -176,25 +176,43 @@ const blockedPlans = ['pro', 'student', 'premium'];
 
             {/* 💡 Common Feature Loop */}
             {plan.features.map((feature, index) => {
-              const parts = feature.split(/(Available Drones:|Permitted Zones:|Permitted Zone:)/g);
+              // For Free Plan, make both "Available Drones:" and "Permitted Zones:" bold
+              if (plan.id === 'free') {
+                const parts = feature.split(/(Available Drones:|Permitted Zones:)/g);
+                return (
+                  <li key={index} className="flex items-start">
+                    <CheckCircle size={12} className="text-orange-500 mr-2 flex-shrink-0 mt-0.5" />
+                    <span className="text-sm text-gray-700">
+                      {parts.map((part, i) => 
+                        part === 'Available Drones:' || part === 'Permitted Zones:' ? (
+                          <strong key={i} className="font-semibold">{part}</strong>
+                        ) : (
+                          part
+                        )
+                      )}
+                    </span>
+                  </li>
+                );
+              }
+              
+              // For other plans, keep the existing behavior
+              const parts = feature.split(/(Available Drones-\d+:?|Permitted Zones?-?\d*\s*\(?[^)]*\)?:?)/g);
               return (
                 <li key={index} className="flex items-start">
                   <CheckCircle size={12} className="text-orange-500 mr-2 flex-shrink-0 mt-0.5" />
                   <span className="text-sm text-gray-700">
-                    {parts.map((part, i) => 
-                      part === 'Available Drones:' || part === 'Permitted Zones:' || part === 'Permitted Zone:' ? (
-                        <strong key={i} className="font-semibold">{part}</strong>
-                      ) : (
-                        part
-                      )
-                    )}
+                    {parts.map((part, i) => {
+                      if (part.match(/^Available Drones-\d+:?/i) || 
+                          part.match(/^Permitted Zones?-?\d*\s*\(?[^)]*\)?:?/i)) {
+                        return <strong key={i} className="font-semibold">{part}</strong>;
+                      }
+                      return part;
+                    })}
                   </span>
                 </li>
               );
             })}
           </ul>
-
-
 
           <Button variant={plan.buttonVariant} onClick={handleAddToCart} fullWidth className="text-sm py-2">
             {plan.buttonText}

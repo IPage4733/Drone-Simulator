@@ -25,11 +25,11 @@ const plans: Plan[] = [
     originalPrice: 99.99,
     billing: 'USD per year ($99.99) (90% Off)',
     features: [
-      'Available Drones: Agriculture Drone, Racing Drone, DJI Mavic, DJI Matrice 350 RTK, Crystalball Model V (Except Fighter-VTOL)',
-      'Permitted Zones: RPTO Ground, Agriculture, City, Bridge & Road, HV Lines & Solar Panel, Factory Except Defence',
-      'Free, Drawing & Automation modes',
-      'Digital Certificate',
-      'Only .edu or .ac emails are allowed.'
+      'Available Drones-3: Agriculture Drone, DJI Mavic, Crystalball Model V',
+      'Permitted Zones-3 (Standard): RPTO Ground, Agriculture, Rail-Road-Canal-Bridge',
+      'Free Flight, Drawing & Automation modes',
+      'Only .edu or .ac emails are allowed.',
+    
     ],
     buttonText: 'Add to Cart',
     buttonVariant: 'primary',
@@ -43,9 +43,10 @@ const plans: Plan[] = [
     originalPrice: 119.99,
     billing: 'USD per Zone/year ($119.99) (80% Off)',
     features: [
-      'Available Drones: Agriculture Drone, Racing Drone, DJI Mavic, DJI Matrice 350 RTK, Crystalball Model V (except Fighter-VTOL)',
-      'Permitted Zone: Any one Zone of RPTO Ground, Agriculture, City, Bridge & Road, HV Lines & Solar Panel, Factory except Defence',
-      'Free Flight, Drawing & Automation Modes'
+      'Available Drones-5: Agriculture Drone, Racing Drone, DJI Mavic, DJI Matrice 350 RTK, Crystalball Model V',
+      'Permitted Zones-6 (Advanced): Any one Zone from RPTO Ground, Agriculture, City, Rail-Road-Canal-Bridge, HV Lines & Solar Panel, Factory',
+      'Free Flight, Drawing & Automation Modes',
+     
     ],
     buttonText: 'Add to Cart',
     buttonVariant: 'primary',
@@ -58,10 +59,10 @@ const plans: Plan[] = [
     price: 99.99,
     billing: 'USD per year',
     features: [
-      'Available Drones: Agriculture Drone, Racing Drone, DJI Mavic, DJI Matrice 350 RTK, Crystalball Model V (except Fighter-VTOL)',
-      'Permitted Zones: RPTO Ground, Agriculture, City, Bridge & Road, HV Lines & Solar Panel, Factory except Defence',
+      'Available Drones-5: Agriculture Drone, Racing Drone, DJI Mavic, DJI Matrice 350 RTK, Crystalball Model V',
+      'Permitted Zones-6 (Advanced): RPTO Ground, Agriculture, City, Rail-Road-Canal-Bridge, HV Lines & Solar Panel, Factory',
       'Free Flight, Drawing & Automation Modes',
-      'Digital Certificate'
+    
     ],
     buttonText: 'Add to Cart',
     buttonVariant: 'primary',
@@ -74,8 +75,8 @@ const plans: Plan[] = [
     price: 29000 ,
     billing: ' USD per year',
     features: [
-      'Available Drones: Agriculture Drone, Racing Drone, DJI Mavic, DJI Matrice 350 RTK, Crystalball Model V, including Fighter-VTOL',
-      'Permitted Zones: RPTO Ground, Agriculture, City, Bridge & Road, HV Lines & Solar Panel, Factory including Defence',
+      'Available Drones-6: Agriculture Drone, Racing Drone, DJI Mavic, DJI Matrice 350 RTK, Crystalball Model V, including Fighter-VTOL',
+      'Permitted Zones-7 (Advanced): RPTO Ground, Agriculture, City, Rail-Road-Canal-Bridge, HV Lines & Solar Panel, Factory, Defence',
       'Advanced Scenario Customization',
       'Admin Panel & Monitoring',
       'Bulk Certificate Generation',
