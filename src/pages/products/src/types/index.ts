@@ -23,6 +23,7 @@ export interface Plan {
   id: string;
   name: string;
   price: number;
+  originalPrice?: number;
   billing: string;
   features: string[];
   buttonText: string;

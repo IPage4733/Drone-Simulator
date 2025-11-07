@@ -15,11 +15,21 @@ const PlansSection: React.FC = () => {
           </p></b>
         </div>
         
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 max-w-7xl mx-auto">
-
-          {plans.map((plan) => (
-            <PlanCard key={plan.id} plan={plan} />
-          ))}
+        <div className="relative max-w-7xl mx-auto">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
+            {plans.map((plan) => (
+              <div key={plan.id} className="relative">
+                {plan.mostPopular && (
+                  <div className="absolute -top-7 left-0 right-0 flex justify-center">
+                    <div className="bg-orange-500 text-white text-sm font-semibold px-4 py-1.5 rounded-lg shadow-md">
+                      Most Popular
+                    </div>
+                  </div>
+                )}
+                <PlanCard plan={plan} />
+              </div>
+            ))}
+          </div>
         </div>
         
         {/* <div className="mt-16 text-center">
