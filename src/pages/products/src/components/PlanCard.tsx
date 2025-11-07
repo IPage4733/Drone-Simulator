@@ -125,39 +125,23 @@ const blockedPlans = ['pro', 'student', 'premium'];
     <>
       <Card
         highlighted={plan.mostPopular}
-
-        className={`h-full flex flex-col ${!plan.mostPopular ? 'border-4 border-gray-300' : ''
-          }`}
-
-
-
+        className={`h-full flex flex-col ${!plan.mostPopular ? 'border-2 border-gray-200' : 'border-orange-500 border-2'} transform transition-transform hover:scale-105`}
       >
-        {plan.mostPopular && (
-          <div className="bg-orange-500 text-white py-1 px-4 text-center text-sm font-semibold">
-            Most Popular
-          </div>
-        )}
-        <div className="p-6 flex flex-col h-full">
-          <div className="flex items-center justify-between mb-2">
-            <h3 className="text-xl font-bold">{plan.name}</h3>
-            {(plan.id === 'Student' || plan.id === 'pro') && (
-              <span className="bg-green-500 text-white text-xs font-semibold px-3 py-1 rounded-full shadow-sm">
-                70% OFF
+        <div className="p-3 sm:p-4 flex flex-col h-full">
+          <div className="flex items-center justify-between mb-3">
+            <h3 className="text-lg font-bold text-gray-800">{plan.name}</h3>
+            {(plan.id === 'Student' || plan.id === 'pro' || plan.id === 'zone') && (
+              <span className="bg-green-500 text-white text-xs font-semibold px-2.5 py-0.5 rounded-full shadow-sm">
+                {plan.id === 'Student' ? '90% OFF' : plan.id === 'zone' ? '80% OFF' : '70% OFF'}
               </span>
             )}
           </div>
-          {plan.id === 'pro' && (
-            <p className="text-base font-bold text-gray-800 mb-4">
-               $34.99/Zone/year
-            </p>
-          )}
-
-
-          {plan.id !== 'institution' && (
+          {/* Price display for free, Student, pro, and zone plans */}
+          {(plan.id === 'free' || plan.id === 'Student' || plan.id === 'pro' || plan.id === 'zone') && (
             <div className="mb-4 flex items-baseline space-x-2">
-              {(plan.id === 'Student' || plan.id === 'pro') ? (
+              {(plan.id === 'Student' || plan.id === 'pro' || plan.id === 'zone') ? (
                 <>
-                  <span className="text-2xl font-bold text-black">
+                  <span className="text-xl font-bold text-black">
                     ${plan.price}
                   </span>
                   <span className="text-sm text-gray-1000 ml-1">
@@ -165,14 +149,14 @@ const blockedPlans = ['pro', 'student', 'premium'];
                   </span>
 
                   <span className="text-gray-600 line-through text-base">
-                    {plan.id === 'Student' ? '$99.99' : '$349.99'}
+                    {plan.id === 'Student' ? '$99.99' : plan.id === 'zone' ? '$119.99' : '$349.99'}
                   </span>
 
 
                 </>
               ) : (
                 <>
-                  <span className="text-3xl font-bold">${plan.price}</span>
+                  <span className="text-xl font-bold">${plan.price}</span>
                   <span className="text-gray-500 ml-1">{plan.billing}</span>
                 </>
               )}
@@ -181,90 +165,38 @@ const blockedPlans = ['pro', 'student', 'premium'];
           )}
 
 
-          <ul className="mb-6 flex-grow space-y-3">
-            {/* ✅ Shared List Format for All Items */}
-            {plan.id === 'free' && (
-              <>
-                <li className="flex items-start">
-                  <CheckCircle size={18} className="text-orange-500 mr-2 flex-shrink-0 mt-0.5" />
-
-                  <span className="text-gray-700"><strong>Available Drones:</strong> Agriculture Drone, Racing Drone, DJI Marvic</span>
-                </li>
-                <li className="flex items-start">
-                  <CheckCircle size={18} className="text-orange-500 mr-2 flex-shrink-0 mt-0.5" />
-
-                  <span className="text-gray-700"><strong>Permitted Zones:</strong> RPTO Ground, Agriculture Zone, City Road or Free Flight Zone</span>
-                </li>
-              </>
-            )}
-
-            {plan.id === 'Student' && (
-              <>
-                <li className="flex items-start">
-                  <CheckCircle size={18} className="text-orange-500 mr-2 flex-shrink-0 mt-0.5" />
-                  <span className="text-gray-700">
-                    <strong>Available Drones:</strong> All from Free Plan, DJI MATRICE 350 RTK, Crystalball<br />
-                     Model V
-                  </span>
-                </li>
-
-                <li className="flex items-start">
-                  <CheckCircle size={18} className="text-orange-500 mr-2 flex-shrink-0 mt-0.5" />
-
-                  <span className="text-gray-700"><strong>Permitted Zones:</strong> RPTO Ground, Agriculture, City Road, HV Lines, Solar Panel Zones, Basic Urban Factory Zone
-                  </span>
-                </li>
-              </>
-            )}
-
-            {plan.id === 'pro' && ( 
-              <>
-                <li className="flex items-start">
-                  <CheckCircle size={18} className="text-orange-500 mr-2 flex-shrink-0 mt-0.5" />
-
-                  <span className="text-gray-700"><strong>Available Drones:</strong> All Drones except Fighter-VTOL</span>
-                </li>
-                <li className="flex items-start">
-                  <CheckCircle size={18} className="text-orange-500 mr-2 flex-shrink-0 mt-0.5" />
-
-                  <span className="text-gray-700"><strong>Permitted Zones:</strong> All Zones Except Defence, Full Training & Analytics</span>
-                </li>
-              </>
-            )}
+          <ul className="mb-4 flex-grow space-y-2">
+            {plan.id === 'pro' && <></>}
 
             {plan.id === 'institution' && (
               <>
-                <li className="flex items-start">
-                  <CheckCircle size={18} className="text-orange-500 mr-2 flex-shrink-0 mt-0.5" />
-
-                  <span className="text-gray-700"><strong></strong> Advanced Scenario Customization</span>
-                </li>
-                <li className="flex items-start">
-                  <CheckCircle size={18} className="text-orange-500 mr-2 flex-shrink-0 mt-0.5" />
-
-                  <span className="text-gray-700"><strong>Available Drones:</strong> All 6 Drones including Fighter-VTOL</span>
-                </li>
-                <li className="flex items-start">
-                  <CheckCircle size={18} className="text-orange-500 mr-2 flex-shrink-0 mt-0.5" />
-
-                  <span className="text-gray-700"><strong>Permitted Zones:</strong> RPTO, Agriculture, Defence, HV Lines, Bridges, City </span>
-                </li>
+                
               </>
             )}
 
             {/* 💡 Common Feature Loop */}
-            {plan.features.map((feature, index) => (
-              <li key={index} className="flex items-start">
-                <CheckCircle size={18} className="text-orange-500 mr-2 flex-shrink-0 mt-0.5" />
-
-                <span className="text-gray-700">{feature}</span>
-              </li>
-            ))}
+            {plan.features.map((feature, index) => {
+              const parts = feature.split(/(Available Drones:|Permitted Zones:|Permitted Zone:)/g);
+              return (
+                <li key={index} className="flex items-start">
+                  <CheckCircle size={12} className="text-orange-500 mr-2 flex-shrink-0 mt-0.5" />
+                  <span className="text-sm text-gray-700">
+                    {parts.map((part, i) => 
+                      part === 'Available Drones:' || part === 'Permitted Zones:' || part === 'Permitted Zone:' ? (
+                        <strong key={i} className="font-semibold">{part}</strong>
+                      ) : (
+                        part
+                      )
+                    )}
+                  </span>
+                </li>
+              );
+            })}
           </ul>
 
 
 
-          <Button variant={plan.buttonVariant} onClick={handleAddToCart} fullWidth>
+          <Button variant={plan.buttonVariant} onClick={handleAddToCart} fullWidth className="text-sm py-2">
             {plan.buttonText}
           </Button>
         </div>
@@ -284,7 +216,7 @@ const blockedPlans = ['pro', 'student', 'premium'];
                   />
                   <div className="space-y-2 z-10">
                     <div className="bg-white bg-opacity-20 backdrop-blur-sm rounded-lg px-4 py-1 flex items-center space-x-2">
-                      <CheckCircle size={18} className="text-orange-500 mr-2 flex-shrink-0 mt-0.5" />
+                      <CheckCircle size={14} className="text-orange-500 mr-1.5 flex-shrink-0 mt-0.5" />
 
                       <span className="text-sm">Quick Verification</span>
                     </div>
@@ -379,7 +311,7 @@ const blockedPlans = ['pro', 'student', 'premium'];
                       : 'bg-white/30 border-red-300 text-red-800'
                       }`}>
                       {error.includes('Verification') ? (
-                        <CheckCircle size={18} className="text-orange-500 mr-2 flex-shrink-0 mt-0.5" />
+                        <CheckCircle size={14} className="text-orange-500 mr-1.5 flex-shrink-0 mt-0.5" />
 
                       ) : (
                         <X size={18} className="mt-0.5 text-red-600" />
