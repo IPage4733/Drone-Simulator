@@ -176,21 +176,12 @@ const blockedPlans = ['pro', 'student', 'premium'];
 
             {/* 💡 Common Feature Loop */}
             {plan.features.map((feature, index) => {
-              // For Free Plan, make both "Available Drones:" and "Permitted Zones:" bold
+              // For Free Plan, use dangerouslySetInnerHTML to render HTML content
               if (plan.id === 'free') {
-                const parts = feature.split(/(Available Drones:|Permitted Zones:)/g);
                 return (
                   <li key={index} className="flex items-start">
                     <CheckCircle size={12} className="text-orange-500 mr-2 flex-shrink-0 mt-0.5" />
-                    <span className="text-sm text-gray-700">
-                      {parts.map((part, i) => 
-                        part === 'Available Drones:' || part === 'Permitted Zones:' ? (
-                          <strong key={i} className="font-semibold">{part}</strong>
-                        ) : (
-                          part
-                        )
-                      )}
-                    </span>
+                    <span className="text-sm text-gray-700" dangerouslySetInnerHTML={{ __html: feature }} />
                   </li>
                 );
               }
