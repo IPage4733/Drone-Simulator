@@ -32,9 +32,7 @@ const HeroSection: React.FC<HeroSectionProps> = ({ scrollToPlans }) => {
 
           {/* CTA Buttons */}
           <div className="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4">
-            <Button size="lg" onClick={scrollToPlans}>
-              Start Free 15-Day Trial
-            </Button>
+           
             <Button variant="outline" size="lg" onClick={scrollToPlans}>
               Explore All Plans
             </Button>
