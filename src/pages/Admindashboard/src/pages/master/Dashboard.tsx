@@ -24,7 +24,7 @@ export const MasterDashboard: React.FC = () => {
   useEffect(() => {
     const fetchUserStats = async () => {
       try {
-        const res = await fetch('https://34-124-167-179.nip.io/api/get-all-users/');
+        const res = await fetch('https://api.dronesimulator.pro/api/get-all-users/');
         const data = await res.json();
         setTotalUsers(data?.statistics?.total_users || 0);
         setActiveUsers(data?.statistics?.active_users || 0);
@@ -42,7 +42,7 @@ export const MasterDashboard: React.FC = () => {
     const fetchRevenue = async () => {
       try {
         const token = sessionStorage.getItem('drone_auth_token');
-        const res = await fetch('https://34-124-167-179.nip.io/api/stripe/analytics/', {
+        const res = await fetch('https://api.dronesimulator.pro/api/stripe/analytics/', {
           headers: {
             Authorization: `Token ${token}`
           }

@@ -35,7 +35,7 @@ const ForgotPassword: React.FC = () => {
 
   setIsLoading(true)
   try {
-    const response = await fetch('https://34-124-167-179.nip.io/api/forgot-password/', {
+    const response = await fetch('https://api.dronesimulator.pro/api/forgot-password/', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'

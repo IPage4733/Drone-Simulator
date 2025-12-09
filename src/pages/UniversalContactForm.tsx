@@ -69,7 +69,7 @@ const handleSubmit = async (e) => {
 
   try {
     // 🔶 Primary backend API call
-    const response = await fetch("https://34-124-167-179.nip.io/api/inquiry/", {
+    const response = await fetch("https://api.dronesimulator.pro/api/inquiry/", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",

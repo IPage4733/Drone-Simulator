@@ -123,7 +123,7 @@ useEffect(() => {
 
   const fetchPremiumData = async () => {
     try {
-      const res = await fetch('https://34-124-167-179.nip.io/api/stripe/transactions/?plan_name=premium', {
+      const res = await fetch('https://api.dronesimulator.pro/api/stripe/transactions/?plan_name=premium', {
         headers: { Authorization: `Token ${token}` }
       });
 
