@@ -256,7 +256,7 @@ const Register: React.FC = () => {
         purpose_of_use: formData.purpose_of_use === 'other' ? formData.purpose_other : formData.purpose_of_use
       };
 
-      const response = await fetch('https://34-124-167-179.nip.io/api/register/', {
+      const response = await fetch('https://api.dronesimulator.pro/api/register/', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
@@ -311,7 +311,7 @@ const Register: React.FC = () => {
         Join thousands of pilots who have mastered drone flying with our simulator.
       </p>
 
-      <div className="bg-white text-gray-800 rounded-md p-4 text-left text-sm">
+      {/* <div className="bg-white text-gray-800 rounded-md p-4 text-left text-sm">
         <p className="font-medium">To login to the Drone Simulator application after installation, please use the demo credentials below:</p>
 
         <p className="mt-2">
@@ -322,7 +322,11 @@ const Register: React.FC = () => {
         <p className="mt-4 text-gray-700 text-sm">
           Support: +91 9059759850 / +91 8804349999
         </p>
-      </div>
+      </div> */}
+      <p className="font-bold text-lg">
+  A verification email has been sent to your registered email address. Please open your inbox, click the verification link, and then return to login and continue using the platform.
+</p>
+
 
       <button
         className="mt-6 px-6 py-2 bg-white text-orange-600 font-medium rounded hover:bg-gray-100"

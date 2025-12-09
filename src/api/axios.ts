@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 const axiosInstance = axios.create({
-  baseURL: 'https://34-124-167-179.nip.io/api/',
+  baseURL: 'https://api.dronesimulator.pro/api/',
   headers: {
     'Content-Type': 'application/json',
   },

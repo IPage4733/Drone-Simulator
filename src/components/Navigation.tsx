@@ -31,7 +31,7 @@ const handleLogout = async () => {
 
   try {
     if (token) {
-      await fetch('https://34-124-167-179.nip.io/api/logout/', {
+      await fetch('https://api.dronesimulator.pro/api/logout/', {
         method: 'POST',
         headers: {
           'Authorization': `Token ${token}`,
