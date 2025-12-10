@@ -1,3 +1,4 @@
+import { API_ENDPOINTS } from '@/config/api'
 import React, { useEffect, useState } from 'react';
 import { UserCog, Plus, Mail, Shield, Edit, Trash2 } from 'lucide-react';
 import { AddEmployeeModal } from '../../components/modals/AddEmployeeModal';
@@ -5,49 +6,49 @@ import axios from 'axios';
 
 export const MasterEmployees: React.FC = () => {
   const [employees, setEmployees] = useState<any[]>([]);
-const [showAddModal, setShowAddModal] = useState(false);
-const [editEmployee, setEditEmployee] = useState<any | null>(null); // New line
+  const [showAddModal, setShowAddModal] = useState(false);
+  const [editEmployee, setEditEmployee] = useState<any | null>(null); // New line
 
 
-useEffect(() => {
-  const fetchEmployees = async () => {
-    try {
-      const token = sessionStorage.getItem('drone_auth_token');
-      if (!token) {
-        console.error("No token found in sessionStorage");
-        return;
-      }
-
-      const res = await axios.get('https://api.dronesimulator.pro/api/admin/groups/', {
-        headers: {
-          Authorization: `Token ${token}`
+  useEffect(() => {
+    const fetchEmployees = async () => {
+      try {
+        const token = sessionStorage.getItem('drone_auth_token');
+        if (!token) {
+          console.error("No token found in sessionStorage");
+          return;
         }
-      });
 
-      const users = res.data.results.flatMap((group: any) =>
-        group.permissions.map((perm: any, idx: number) => ({
-          id: `${group.id}-${perm.id}-${idx}`,
-          name: group.name,
-          email: `${group.name.toLowerCase().replace(/\s+/g, '')}@example.com`,
-          role: 'editor',
-          status: 'Active',
-          joinDate: '2024-06-01',
-          lastLogin: '2024-07-01',
-          activityCount: perm.id,
-        }))
-      );
+        const res = await axios.get(API_ENDPOINTS.ADMIN_GROUPS, {
+          headers: {
+            Authorization: `Token ${token}`
+          }
+        });
 
-      const uniqueEmployees = users.filter(
-        (value, index, self) => index === self.findIndex(v => v.email === value.email)
-      );
-      setEmployees(uniqueEmployees);
-    } catch (err) {
-      console.error('Error fetching employees:', err);
-    }
-  };
+        const users = res.data.results.flatMap((group: any) =>
+          group.permissions.map((perm: any, idx: number) => ({
+            id: `${group.id}-${perm.id}-${idx}`,
+            name: group.name,
+            email: `${group.name.toLowerCase().replace(/\s+/g, '')}@example.com`,
+            role: 'editor',
+            status: 'Active',
+            joinDate: '2024-06-01',
+            lastLogin: '2024-07-01',
+            activityCount: perm.id,
+          }))
+        );
 
-  fetchEmployees();
-}, []);
+        const uniqueEmployees = users.filter(
+          (value, index, self) => index === self.findIndex(v => v.email === value.email)
+        );
+        setEmployees(uniqueEmployees);
+      } catch (err) {
+        console.error('Error fetching employees:', err);
+      }
+    };
+
+    fetchEmployees();
+  }, []);
 
 
   const getRoleColor = (role: string) => {
@@ -150,16 +151,16 @@ useEffect(() => {
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{employee.joinDate}</td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                       <div className="flex items-center space-x-2">
-                       <button
-  onClick={() => {
-    setEditEmployee(employee);
-    setShowAddModal(true);
-  }}
-  className="text-blue-600 hover:text-blue-900 transition-colors p-1"
-  title="Edit Employee"
->
-  <Edit className="w-4 h-4" />
-</button>
+                        <button
+                          onClick={() => {
+                            setEditEmployee(employee);
+                            setShowAddModal(true);
+                          }}
+                          className="text-blue-600 hover:text-blue-900 transition-colors p-1"
+                          title="Edit Employee"
+                        >
+                          <Edit className="w-4 h-4" />
+                        </button>
 
                         <button className="text-red-600 hover:text-red-900 transition-colors p-1" title="Delete Employee">
                           <Trash2 className="w-4 h-4" />
@@ -174,23 +175,23 @@ useEffect(() => {
         </div>
       </div>
 
-     <AddEmployeeModal
-  isOpen={showAddModal}
-  onClose={() => {
-    setShowAddModal(false);
-    setEditEmployee(null);
-  }}
-  onSave={(updatedEmployee) => {
-    setShowAddModal(false);
-    setEditEmployee(null);
+      <AddEmployeeModal
+        isOpen={showAddModal}
+        onClose={() => {
+          setShowAddModal(false);
+          setEditEmployee(null);
+        }}
+        onSave={(updatedEmployee) => {
+          setShowAddModal(false);
+          setEditEmployee(null);
 
-    // Optionally update UI immediately
-    setEmployees(prev =>
-      prev.map(emp => emp.id === updatedEmployee.id ? { ...emp, ...updatedEmployee } : emp)
-    );
-  }}
-  editingEmployee={editEmployee}
-/>
+          // Optionally update UI immediately
+          setEmployees(prev =>
+            prev.map(emp => emp.id === updatedEmployee.id ? { ...emp, ...updatedEmployee } : emp)
+          );
+        }}
+        editingEmployee={editEmployee}
+      />
 
     </div>
   );

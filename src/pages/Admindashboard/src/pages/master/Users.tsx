@@ -6,6 +6,7 @@ import { useAuth } from '../../hooks/useAuth';
 import { useEffect } from 'react';
 import axios from 'axios';
 import axiosInstance from '@/api/axios';
+import { API_ENDPOINTS } from '@/config/api';
 export const MasterUsers: React.FC = () => {
   const { plans, drones, scenarios, updateUserPlan, updateUserAddOns, updateCustomPlan } = useData();
   const [users, setUsers] = useState<any[]>([]);
@@ -61,7 +62,7 @@ export const MasterUsers: React.FC = () => {
 
     try {
       const token = sessionStorage.getItem('drone_auth_token') || '';
-      await axios.put('https://api.dronesimulator.pro/api/update-user-details/', updatePayload, {
+      await axios.put(API_ENDPOINTS.UPDATE_USER, updatePayload, {
         headers: {
           Authorization: `Token ${token}`,
         },
@@ -178,7 +179,7 @@ export const MasterUsers: React.FC = () => {
 
         const [usersRes, transactionsRes] = await Promise.all([
           axiosInstance.get('/get-all-users/'),
-          axios.get('https://api.dronesimulator.pro/api/stripe/transactions/', {
+          axios.get(API_ENDPOINTS.STRIPE_TRANSACTIONS, {
             headers: {
               Authorization: `Token ${token}`,
             },
@@ -253,7 +254,7 @@ export const MasterUsers: React.FC = () => {
     fetchUsers();
   }, []);
 
- const [sortConfig, setSortConfig] = useState<{ key: string | null, direction: 'asc' | 'desc' }>({
+  const [sortConfig, setSortConfig] = useState<{ key: string | null, direction: 'asc' | 'desc' }>({
     key: null,
     direction: 'asc'
   });
@@ -307,7 +308,7 @@ export const MasterUsers: React.FC = () => {
     link.click();
     document.body.removeChild(link);
   };
- 
+
   const getTotalDurationSeconds = (scenarios: any[]) => {
     let totalSeconds = 0;
     scenarios.forEach(({ duration_formatted }) => {

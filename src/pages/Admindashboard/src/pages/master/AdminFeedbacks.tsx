@@ -1,3 +1,4 @@
+import { API_ENDPOINTS } from '@/config/api'
 import React, { useState, useEffect, Fragment } from 'react';
 import axios from 'axios';
 import { Trash2, Eye } from 'lucide-react';
@@ -55,7 +56,7 @@ const AdminFeedbacks: React.FC = () => {
   const fetchFeedbacks = async () => {
     try {
       const token = sessionStorage.getItem('drone_auth_token');
-      const response = await axios.get('https://api.dronesimulator.pro/api/feedback/admin/all/', {
+      const response = await axios.get(API_ENDPOINTS.FEEDBACK_ADMIN_ALL, {
         headers: { Authorization: `Token ${token}` },
       });
       setFeedbacks(response.data.results || []);
@@ -70,7 +71,7 @@ const AdminFeedbacks: React.FC = () => {
     if (!window.confirm('Are you sure you want to delete this feedback?')) return;
     try {
       const token = sessionStorage.getItem('drone_auth_token');
-      await axios.delete(`https://api.dronesimulator.pro/api/feedback/admin/${id}/delete/`, {
+      await axios.delete(API_ENDPOINTS.FEEDBACK_ADMIN_DELETE(id), {
         headers: { Authorization: `Token ${token}` },
       });
       setFeedbacks(prev => prev.filter(f => f.id !== id));
@@ -127,70 +128,70 @@ const AdminFeedbacks: React.FC = () => {
     <div className="p-6 space-y-4">
 
       {/* Top Row: Title + Export + Count */}
-<div className="flex justify-between items-center flex-wrap gap-4">
-  <h2 className="text-xl font-bold">User Feedback</h2>
+      <div className="flex justify-between items-center flex-wrap gap-4">
+        <h2 className="text-xl font-bold">User Feedback</h2>
 
-  <div className="flex items-center gap-4">
-    <button
-      onClick={() => exportToCSV(filteredFeedbacks, 'feedbacks.csv')}
-      className="bg-orange-600 text-white px-4 py-2 rounded hover:bg-orange-700 text-sm font-medium flex items-center gap-2"
-    >
-      <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v2a2 2 0 002 2h12a2 2 0 002-2v-2M7 10l5 5m0 0l5-5m-5 5V4" />
-      </svg>
-      Export CSV
-    </button>
-    <div className="text-sm text-gray-600">Total: {filteredFeedbacks.length}</div>
-  </div>
-</div>
+        <div className="flex items-center gap-4">
+          <button
+            onClick={() => exportToCSV(filteredFeedbacks, 'feedbacks.csv')}
+            className="bg-orange-600 text-white px-4 py-2 rounded hover:bg-orange-700 text-sm font-medium flex items-center gap-2"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v2a2 2 0 002 2h12a2 2 0 002-2v-2M7 10l5 5m0 0l5-5m-5 5V4" />
+            </svg>
+            Export CSV
+          </button>
+          <div className="text-sm text-gray-600">Total: {filteredFeedbacks.length}</div>
+        </div>
+      </div>
 
-{/* Filters Row (Date & Quick Buttons) */}
-<div className="mt-4 flex flex-wrap items-center gap-3">
-  <label className="text-sm text-gray-700 flex items-center gap-2">
-    From:
-    <input
-      type="date"
-      value={startDate}
-      onChange={(e) => setStartDate(e.target.value)}
-      className="border border-gray-300 rounded px-2 py-1"
-    />
-  </label>
+      {/* Filters Row (Date & Quick Buttons) */}
+      <div className="mt-4 flex flex-wrap items-center gap-3">
+        <label className="text-sm text-gray-700 flex items-center gap-2">
+          From:
+          <input
+            type="date"
+            value={startDate}
+            onChange={(e) => setStartDate(e.target.value)}
+            className="border border-gray-300 rounded px-2 py-1"
+          />
+        </label>
 
-  <label className="text-sm text-gray-700 flex items-center gap-2">
-    To:
-    <input
-      type="date"
-      value={endDate}
-      onChange={(e) => setEndDate(e.target.value)}
-      className="border border-gray-300 rounded px-2 py-1"
-    />
-  </label>
+        <label className="text-sm text-gray-700 flex items-center gap-2">
+          To:
+          <input
+            type="date"
+            value={endDate}
+            onChange={(e) => setEndDate(e.target.value)}
+            className="border border-gray-300 rounded px-2 py-1"
+          />
+        </label>
 
-  {['today', '7days', '1month', '1year'].map((key) => (
-    <button
-      key={key}
-      onClick={() => setQuickFilter(prev => (prev === key ? '' : key))}
-      className={`text-sm font-medium px-3 py-1.5 rounded ${quickFilter === key
-        ? 'bg-gray-800 text-white shadow'
-        : 'bg-gray-100 text-gray-800 hover:bg-gray-200'
-        }`}
-    >
-      {{
-        today: 'Today',
-        '7days': 'Last 7 Days',
-        '1month': 'Last 1 Month',
-        '1year': 'Last 1 Year',
-      }[key]}
-    </button>
-  ))}
+        {['today', '7days', '1month', '1year'].map((key) => (
+          <button
+            key={key}
+            onClick={() => setQuickFilter(prev => (prev === key ? '' : key))}
+            className={`text-sm font-medium px-3 py-1.5 rounded ${quickFilter === key
+              ? 'bg-gray-800 text-white shadow'
+              : 'bg-gray-100 text-gray-800 hover:bg-gray-200'
+              }`}
+          >
+            {{
+              today: 'Today',
+              '7days': 'Last 7 Days',
+              '1month': 'Last 1 Month',
+              '1year': 'Last 1 Year',
+            }[key]}
+          </button>
+        ))}
 
-  <button
-    onClick={clearAllFilters}
-    className="text-sm font-medium px-3 py-1.5 rounded bg-gray-200 text-gray-800 hover:bg-gray-300"
-  >
-    Clear All
-  </button>
-</div>
+        <button
+          onClick={clearAllFilters}
+          className="text-sm font-medium px-3 py-1.5 rounded bg-gray-200 text-gray-800 hover:bg-gray-300"
+        >
+          Clear All
+        </button>
+      </div>
 
 
 

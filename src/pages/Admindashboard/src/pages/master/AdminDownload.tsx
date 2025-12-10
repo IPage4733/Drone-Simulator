@@ -1,3 +1,4 @@
+import { API_ENDPOINTS } from '@/config/api'
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { Trash2, Eye, Download } from 'lucide-react';
@@ -29,7 +30,7 @@ const DownloadAdmin: React.FC = () => {
   const fetchDownloads = async () => {
     try {
       const token = sessionStorage.getItem('drone_auth_token');
-      const response = await axios.get('https://api.dronesimulator.pro/api/get-all-downloads/', {
+      const response = await axios.get(API_ENDPOINTS.GET_ALL_DOWNLOADS, {
         headers: { Authorization: `Token ${token}` },
       });
       setDownloads(response.data.data || []);
@@ -45,7 +46,7 @@ const DownloadAdmin: React.FC = () => {
 
     try {
       const token = sessionStorage.getItem('drone_auth_token');
-      const response = await axios.delete('https://api.dronesimulator.pro/api/delete-download-record/', {
+      const response = await axios.delete(API_ENDPOINTS.DELETE_DOWNLOAD, {
         headers: {
           Authorization: `Token ${token}`,
           'Content-Type': 'application/json',
@@ -197,46 +198,46 @@ const DownloadAdmin: React.FC = () => {
 
 
       <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
-  <div className="overflow-x-auto">
-    <table className="w-full table-auto text-[11px]">
-      <thead className="bg-gray-50">
-        <tr>
-          <th className="px-2 py-1 text-left font-medium text-gray-500 uppercase tracking-wide">Name</th>
-          <th className="px-2 py-1 text-left font-medium text-gray-500 uppercase tracking-wide">Email</th>
-          <th className="px-2 py-1 text-left font-medium text-gray-500 uppercase tracking-wide">Phone</th>
-          <th className="px-2 py-1 text-left font-medium text-gray-500 uppercase tracking-wide">Location</th>
-          <th className="px-2 py-1 text-left font-medium text-gray-500 uppercase tracking-wide">Date</th>
-          <th className="px-2 py-1 text-left font-medium text-gray-500 uppercase tracking-wide">Actions</th>
-        </tr>
-      </thead>
-      <tbody className="bg-white divide-y divide-gray-200">
-        {filteredDownloads.map((download) => (
-          <tr key={download.id} className="hover:bg-gray-50 transition-colors">
-            <td className="px-2 py-1 text-gray-900">{download.full_name || download.username || 'Anonymous'}</td>
-            <td className="px-2 py-1 text-gray-600">{download.email || 'N/A'}</td>
-            <td className="px-2 py-1 text-gray-600">{download.phone_number || 'N/A'}</td>
-            <td className="px-2 py-1 text-gray-700">
-              {download.city || '-'}
-            </td>
-            <td className="px-2 py-1 text-gray-700">
-              {new Date(download.last_download_at || download.created_at).toLocaleDateString()}
-            </td>
-            <td className="px-2 py-1 text-gray-700">
-              <div className="flex items-center space-x-1">
-                <button onClick={() => openDialog(download)} className="text-orange-600 hover:text-orange-800" title="View">
-                  <Eye size={14} />
-                </button>
-                <button onClick={() => handleDelete(download.email)} className="text-red-600 hover:text-red-800" title="Delete">
-                  <Trash2 size={14} />
-                </button>
-              </div>
-            </td>
-          </tr>
-        ))}
-      </tbody>
-    </table>
-  </div>
-</div>
+        <div className="overflow-x-auto">
+          <table className="w-full table-auto text-[11px]">
+            <thead className="bg-gray-50">
+              <tr>
+                <th className="px-2 py-1 text-left font-medium text-gray-500 uppercase tracking-wide">Name</th>
+                <th className="px-2 py-1 text-left font-medium text-gray-500 uppercase tracking-wide">Email</th>
+                <th className="px-2 py-1 text-left font-medium text-gray-500 uppercase tracking-wide">Phone</th>
+                <th className="px-2 py-1 text-left font-medium text-gray-500 uppercase tracking-wide">Location</th>
+                <th className="px-2 py-1 text-left font-medium text-gray-500 uppercase tracking-wide">Date</th>
+                <th className="px-2 py-1 text-left font-medium text-gray-500 uppercase tracking-wide">Actions</th>
+              </tr>
+            </thead>
+            <tbody className="bg-white divide-y divide-gray-200">
+              {filteredDownloads.map((download) => (
+                <tr key={download.id} className="hover:bg-gray-50 transition-colors">
+                  <td className="px-2 py-1 text-gray-900">{download.full_name || download.username || 'Anonymous'}</td>
+                  <td className="px-2 py-1 text-gray-600">{download.email || 'N/A'}</td>
+                  <td className="px-2 py-1 text-gray-600">{download.phone_number || 'N/A'}</td>
+                  <td className="px-2 py-1 text-gray-700">
+                    {download.city || '-'}
+                  </td>
+                  <td className="px-2 py-1 text-gray-700">
+                    {new Date(download.last_download_at || download.created_at).toLocaleDateString()}
+                  </td>
+                  <td className="px-2 py-1 text-gray-700">
+                    <div className="flex items-center space-x-1">
+                      <button onClick={() => openDialog(download)} className="text-orange-600 hover:text-orange-800" title="View">
+                        <Eye size={14} />
+                      </button>
+                      <button onClick={() => handleDelete(download.email)} className="text-red-600 hover:text-red-800" title="Delete">
+                        <Trash2 size={14} />
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </div>
 
 
       {selectedDownload && (

@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { Trash2, Eye } from 'lucide-react';
 import { Dialog } from '@headlessui/react';
+import { API_ENDPOINTS } from '@/config/api';
 
 interface Contact {
   id: number;
@@ -75,7 +76,7 @@ const AdminContacts: React.FC = () => {
   const fetchContacts = async () => {
     try {
       const token = sessionStorage.getItem('drone_auth_token');
-      const response = await axios.get('https://api.dronesimulator.pro/api/contact/admin/all/', {
+      const response = await axios.get(API_ENDPOINTS.CONTACT_ADMIN_ALL, {
         headers: {
           Authorization: `Token ${token}`,
         },
@@ -92,7 +93,7 @@ const AdminContacts: React.FC = () => {
     if (!window.confirm('Are you sure you want to delete this contact?')) return;
     try {
       const token = sessionStorage.getItem('drone_auth_token');
-      await axios.delete(`https://api.dronesimulator.pro/api/contact/admin/${id}/delete/`, {
+      await axios.delete(API_ENDPOINTS.CONTACT_ADMIN_DELETE(id), {
         headers: { Authorization: `Token ${token}` },
       });
       setContacts(prev => prev.filter(c => c.id !== id));
@@ -148,31 +149,31 @@ const AdminContacts: React.FC = () => {
   return (
     <div className="p-6 space-y-4">
       <div className="flex items-center justify-between">
-  <h2 className="text-xl font-bold text-gray-900">Contact Submissions</h2>
+        <h2 className="text-xl font-bold text-gray-900">Contact Submissions</h2>
 
-  <div className="flex items-center gap-3">
-    <button
-      onClick={() => exportToCSV(filteredContacts, 'contacts.csv')}
-      className="bg-orange-600 hover:bg-orange-700 text-white px-4 py-2 rounded-md text-sm font-medium flex items-center"
-    >
-      <svg
-        className="w-4 h-4 mr-2"
-        fill="none"
-        stroke="currentColor"
-        strokeWidth="2"
-        viewBox="0 0 24 24"
-      >
-        <path
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          d="M4 4v16h16V4H4zm8 4v8m0 0l-3-3m3 3l3-3"
-        />
-      </svg>
-      Export CSV
-    </button>
-    <span className="text-sm text-gray-600">Total: {filteredContacts.length}</span>
-  </div>
-</div>
+        <div className="flex items-center gap-3">
+          <button
+            onClick={() => exportToCSV(filteredContacts, 'contacts.csv')}
+            className="bg-orange-600 hover:bg-orange-700 text-white px-4 py-2 rounded-md text-sm font-medium flex items-center"
+          >
+            <svg
+              className="w-4 h-4 mr-2"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="M4 4v16h16V4H4zm8 4v8m0 0l-3-3m3 3l3-3"
+              />
+            </svg>
+            Export CSV
+          </button>
+          <span className="text-sm text-gray-600">Total: {filteredContacts.length}</span>
+        </div>
+      </div>
 
 
       <div className="flex flex-wrap gap-4 items-center justify-between">
@@ -201,8 +202,8 @@ const AdminContacts: React.FC = () => {
                 key={key}
                 onClick={() => setQuickFilter(prev => (prev === key ? '' : key))}
                 className={`px-4 py-1.5 rounded-md text-sm font-medium transition ${quickFilter === key
-                    ? 'bg-orange-600 text-white shadow'
-                    : 'bg-gray-100 text-gray-800 hover:bg-gray-200'
+                  ? 'bg-orange-600 text-white shadow'
+                  : 'bg-gray-100 text-gray-800 hover:bg-gray-200'
                   }`}
               >
                 {{
@@ -225,7 +226,7 @@ const AdminContacts: React.FC = () => {
 
         </div>
 
-        
+
       </div>
 
       <table className="min-w-full divide-y divide-gray-200 bg-white shadow-sm rounded-md">

@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { TrendingUp, Users, CreditCard, Activity } from 'lucide-react';
 import { useData } from '../../hooks/useData';
 import { CustomDateFilter } from '../../components/common/CustomDateFilter';
+import { API_ENDPOINTS } from '@/config/api';
 
 interface User {
   plan: string;
@@ -24,7 +25,7 @@ export const MasterDashboard: React.FC = () => {
   useEffect(() => {
     const fetchUserStats = async () => {
       try {
-        const res = await fetch('https://api.dronesimulator.pro/api/get-all-users/');
+        const res = await fetch(API_ENDPOINTS.GET_ALL_USERS);
         const data = await res.json();
         setTotalUsers(data?.statistics?.total_users || 0);
         setActiveUsers(data?.statistics?.active_users || 0);
@@ -42,7 +43,7 @@ export const MasterDashboard: React.FC = () => {
     const fetchRevenue = async () => {
       try {
         const token = sessionStorage.getItem('drone_auth_token');
-        const res = await fetch('https://api.dronesimulator.pro/api/stripe/analytics/', {
+        const res = await fetch(API_ENDPOINTS.STRIPE_ANALYTICS, {
           headers: {
             Authorization: `Token ${token}`
           }

@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { useLocation } from 'react-router-dom';
 import { Link } from "react-router-dom";
+import { API_ENDPOINTS } from '@/config/api';
 
 const HelpPage: React.FC = () => {
     const location = useLocation();
@@ -75,10 +76,10 @@ const HelpPage: React.FC = () => {
         });
 
         try {
-            const response = await fetch("https://api.dronesimulator.pro/api/feedback/", {
+            const response = await fetch(API_ENDPOINTS.FEEDBACK, {
                 method: "POST",
                 headers: {
-                    Authorization: `Token ${token}`,
+                    Authorization: `Token ${token} `,
                 },
                 body: formData,
             });
@@ -266,41 +267,41 @@ const HelpPage: React.FC = () => {
                                 className="w-full border px-3 py-2 rounded"
                             ></textarea>
                         </div>
-                       <div className="mb-4">
-  <label className="block font-medium mb-1">Upload screenshots (optional)</label>
-  <div
-    ref={dropRef}
-    onDrop={handleDrop}
-    onDragOver={(e) => e.preventDefault()}
-    className="border-2 border-dashed border-gray-400 rounded-md p-5 text-center bg-gray-50 hover:bg-gray-100 transition-all cursor-pointer"
-  >
-    <p className="text-gray-600 text-sm">
-      <span className="font-medium">Drag & drop</span> images here, or
-      <span className="text-blue-600 underline ml-1">click to browse</span><br />
-      (You can also paste screenshots with <kbd>Ctrl</kbd> + <kbd>V</kbd>)
-    </p>
-    <input
-      type="file"
-      name="images"
-      accept="image/*"
-      multiple
-      onChange={(e) => handleFiles(e.target.files || [])}
-      className="hidden"
-      id="uploadInput"
-    />
-  </div>
+                        <div className="mb-4">
+                            <label className="block font-medium mb-1">Upload screenshots (optional)</label>
+                            <div
+                                ref={dropRef}
+                                onDrop={handleDrop}
+                                onDragOver={(e) => e.preventDefault()}
+                                className="border-2 border-dashed border-gray-400 rounded-md p-5 text-center bg-gray-50 hover:bg-gray-100 transition-all cursor-pointer"
+                            >
+                                <p className="text-gray-600 text-sm">
+                                    <span className="font-medium">Drag & drop</span> images here, or
+                                    <span className="text-blue-600 underline ml-1">click to browse</span><br />
+                                    (You can also paste screenshots with <kbd>Ctrl</kbd> + <kbd>V</kbd>)
+                                </p>
+                                <input
+                                    type="file"
+                                    name="images"
+                                    accept="image/*"
+                                    multiple
+                                    onChange={(e) => handleFiles(e.target.files || [])}
+                                    className="hidden"
+                                    id="uploadInput"
+                                />
+                            </div>
 
-  {/* Invisible label triggers file input click */}
-  <label htmlFor="uploadInput" className="sr-only">Upload Images</label>
+                            {/* Invisible label triggers file input click */}
+                            <label htmlFor="uploadInput" className="sr-only">Upload Images</label>
 
-  {screenshots.length > 0 && (
-    <ul className="text-xs mt-2 text-gray-600 list-disc pl-4">
-      {screenshots.map((file, i) => (
-        <li key={i}>{file.name}</li>
-      ))}
-    </ul>
-  )}
-</div>
+                            {screenshots.length > 0 && (
+                                <ul className="text-xs mt-2 text-gray-600 list-disc pl-4">
+                                    {screenshots.map((file, i) => (
+                                        <li key={i}>{file.name}</li>
+                                    ))}
+                                </ul>
+                            )}
+                        </div>
 
                         <div>
                             <label className="flex items-center gap-2 text-sm">

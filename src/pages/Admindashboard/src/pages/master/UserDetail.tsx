@@ -1,3 +1,4 @@
+import { API_ENDPOINTS } from '@/config/api'
 import React, { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { ArrowLeft, Edit, Save, User, Activity, Clock, BarChart3 } from 'lucide-react';
@@ -22,7 +23,7 @@ export const MasterUserDetail: React.FC = () => {
   useEffect(() => {
     const fetchUserDetails = async () => {
       try {
-        const userDetailsRes = await axios.post('https://api.dronesimulator.pro/api/get-single-user-details/', {
+        const userDetailsRes = await axios.post(API_ENDPOINTS.GET_SINGLE_USER, {
           email: email
         });
 
@@ -169,7 +170,7 @@ export const MasterUserDetail: React.FC = () => {
 
     try {
       await axios.put(
-        `https://api.dronesimulator.pro/api/update-user-details/`,
+        API_ENDPOINTS.UPDATE_USER,
         {
           email: editData.email,
           full_name: editData.name,
@@ -211,109 +212,109 @@ export const MasterUserDetail: React.FC = () => {
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* User Information */}
-     <div className="lg:col-span-2 bg-white rounded-xl shadow-lg border border-orange-500 p-4">
-  <div className="flex items-center justify-between mb-3">
-    <h2 className="text-sm font-semibold text-black">User Information</h2>
-    <button
-      onClick={() => isEditing ? handleSave() : setIsEditing(true)}
-      className="flex items-center space-x-2 px-3 py-1.5 bg-orange-500 text-white rounded-lg hover:bg-orange-600 transition-colors"
-    >
-      {isEditing ? <Save className="w-4 h-4" /> : <Edit className="w-4 h-4" />}
-      <span className="text-xs">{isEditing ? 'Save' : 'Edit'}</span>
-    </button>
-  </div>
-
-  <div className="space-y-3">
-    <div className="flex items-center space-x-3">
-      <div className="w-10 h-10 bg-orange-100 rounded-full flex items-center justify-center">
-        <User className="w-5 h-5 text-orange-600" />
-      </div>
-      <div>
-        <h3 className="text-sm font-semibold text-black">{user.name}</h3>
-        <p className="text-xs text-gray-600">{user.email}</p>
-        <span className={`inline-flex px-2 py-0.5 text-xs font-semibold rounded-full mt-1 ${user.status === 'Active' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}>
-          {user.status}
-        </span>
-      </div>
-    </div>
-
-    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-      <div>
-        <label className="block text-xs font-medium text-black mb-0.5">Full Name</label>
-        <input
-          type="text"
-          value={isEditing ? editData.name : user.name}
-          onChange={(e) => setEditData(prev => ({ ...prev, name: e.target.value }))}
-          disabled={!isEditing}
-          className={`w-full px-3 py-1.5 border border-gray-300 rounded-lg ${isEditing ? 'focus:ring-2 focus:ring-orange-500' : 'bg-gray-50'}`}
-        />
-      </div>
-      <div>
-        <label className="block text-xs font-medium text-black mb-0.5">Email</label>
-        <input
-          type="email"
-          value={isEditing ? editData.email : user.email}
-          onChange={(e) => setEditData(prev => ({ ...prev, email: e.target.value }))}
-          disabled={!isEditing}
-          className={`w-full px-3 py-1.5 border border-gray-300 rounded-lg ${isEditing ? 'focus:ring-2 focus:ring-orange-500' : 'bg-gray-50'}`}
-        />
-      </div>
-      <div>
-        <label className="block text-xs font-medium text-black mb-0.5">Status</label>
-        <select
-          value={isEditing ? editData.status : user.status}
-          onChange={(e) => setEditData(prev => ({ ...prev, status: e.target.value }))}
-          disabled={!isEditing}
-          className={`w-full px-3 py-1.5 border border-gray-300 rounded-lg ${isEditing ? 'focus:ring-2 focus:ring-orange-500' : 'bg-gray-50'}`}
-        >
-          <option value="Active">Active</option>
-          <option value="Inactive">Inactive</option>
-          <option value="Suspended">Suspended</option>
-        </select>
-      </div>
-      <div>
-        <label className="block text-xs font-medium text-black mb-0.5">Registration Date</label>
-        <input
-          type="text"
-          value={user.registrationDate}
-          disabled
-          className="w-full px-3 py-1.5 border border-gray-300 rounded-lg bg-gray-50"
-        />
-      </div>
-    </div>
-
-    <div className="border-t border-orange-500 pt-3">
-      <h3 className="text-sm font-medium text-black mb-3">Usage Statistics</h3>
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-        <div className="bg-white p-3 rounded-lg border border-orange-500">
-          <div className="flex items-center space-x-2">
-            <Activity className="w-4 h-4 text-orange-600" />
-            <span className="text-xs font-medium text-black">This Month</span>
+        <div className="lg:col-span-2 bg-white rounded-xl shadow-lg border border-orange-500 p-4">
+          <div className="flex items-center justify-between mb-3">
+            <h2 className="text-sm font-semibold text-black">User Information</h2>
+            <button
+              onClick={() => isEditing ? handleSave() : setIsEditing(true)}
+              className="flex items-center space-x-2 px-3 py-1.5 bg-orange-500 text-white rounded-lg hover:bg-orange-600 transition-colors"
+            >
+              {isEditing ? <Save className="w-4 h-4" /> : <Edit className="w-4 h-4" />}
+              <span className="text-xs">{isEditing ? 'Save' : 'Edit'}</span>
+            </button>
           </div>
-           <div className="text-[20px] text-gray-900"> Count : {user.usage.simulationsThisMonth}</div>
-         
-        </div>
-        <div className="bg-white p-3 rounded-lg border border-orange-500">
-          <div className="flex items-center space-x-2">
-            <BarChart3 className="w-4 h-4 text-orange-600" />
-            <span className="text-xs font-medium text-black">Total</span>
-          </div>
-          <p className="text-xl font-bold text-black mt-1">{overallDuration}</p>
-          <p className="text-xs text-gray-600">{user.usage.totalSimulations} simulations</p>
-        </div>
 
-        <div className="bg-white p-3 rounded-lg border border-orange-500">
-          <div className="flex items-center space-x-2">
-            <Clock className="w-4 h-4 text-orange-600" />
-            <span className="text-xs font-medium text-black">Last Active</span>
+          <div className="space-y-3">
+            <div className="flex items-center space-x-3">
+              <div className="w-10 h-10 bg-orange-100 rounded-full flex items-center justify-center">
+                <User className="w-5 h-5 text-orange-600" />
+              </div>
+              <div>
+                <h3 className="text-sm font-semibold text-black">{user.name}</h3>
+                <p className="text-xs text-gray-600">{user.email}</p>
+                <span className={`inline-flex px-2 py-0.5 text-xs font-semibold rounded-full mt-1 ${user.status === 'Active' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}>
+                  {user.status}
+                </span>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <div>
+                <label className="block text-xs font-medium text-black mb-0.5">Full Name</label>
+                <input
+                  type="text"
+                  value={isEditing ? editData.name : user.name}
+                  onChange={(e) => setEditData(prev => ({ ...prev, name: e.target.value }))}
+                  disabled={!isEditing}
+                  className={`w-full px-3 py-1.5 border border-gray-300 rounded-lg ${isEditing ? 'focus:ring-2 focus:ring-orange-500' : 'bg-gray-50'}`}
+                />
+              </div>
+              <div>
+                <label className="block text-xs font-medium text-black mb-0.5">Email</label>
+                <input
+                  type="email"
+                  value={isEditing ? editData.email : user.email}
+                  onChange={(e) => setEditData(prev => ({ ...prev, email: e.target.value }))}
+                  disabled={!isEditing}
+                  className={`w-full px-3 py-1.5 border border-gray-300 rounded-lg ${isEditing ? 'focus:ring-2 focus:ring-orange-500' : 'bg-gray-50'}`}
+                />
+              </div>
+              <div>
+                <label className="block text-xs font-medium text-black mb-0.5">Status</label>
+                <select
+                  value={isEditing ? editData.status : user.status}
+                  onChange={(e) => setEditData(prev => ({ ...prev, status: e.target.value }))}
+                  disabled={!isEditing}
+                  className={`w-full px-3 py-1.5 border border-gray-300 rounded-lg ${isEditing ? 'focus:ring-2 focus:ring-orange-500' : 'bg-gray-50'}`}
+                >
+                  <option value="Active">Active</option>
+                  <option value="Inactive">Inactive</option>
+                  <option value="Suspended">Suspended</option>
+                </select>
+              </div>
+              <div>
+                <label className="block text-xs font-medium text-black mb-0.5">Registration Date</label>
+                <input
+                  type="text"
+                  value={user.registrationDate}
+                  disabled
+                  className="w-full px-3 py-1.5 border border-gray-300 rounded-lg bg-gray-50"
+                />
+              </div>
+            </div>
+
+            <div className="border-t border-orange-500 pt-3">
+              <h3 className="text-sm font-medium text-black mb-3">Usage Statistics</h3>
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                <div className="bg-white p-3 rounded-lg border border-orange-500">
+                  <div className="flex items-center space-x-2">
+                    <Activity className="w-4 h-4 text-orange-600" />
+                    <span className="text-xs font-medium text-black">This Month</span>
+                  </div>
+                  <div className="text-[20px] text-gray-900"> Count : {user.usage.simulationsThisMonth}</div>
+
+                </div>
+                <div className="bg-white p-3 rounded-lg border border-orange-500">
+                  <div className="flex items-center space-x-2">
+                    <BarChart3 className="w-4 h-4 text-orange-600" />
+                    <span className="text-xs font-medium text-black">Total</span>
+                  </div>
+                  <p className="text-xl font-bold text-black mt-1">{overallDuration}</p>
+                  <p className="text-xs text-gray-600">{user.usage.totalSimulations} simulations</p>
+                </div>
+
+                <div className="bg-white p-3 rounded-lg border border-orange-500">
+                  <div className="flex items-center space-x-2">
+                    <Clock className="w-4 h-4 text-orange-600" />
+                    <span className="text-xs font-medium text-black">Last Active</span>
+                  </div>
+                  <p className="text-xs font-bold text-black mt-1">{user.lastLogin}</p>
+                  <p className="text-xs text-gray-600">activity</p>
+                </div>
+              </div>
+            </div>
           </div>
-          <p className="text-xs font-bold text-black mt-1">{user.lastLogin}</p>
-          <p className="text-xs text-gray-600">activity</p>
         </div>
-      </div>
-    </div>
-  </div>
-</div>
 
 
         <div className="space-y-4 mt-6">
@@ -358,7 +359,7 @@ export const MasterUserDetail: React.FC = () => {
               </div>
 
               <div>
-               
+
                 <div className="space-y-2">
                   {Object.entries(user.addOns).map(([key, value]) => (
                     <label key={key} className="flex items-center space-x-3">

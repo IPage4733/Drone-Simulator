@@ -1,4 +1,5 @@
-import React, { useState, useEffect } from 'react';
+import { API_ENDPOINTS } from '@/config/api'
+import React, { useEffect, useState } from 'react';
 import { BarChart3, Globe, TrendingUp, Users, Filter, Download, Eye, MapPin, Target, Zap } from 'lucide-react';
 import axios from 'axios';
 
@@ -77,107 +78,107 @@ export const MasterUserMetrics: React.FC = () => {
     return colors[index % colors.length];
   };
 
-useEffect(() => {
-  const fetchDownloads = async () => {
-    try {
-      const response = await fetch('https://api.dronesimulator.pro/api/get-all-downloads/');
-      if (response.ok) {
-        const data = await response.json();
-        const raw = Array.isArray(data.data) ? data.data : [data.data];
-        setDownloadsData(raw);
+  useEffect(() => {
+    const fetchDownloads = async () => {
+      try {
+        const response = await fetch(API_ENDPOINTS.GET_ALL_DOWNLOADS);
+        if (response.ok) {
+          const data = await response.json();
+          const raw = Array.isArray(data.data) ? data.data : [data.data];
+          setDownloadsData(raw);
 
-        const groupedByCountry = raw.reduce((acc, item) => {
-          const rawCountry = item.country || 'Unknown';
-          const country = rawCountry.trim().toLowerCase(); // normalize
-          const displayName = rawCountry.trim().replace(/\b\w/g, char => char.toUpperCase());
+          const groupedByCountry = raw.reduce((acc, item) => {
+            const rawCountry = item.country || 'Unknown';
+            const country = rawCountry.trim().toLowerCase(); // normalize
+            const displayName = rawCountry.trim().replace(/\b\w/g, char => char.toUpperCase());
 
-          if (!acc[country]) {
-            acc[country] = {
-              country: displayName,
-              users: new Set(),
-              downloads: 0,
+            if (!acc[country]) {
+              acc[country] = {
+                country: displayName,
+                users: new Set(),
+                downloads: 0,
+                flag: '🌐',
+              };
+            }
+
+            acc[country].downloads += item.download_count || 1;
+            acc[country].users.add(item.email);
+            return acc;
+          }, {});
+
+          const currentSnapshot = Object.values(groupedByCountry).map((item: any) => ({
+            country: item.country,
+            downloads: item.downloads,
+            users: item.users.size,
+          }));
+
+          const previousRaw = localStorage.getItem('countryDownloadSnapshot');
+          const previousSnapshot = previousRaw ? JSON.parse(previousRaw) : [];
+
+          // Save current snapshot for next time
+          localStorage.setItem('countryDownloadSnapshot', JSON.stringify(currentSnapshot));
+
+          const countries = currentSnapshot.map((item: any) => {
+            const previous = previousSnapshot.find((p: any) => p.country === item.country);
+            const previousDownloads = previous?.downloads || 0;
+            const growth = previousDownloads > 0
+              ? (((item.downloads - previousDownloads) / previousDownloads) * 100).toFixed(1)
+              : '0.0';
+
+            return {
+              ...item,
               flag: '🌐',
+              growth: `${growth}%`,
             };
-          }
+          });
 
-          acc[country].downloads += item.download_count || 1;
-          acc[country].users.add(item.email);
-          return acc;
-        }, {});
+          setCountryDownloads(countries);
+          const totalDownloads = countries.reduce((acc, item) => acc + item.downloads, 0);
+          setTotalRevenue(totalDownloads); // Reused as totalDownloads
 
-        const currentSnapshot = Object.values(groupedByCountry).map((item: any) => ({
-          country: item.country,
-          downloads: item.downloads,
-          users: item.users.size,
-        }));
+          // Group by interest
+          const groupedByInterest = raw.reduce((acc, item) => {
+            const interest = item.purpose_of_use || 'Uncategorized';
+            if (!acc[interest]) {
+              acc[interest] = {
+                interest,
+                users: new Set(),
+                downloads: 0,
+                revenue: 0,
+              };
+            }
+            acc[interest].downloads += item.download_count || 1;
+            acc[interest].users.add(item.email);
+            acc[interest].revenue += (item.download_count || 1) * 10;
+            return acc;
+          }, {});
 
-        const previousRaw = localStorage.getItem('countryDownloadSnapshot');
-        const previousSnapshot = previousRaw ? JSON.parse(previousRaw) : [];
-
-        // Save current snapshot for next time
-        localStorage.setItem('countryDownloadSnapshot', JSON.stringify(currentSnapshot));
-
-        const countries = currentSnapshot.map((item: any) => {
-          const previous = previousSnapshot.find((p: any) => p.country === item.country);
-          const previousDownloads = previous?.downloads || 0;
-          const growth = previousDownloads > 0
-            ? (((item.downloads - previousDownloads) / previousDownloads) * 100).toFixed(1)
-            : '0.0';
-
-          return {
-            ...item,
-            flag: '🌐',
-            growth: `${growth}%`,
-          };
-        });
-
-        setCountryDownloads(countries);
-        const totalDownloads = countries.reduce((acc, item) => acc + item.downloads, 0);
-        setTotalRevenue(totalDownloads); // Reused as totalDownloads
-
-        // Group by interest
-        const groupedByInterest = raw.reduce((acc, item) => {
-          const interest = item.purpose_of_use || 'Uncategorized';
-          if (!acc[interest]) {
-            acc[interest] = {
-              interest,
-              users: new Set(),
-              downloads: 0,
-              revenue: 0,
+          const interests = Object.values(groupedByInterest).map((item: any) => {
+            const users = item.users.size;
+            const percentage = ((users / raw.length) * 100).toFixed(1);
+            return {
+              interest: item.interest,
+              users,
+              percentage: parseFloat(percentage),
+              revenue: item?.revenue ?? 0,
+              growth: '+10%', // You can enhance this too
             };
-          }
-          acc[interest].downloads += item.download_count || 1;
-          acc[interest].users.add(item.email);
-          acc[interest].revenue += (item.download_count || 1) * 10;
-          return acc;
-        }, {});
+          });
 
-        const interests = Object.values(groupedByInterest).map((item: any) => {
-          const users = item.users.size;
-          const percentage = ((users / raw.length) * 100).toFixed(1);
-          return {
-            interest: item.interest,
-            users,
-            percentage: parseFloat(percentage),
-            revenue: item?.revenue ?? 0,
-            growth: '+10%', // You can enhance this too
-          };
-        });
-
-        setUserInterests(interests);
+          setUserInterests(interests);
+        }
+      } catch (err) {
+        console.error('Failed to fetch download data:', err);
+        setUserInterests([]);
+        setCountryDownloads([]);
+        setTotalRevenue(0);
+      } finally {
+        setLoading(false);
       }
-    } catch (err) {
-      console.error('Failed to fetch download data:', err);
-      setUserInterests([]);
-      setCountryDownloads([]);
-      setTotalRevenue(0);
-    } finally {
-      setLoading(false);
-    }
-  };
+    };
 
-  fetchDownloads();
-}, []);
+    fetchDownloads();
+  }, []);
 
 
   const totalCountryRevenue = totalRevenue;
@@ -371,7 +372,7 @@ useEffect(() => {
                 </div>
                 <div className="flex justify-between text-xs text-gray-500">
                   <span>{interest.users} users ({interest.percentage}%)</span>
-                 
+
                 </div>
               </div>
             ))}
@@ -453,7 +454,7 @@ useEffect(() => {
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
               {countryDownloads.map((country, index) => {
-               const marketShare = (country.downloads / totalDownloads) * 100;
+                const marketShare = (country.downloads / totalDownloads) * 100;
 
                 return (
                   <tr key={country.country} className="hover:bg-gray-50 transition-colors">
