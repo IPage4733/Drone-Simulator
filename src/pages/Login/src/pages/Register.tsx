@@ -1,3 +1,4 @@
+import { API_ENDPOINTS } from '@/config/api'
 import React, { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
@@ -256,7 +257,7 @@ const Register: React.FC = () => {
         purpose_of_use: formData.purpose_of_use === 'other' ? formData.purpose_other : formData.purpose_of_use
       };
 
-      const response = await fetch('https://api.dronesimulator.pro/api/register/', {
+      const response = await fetch(API_ENDPOINTS.REGISTER, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
@@ -302,16 +303,16 @@ const Register: React.FC = () => {
   return (
     <>
       <Navigation />
-     {showVerificationPopup && (
-  <div className="fixed inset-0 z-50 bg-black bg-opacity-40 flex items-center justify-center">
-    <div className="bg-gradient-to-r from-orange-400 to-orange-500 rounded-lg shadow-lg p-8 w-[550px] text-center text-white">
+      {showVerificationPopup && (
+        <div className="fixed inset-0 z-50 bg-black bg-opacity-40 flex items-center justify-center">
+          <div className="bg-gradient-to-r from-orange-400 to-orange-500 rounded-lg shadow-lg p-8 w-[550px] text-center text-white">
 
-      <h3 className="text-2xl font-semibold mb-2">Ready to Take Flight?</h3>
-      <p className="text-white text-sm mb-6">
-        Join thousands of pilots who have mastered drone flying with our simulator.
-      </p>
+            <h3 className="text-2xl font-semibold mb-2">Ready to Take Flight?</h3>
+            <p className="text-white text-sm mb-6">
+              Join thousands of pilots who have mastered drone flying with our simulator.
+            </p>
 
-      {/* <div className="bg-white text-gray-800 rounded-md p-4 text-left text-sm">
+            {/* <div className="bg-white text-gray-800 rounded-md p-4 text-left text-sm">
         <p className="font-medium">To login to the Drone Simulator application after installation, please use the demo credentials below:</p>
 
         <p className="mt-2">
@@ -323,24 +324,24 @@ const Register: React.FC = () => {
           Support: +91 9059759850 / +91 8804349999
         </p>
       </div> */}
-      <p className="font-bold text-lg">
-  A verification email has been sent to your registered email address. Please open your inbox, click the verification link, and then return to login and continue using the platform.
-</p>
+            <p className="font-bold text-lg">
+              A verification email has been sent to your registered email address. Please open your inbox, click the verification link, and then return to login and continue using the platform.
+            </p>
 
 
-      <button
-        className="mt-6 px-6 py-2 bg-white text-orange-600 font-medium rounded hover:bg-gray-100"
-        onClick={() => {
-          setShowVerificationPopup(false);
-          navigate('/');
-        }}
-      >
-        Start Your Journey
-      </button>
+            <button
+              className="mt-6 px-6 py-2 bg-white text-orange-600 font-medium rounded hover:bg-gray-100"
+              onClick={() => {
+                setShowVerificationPopup(false);
+                navigate('/');
+              }}
+            >
+              Start Your Journey
+            </button>
 
-    </div>
-  </div>
-)}
+          </div>
+        </div>
+      )}
 
       <div
         className="pt-24 min-h-screen w-full bg-cover bg-center bg-no-repeat flex justify-end items-center px-2 md:px-12"

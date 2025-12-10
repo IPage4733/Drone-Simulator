@@ -1,5 +1,6 @@
 // ✅ Full replacement of MasterIncome component with same UI structure but using dynamic data
 
+import { API_ENDPOINTS } from '@/config/api'
 import React, { useEffect, useState } from 'react';
 import { TrendingUp, DollarSign, Calendar, ArrowUpRight, Download, Filter } from 'lucide-react';
 import { CustomDateFilter } from '../../components/common/CustomDateFilter';
@@ -23,42 +24,42 @@ export const MasterIncome: React.FC = () => {
   };
 
   useEffect(() => {
-  const fetchData = async () => {
-    const token = sessionStorage.getItem('drone_auth_token');
-    if (!token) {
-      console.error('No auth token found in sessionStorage.');
-      setLoading(false);
-      return;
-    }
-
-    try {
-      const [analyticsRes, transactionsRes] = await Promise.all([
-        fetch('https://api.dronesimulator.pro/api/stripe/analytics/', {
-          headers: { Authorization: `Token ${token}` },
-        }),
-        fetch('https://api.dronesimulator.pro/api/stripe/transactions/', {
-          headers: { Authorization: `Token ${token}` },
-        }),
-      ]);
-
-      if (!analyticsRes.ok || !transactionsRes.ok) {
-        console.error('Invalid or expired token.');
+    const fetchData = async () => {
+      const token = sessionStorage.getItem('drone_auth_token');
+      if (!token) {
+        console.error('No auth token found in sessionStorage.');
         setLoading(false);
         return;
       }
 
-      const analyticsData = await analyticsRes.json();
-      const transactionData = await transactionsRes.json();
-      setAnalytics(analyticsData || {});
-      setTransactions(transactionData.results || []);
-    } catch (err) {
-      console.error('Error fetching data:', err);
-    } finally {
-      setLoading(false);
-    }
-  };
-  fetchData();
-}, []);
+      try {
+        const [analyticsRes, transactionsRes] = await Promise.all([
+          fetch(API_ENDPOINTS.STRIPE_ANALYTICS, {
+            headers: { Authorization: `Token ${token}` },
+          }),
+          fetch(API_ENDPOINTS.STRIPE_TRANSACTIONS, {
+            headers: { Authorization: `Token ${token}` },
+          }),
+        ]);
+
+        if (!analyticsRes.ok || !transactionsRes.ok) {
+          console.error('Invalid or expired token.');
+          setLoading(false);
+          return;
+        }
+
+        const analyticsData = await analyticsRes.json();
+        const transactionData = await transactionsRes.json();
+        setAnalytics(analyticsData || {});
+        setTransactions(transactionData.results || []);
+      } catch (err) {
+        console.error('Error fetching data:', err);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchData();
+  }, []);
 
   const filteredRecords = transactions.filter(record => {
     const matchesPlan = planFilter === 'all' || record.plan_name === planFilter;
@@ -120,7 +121,7 @@ export const MasterIncome: React.FC = () => {
     window.URL.revokeObjectURL(url);
   };
 
-  
+
 
   return (
     <div className="space-y-6">
@@ -260,9 +261,8 @@ export const MasterIncome: React.FC = () => {
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-800">{record.payment_method}</td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{new Date(record.payment_date).toLocaleString()}</td>
                   <td className="px-6 py-4 whitespace-nowrap">
-                    <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
-                      record.payment_status === 'succeeded' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
-                    }`}>
+                    <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${record.payment_status === 'succeeded' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
+                      }`}>
                       {record.payment_status_display}
                     </span>
                   </td>

@@ -6,6 +6,7 @@ import { useAuth } from '../context/AuthContext'
 import Navigation from '@/components/Navigation'
 import Logo from '../components/Logo'
 import { Eye, EyeOff } from 'lucide-react'
+import { API_ENDPOINTS } from '@/config/api'
 
 interface CustomJwtPayload {
   email: string
@@ -44,7 +45,7 @@ const Login: React.FC = () => {
     setIsLoading(true)
 
     try {
-      const response = await fetch('https://api.dronesimulator.pro/api/login/', {
+      const response = await fetch(API_ENDPOINTS.LOGIN, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -80,7 +81,7 @@ const Login: React.FC = () => {
       const email = decoded.email
       const username = decoded.name || email.split('@')[0]
 
-      const response = await fetch('https://api.dronesimulator.pro/api/social-login/', {
+      const response = await fetch(API_ENDPOINTS.SOCIAL_LOGIN, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ token: credentialResponse.credential, email, username })

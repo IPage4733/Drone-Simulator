@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { HelpCircle, Menu, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { API_ENDPOINTS } from "@/config/api";
 
 const Navigation = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -15,7 +16,7 @@ const Navigation = () => {
     { name: "Features", path: "/features" },
     { name: "Tutorials", path: "/tutorials" },
     // { name: "Download", path: "/download" },
-    
+
     { name: "Contact", path: "/contactus" },
   ];
 
@@ -26,28 +27,28 @@ const Navigation = () => {
     setIsLoggedIn(!!token);
   }, [location.pathname]);
 
-const handleLogout = async () => {
-  const token = sessionStorage.getItem('auth_token')
+  const handleLogout = async () => {
+    const token = sessionStorage.getItem('auth_token')
 
-  try {
-    if (token) {
-      await fetch('https://api.dronesimulator.pro/api/logout/', {
-        method: 'POST',
-        headers: {
-          'Authorization': `Token ${token}`,
-          'Content-Type': 'application/json'
-        }
-      })
+    try {
+      if (token) {
+        await fetch(API_ENDPOINTS.LOGOUT, {
+          method: 'POST',
+          headers: {
+            'Authorization': `Token ${token}`,
+            'Content-Type': 'application/json'
+          }
+        })
+      }
+    } catch (error) {
+      console.error('Logout API failed:', error)
+    } finally {
+      // Clear session and redirect
+      sessionStorage.clear()
+      setIsLoggedIn(false)
+      navigate("/auth/login")
     }
-  } catch (error) {
-    console.error('Logout API failed:', error)
-  } finally {
-    // Clear session and redirect
-    sessionStorage.clear()
-    setIsLoggedIn(false)
-    navigate("/auth/login")
   }
-}
 
 
   return (
@@ -65,11 +66,10 @@ const handleLogout = async () => {
               <Link
                 key={item.name}
                 to={item.path}
-                className={`px-3 py-2 text-sm font-medium transition-colors duration-200 ${
-                  isActive(item.path)
+                className={`px-3 py-2 text-sm font-medium transition-colors duration-200 ${isActive(item.path)
                     ? "text-primary border-b-2 border-primary"
                     : "text-gray-600 hover:text-primary"
-                }`}
+                  }`}
               >
                 {item.name}
               </Link>
@@ -94,19 +94,19 @@ const handleLogout = async () => {
                 Login
               </Link>
             )}
-  <Link
-  to="/contact"
-  className="flex items-center gap-1 text-sm font-medium text-gray-600 hover:text-primary transition-colors"
-  title="Help & Support"
->
-  <HelpCircle className="w-4 h-4" />
-  Help
-</Link>
+            <Link
+              to="/contact"
+              className="flex items-center gap-1 text-sm font-medium text-gray-600 hover:text-primary transition-colors"
+              title="Help & Support"
+            >
+              <HelpCircle className="w-4 h-4" />
+              Help
+            </Link>
             <Link to="/download">
-  <Button className="bg-primary hover:bg-primary/90 text-white">
-    Download Now
-  </Button>
-</Link>
+              <Button className="bg-primary hover:bg-primary/90 text-white">
+                Download Now
+              </Button>
+            </Link>
           </div>
 
           {/* Mobile menu button */}
@@ -125,11 +125,10 @@ const handleLogout = async () => {
                 <Link
                   key={item.name}
                   to={item.path}
-                  className={`block px-3 py-2 text-base font-medium transition-colors duration-200 ${
-                    isActive(item.path)
+                  className={`block px-3 py-2 text-base font-medium transition-colors duration-200 ${isActive(item.path)
                       ? "text-primary bg-primary/10"
                       : "text-gray-600 hover:text-primary hover:bg-gray-50"
-                  }`}
+                    }`}
                   onClick={() => setIsOpen(false)}
                 >
                   {item.name}
@@ -164,14 +163,14 @@ const handleLogout = async () => {
                   Login
                 </Link>
               )}
-<Link
-  to="/contact"
-  className="flex items-center gap-1 text-sm font-medium text-gray-600 hover:text-primary transition-colors"
-  title="Help & Support"
->
-  <HelpCircle className="w-4 h-4" />
-  Help
-</Link>
+              <Link
+                to="/contact"
+                className="flex items-center gap-1 text-sm font-medium text-gray-600 hover:text-primary transition-colors"
+                title="Help & Support"
+              >
+                <HelpCircle className="w-4 h-4" />
+                Help
+              </Link>
               <div className="px-3 py-2">
                 <Button className="w-full bg-primary hover:bg-primary/90 text-white">
                   Download Now

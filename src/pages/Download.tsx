@@ -10,6 +10,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Checkbox } from "@/components/ui/checkbox";
 import { useToast } from "@/hooks/use-toast";
 import { useNavigate } from 'react-router-dom';
+import { API_ENDPOINTS } from "@/config/api";
 import {
   CheckCircle,
   X,
@@ -115,7 +116,7 @@ const Download = () => {
 
     try {
       // Send to your primary API
-      const response = await fetch("https://api.dronesimulator.pro/api/download-app/", {
+      const response = await fetch(API_ENDPOINTS.DOWNLOAD_APP, {
         method: "POST",
         headers: {
           "Content-Type": "application/json"
@@ -127,7 +128,7 @@ const Download = () => {
       if (!response.ok) throw new Error(result.message || "Submission failed");
 
       // Send to NeoDove API with logging and error capture
-      const neoRes = await fetch("https://8f21b23d-d474-422c-89b2-868a67b07e89.neodove.com/integration/custom/da0b1545-0690-4f36-b538-100a870026eb/leads", {
+      const neoRes = await fetch(API_ENDPOINTS.NEODOVE_DOWNLOAD_LEADS, {
         method: "POST",
         headers: {
           "Content-Type": "application/json"

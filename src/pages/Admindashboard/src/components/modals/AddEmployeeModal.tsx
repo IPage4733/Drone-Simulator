@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import axios from 'axios';
 import { X, UserPlus } from 'lucide-react';
 import { Employee } from '../../hooks/useData';
+import { API_ENDPOINTS } from '@/config/api';
 
 interface AddEmployeeModalProps {
   isOpen: boolean;
@@ -27,93 +28,93 @@ export const AddEmployeeModal: React.FC<AddEmployeeModalProps> = ({
   const [loading, setLoading] = useState(false);
 
   if (!isOpen) return null;
-const assignGroupsToUser = async (userId: number, groupIds: number[]) => {
-  try {
-    const token = sessionStorage.getItem('drone_auth_token');
-    if (!token) throw new Error('Auth token missing');
+  const assignGroupsToUser = async (userId: number, groupIds: number[]) => {
+    try {
+      const token = sessionStorage.getItem('drone_auth_token');
+      if (!token) throw new Error('Auth token missing');
 
-    await axios.put(
-      `https://34-93-79-185.nip.io/api/admin/users/${userId}/assign-groups/`,
-      { groups: groupIds },
-      {
-        headers: {
-          Authorization: `Token ${token}`,
-          'Content-Type': 'application/json'
+      await axios.put(
+        `https://34-93-79-185.nip.io/api/admin/users/${userId}/assign-groups/`,
+        { groups: groupIds },
+        {
+          headers: {
+            Authorization: `Token ${token}`,
+            'Content-Type': 'application/json'
+          }
         }
-      }
-    );
+      );
 
-    console.log('Groups assigned successfully');
-  } catch (err) {
-    console.error('Error assigning groups:', err);
-  }
-};
-
-const handleSave = async () => {
-  setError('');
-
-  if (!formData.name || !formData.email) {
-    setError('Name and email are required.');
-    return;
-  }
-
-  const token = sessionStorage.getItem('drone_auth_token');
-  if (!token) {
-    setError('Authentication token missing.');
-    return;
-  }
-
-  const requestBody = {
-    email: formData.email,
-    full_name: formData.name,
-    password: 'TestPassword123!', // You can randomize later
-    is_staff: true,
-    is_superuser: formData.role === 'admin',
-    groups: [] // we'll assign separately after creation
+      console.log('Groups assigned successfully');
+    } catch (err) {
+      console.error('Error assigning groups:', err);
+    }
   };
 
-  setLoading(true);
-  try {
-    const response = await axios.post(
-      'https://api.dronesimulator.pro/api/admin/create-user/',
-      requestBody,
-      {
-        headers: {
-          Authorization: `Token ${token}`,
-          'Content-Type': 'application/json'
-        }
-      }
-    );
+  const handleSave = async () => {
+    setError('');
 
-    const newUser = response.data;
-    console.log('Employee created:', newUser);
+    if (!formData.name || !formData.email) {
+      setError('Name and email are required.');
+      return;
+    }
 
-    // Now assign group using the second API
-    const groupId = formData.role === 'admin' ? 1 : formData.role === 'editor' ? 2 : 3;
-    await assignGroupsToUser(newUser.id, [groupId]);
+    const token = sessionStorage.getItem('drone_auth_token');
+    if (!token) {
+      setError('Authentication token missing.');
+      return;
+    }
 
-    // Notify parent component
-    onSave({
-      name: formData.name,
+    const requestBody = {
       email: formData.email,
-      role: formData.role,
-      status: formData.status
-    });
+      full_name: formData.name,
+      password: 'TestPassword123!', // You can randomize later
+      is_staff: true,
+      is_superuser: formData.role === 'admin',
+      groups: [] // we'll assign separately after creation
+    };
 
-    setFormData({
-      name: '',
-      email: '',
-      role: 'editor',
-      status: 'Active'
-    });
-    onClose();
-  } catch (err: any) {
-    console.error('Error creating user:', err);
-    setError('Failed to create user. Please try again.');
-  } finally {
-    setLoading(false);
-  }
-};
+    setLoading(true);
+    try {
+      const response = await axios.post(
+        API_ENDPOINTS.ADMIN_CREATE_USER,
+        requestBody,
+        {
+          headers: {
+            Authorization: `Token ${token}`,
+            'Content-Type': 'application/json'
+          }
+        }
+      );
+
+      const newUser = response.data;
+      console.log('Employee created:', newUser);
+
+      // Now assign group using the second API
+      const groupId = formData.role === 'admin' ? 1 : formData.role === 'editor' ? 2 : 3;
+      await assignGroupsToUser(newUser.id, [groupId]);
+
+      // Notify parent component
+      onSave({
+        name: formData.name,
+        email: formData.email,
+        role: formData.role,
+        status: formData.status
+      });
+
+      setFormData({
+        name: '',
+        email: '',
+        role: 'editor',
+        status: 'Active'
+      });
+      onClose();
+    } catch (err: any) {
+      console.error('Error creating user:', err);
+      setError('Failed to create user. Please try again.');
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">

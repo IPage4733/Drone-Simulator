@@ -1,3 +1,4 @@
+import { API_ENDPOINTS } from '@/config/api'
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { Trash2, Eye } from 'lucide-react';
@@ -56,7 +57,7 @@ const AdminInquiries: React.FC = () => {
   const fetchInquiries = async () => {
     try {
       const token = sessionStorage.getItem('drone_auth_token');
-      const response = await axios.get('https://api.dronesimulator.pro/api/inquiry/admin/all/', {
+      const response = await axios.get(API_ENDPOINTS.INQUIRY_ADMIN_ALL, {
         headers: { Authorization: `Token ${token}` },
       });
       setInquiries(response.data.results);
@@ -71,7 +72,7 @@ const AdminInquiries: React.FC = () => {
     if (!window.confirm('Are you sure you want to delete this inquiry?')) return;
     try {
       const token = sessionStorage.getItem('drone_auth_token');
-      await axios.delete(`https://api.dronesimulator.pro/api/inquiry/admin/${id}/delete/`, {
+      await axios.delete(API_ENDPOINTS.INQUIRY_ADMIN_DELETE(id), {
         headers: { Authorization: `Token ${token}` },
       });
       setInquiries(prev => prev.filter(i => i.id !== id));
@@ -158,53 +159,52 @@ const AdminInquiries: React.FC = () => {
         </div>
       </div>
 
-<div className="flex flex-wrap items-center gap-3">
-  <label className="text-sm text-gray-700 flex items-center gap-2">
-    From:
-    <input
-      type="date"
-      value={startDate}
-      onChange={(e) => setStartDate(e.target.value)}
-      className="border border-gray-300 rounded px-2 py-1"
-    />
-  </label>
+      <div className="flex flex-wrap items-center gap-3">
+        <label className="text-sm text-gray-700 flex items-center gap-2">
+          From:
+          <input
+            type="date"
+            value={startDate}
+            onChange={(e) => setStartDate(e.target.value)}
+            className="border border-gray-300 rounded px-2 py-1"
+          />
+        </label>
 
-  <label className="text-sm text-gray-700 flex items-center gap-2">
-    To:
-    <input
-      type="date"
-      value={endDate}
-      onChange={(e) => setEndDate(e.target.value)}
-      className="border border-gray-300 rounded px-2 py-1"
-    />
-  </label>
+        <label className="text-sm text-gray-700 flex items-center gap-2">
+          To:
+          <input
+            type="date"
+            value={endDate}
+            onChange={(e) => setEndDate(e.target.value)}
+            className="border border-gray-300 rounded px-2 py-1"
+          />
+        </label>
 
-  {['today', '7days', '1month', '1year'].map((key) => (
-    <button
-      key={key}
-      onClick={() => setQuickFilter(prev => (prev === key ? '' : key))}
-      className={`text-sm font-medium px-3 py-1.5 rounded ${
-        quickFilter === key
-          ? 'bg-gray-800 text-white'
-          : 'bg-gray-100 text-gray-800 hover:bg-gray-200'
-      }`}
-    >
-      {{
-        today: 'Today',
-        '7days': 'Last 7 Days',
-        '1month': 'Last 1 Month',
-        '1year': 'Last 1 Year',
-      }[key]}
-    </button>
-  ))}
+        {['today', '7days', '1month', '1year'].map((key) => (
+          <button
+            key={key}
+            onClick={() => setQuickFilter(prev => (prev === key ? '' : key))}
+            className={`text-sm font-medium px-3 py-1.5 rounded ${quickFilter === key
+                ? 'bg-gray-800 text-white'
+                : 'bg-gray-100 text-gray-800 hover:bg-gray-200'
+              }`}
+          >
+            {{
+              today: 'Today',
+              '7days': 'Last 7 Days',
+              '1month': 'Last 1 Month',
+              '1year': 'Last 1 Year',
+            }[key]}
+          </button>
+        ))}
 
-  <button
-    onClick={clearAllFilters}
-    className="text-sm font-medium px-3 py-1.5 rounded bg-gray-200 text-gray-800 hover:bg-gray-300"
-  >
-    Clear All
-  </button>
-</div>
+        <button
+          onClick={clearAllFilters}
+          className="text-sm font-medium px-3 py-1.5 rounded bg-gray-200 text-gray-800 hover:bg-gray-300"
+        >
+          Clear All
+        </button>
+      </div>
 
 
       <table className="min-w-full divide-y divide-gray-200 bg-white shadow-sm rounded-md">

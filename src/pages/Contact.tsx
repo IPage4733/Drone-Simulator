@@ -7,6 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
+import { API_ENDPOINTS } from "@/config/api";
 
 type ContactMessage = {
   id?: number;
@@ -45,7 +46,7 @@ const Contact = () => {
     if (!token) return;
 
     try {
-      const res = await fetch("https://api.dronesimulator.pro/api/contact/my/", {
+      const res = await fetch(API_ENDPOINTS.CONTACT_MY, {
         headers: { Authorization: `Token ${token}` }
       });
       if (res.ok) {
@@ -72,7 +73,7 @@ const Contact = () => {
     }
 
     try {
-      const response = await fetch("https://api.dronesimulator.pro/api/contact/", {
+      const response = await fetch(API_ENDPOINTS.CONTACT, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -113,7 +114,7 @@ const Contact = () => {
     if (!token || !isAdmin) return;
 
     try {
-      const res = await fetch(`https://api.dronesimulator.pro/api/contact/admin/${id}/delete/`, {
+      const res = await fetch(API_ENDPOINTS.CONTACT_ADMIN_DELETE(id), {
         method: "DELETE",
         headers: { Authorization: `Token ${token}` }
       });

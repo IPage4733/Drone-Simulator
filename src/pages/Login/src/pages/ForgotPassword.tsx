@@ -1,3 +1,4 @@
+import { API_ENDPOINTS } from '@/config/api'
 import React, { useState } from 'react'
 import { Link } from 'react-router-dom'
 import Logo from '../components/Logo'
@@ -28,40 +29,40 @@ const ForgotPassword: React.FC = () => {
     return Object.keys(newErrors).length === 0
   }
 
- const handleSubmit = async (e: React.FormEvent) => {
-  e.preventDefault()
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault()
 
-  if (!validateForm()) return
+    if (!validateForm()) return
 
-  setIsLoading(true)
-  try {
-    const response = await fetch('https://api.dronesimulator.pro/api/forgot-password/', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({ email })
-    })
+    setIsLoading(true)
+    try {
+      const response = await fetch(API_ENDPOINTS.FORGOT_PASSWORD, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ email })
+      })
 
-    if (!response.ok) {
-      const errorData = await response.json()
-      throw new Error(errorData.error || 'Failed to send reset email')
+      if (!response.ok) {
+        const errorData = await response.json()
+        throw new Error(errorData.error || 'Failed to send reset email')
+      }
+
+      setIsSubmitted(true)
+    } catch (error: any) {
+      setErrors({ submit: error.message || 'Failed to send reset email. Please try again.' })
+    } finally {
+      setIsLoading(false)
     }
-
-    setIsSubmitted(true)
-  } catch (error: any) {
-    setErrors({ submit: error.message || 'Failed to send reset email. Please try again.' })
-  } finally {
-    setIsLoading(false)
   }
-}
 
 
   if (isSubmitted) {
     return (
       <div className="auth-card">
         <Logo />
-        
+
         <div className="text-center">
           <div className="mb-6">
             <div className="mx-auto w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mb-4">
@@ -88,7 +89,7 @@ const ForgotPassword: React.FC = () => {
             >
               Try Again
             </button>
-            
+
             <Link
               to="/auth/login"
               className="btn-secondary"
@@ -104,7 +105,7 @@ const ForgotPassword: React.FC = () => {
   return (
     <div className="auth-card">
       <Logo />
-      
+
       <div className="text-center mb-8">
         <h2 className="text-3xl font-bold text-gray-900 mb-2">Reset Password</h2>
         <p className="text-gray-600">

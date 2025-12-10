@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import { useAuth } from '../context/AuthContext'
 import { useNavigate, Link } from 'react-router-dom'
+import { API_ENDPOINTS } from '@/config/api'
 import {
   User,
   Settings,
@@ -167,7 +168,7 @@ const Profile: React.FC = () => {
         const { email } = JSON.parse(storedUser)
 
         // Fetch user details
-        const userRes = await fetch('https://api.dronesimulator.pro/api/get-single-user-details/', {
+        const userRes = await fetch(API_ENDPOINTS.GET_SINGLE_USER, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -193,7 +194,7 @@ const Profile: React.FC = () => {
         }
 
         // Fetch stripe transactions
-        const stripeRes = await fetch('https://api.dronesimulator.pro/api/stripe/my-transactions/', {
+        const stripeRes = await fetch(API_ENDPOINTS.STRIPE_MY_TRANSACTIONS, {
           headers: {
             Authorization: `Token ${token}`
           }
@@ -322,7 +323,7 @@ const Profile: React.FC = () => {
     }
 
     try {
-      const response = await fetch('https://api.dronesimulator.pro/api/update-user-details/', {
+      const response = await fetch(API_ENDPOINTS.UPDATE_USER, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',

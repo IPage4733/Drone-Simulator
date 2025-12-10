@@ -1,3 +1,4 @@
+import { API_ENDPOINTS } from '@/config/api'
 import React, { useState } from 'react';
 import { ShoppingCart, X, Trash2 } from 'lucide-react';
 import { useCart } from '../context/CartContext';
@@ -7,42 +8,42 @@ const MiniCart: React.FC = () => {
   const { items, totalItems, totalPrice, removeItem } = useCart();
   const [isPopupOpen, setIsPopupOpen] = useState(false);
 
-const handleCheckout = async () => {
-  if (items.length === 0) return;
+  const handleCheckout = async () => {
+    if (items.length === 0) return;
 
-  const item = items[0];
-  const stripe_price_id = item.stripe_price_id || 'price_1RcJttCKYG7gRDVPBkHPkocp';
+    const item = items[0];
+    const stripe_price_id = item.stripe_price_id || 'price_1RcJttCKYG7gRDVPBkHPkocp';
 
-  const token = sessionStorage.getItem('auth_token');
-  if (!token) {
-    alert('Please login and try again.');
-    return;
-  }
-
-  try {
-    const response = await fetch('https://api.dronesimulator.pro/api/stripe/create-checkout-session/', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Token ${token}`,
-      },
-      body: JSON.stringify({ stripe_price_id }),
-    });
-
-    const data = await response.json();
-
-    console.log('Checkout API Response:', data); // ✅ log full response
-
-    if (response.ok && data.checkout_url) {
-      window.location.href = data.checkout_url;
-    } else {
-      alert(data.message || 'Stripe checkout failed. Check console.');
+    const token = sessionStorage.getItem('auth_token');
+    if (!token) {
+      alert('Please login and try again.');
+      return;
     }
-  } catch (err) {
-    console.error('Fetch Error:', err);
-    alert('Something went wrong. Please try again.');
-  }
-};
+
+    try {
+      const response = await fetch(API_ENDPOINTS.STRIPE_CREATE_CHECKOUT, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Token ${token}`,
+        },
+        body: JSON.stringify({ stripe_price_id }),
+      });
+
+      const data = await response.json();
+
+      console.log('Checkout API Response:', data); // ✅ log full response
+
+      if (response.ok && data.checkout_url) {
+        window.location.href = data.checkout_url;
+      } else {
+        alert(data.message || 'Stripe checkout failed. Check console.');
+      }
+    } catch (err) {
+      console.error('Fetch Error:', err);
+      alert('Something went wrong. Please try again.');
+    }
+  };
 
 
 
@@ -73,7 +74,7 @@ const handleCheckout = async () => {
               {totalItems}
             </span>
           </div>
-          
+
           {/* Checkout Text */}
           <span>Checkout</span>
         </button>
@@ -83,17 +84,17 @@ const handleCheckout = async () => {
       {isPopupOpen && (
         <div className="fixed inset-0 z-60 flex items-center justify-center p-4">
           {/* Backdrop */}
-          <div 
+          <div
             className="absolute inset-0 bg-black/50 backdrop-blur-sm"
             onClick={() => setIsPopupOpen(false)}
           />
-          
+
           {/* Popup Content */}
           <div className="relative bg-white rounded-2xl shadow-2xl w-full max-w-md max-h-[90vh] flex flex-col overflow-hidden">
             {/* Header */}
             <div className="flex items-center justify-between p-6 border-b border-gray-200 flex-shrink-0">
               <h3 className="text-xl font-bold text-gray-800">Your Cart ({totalItems})</h3>
-              <button 
+              <button
                 onClick={() => setIsPopupOpen(false)}
                 className="text-gray-400 hover:text-gray-600 transition-colors"
               >
@@ -117,7 +118,7 @@ const handleCheckout = async () => {
                           )}
                         </div>
                       </div>
-                      <button 
+                      <button
                         onClick={() => removeItem(item.id, item.type)}
                         className="text-gray-400 hover:text-red-500 transition-colors p-2"
                       >
@@ -141,17 +142,17 @@ const handleCheckout = async () => {
                   <span className="text-lg font-semibold text-gray-800">Total:</span>
                   <span className="text-xl font-bold text-orange-500">${totalPrice}</span>
                 </div>
-                
+
                 <div className="flex space-x-3">
-                  <Button 
-                    variant="outline" 
-                    onClick={() => setIsPopupOpen(false)} 
+                  <Button
+                    variant="outline"
+                    onClick={() => setIsPopupOpen(false)}
                     fullWidth
                   >
                     Continue Shopping
                   </Button>
-                  <Button 
-                    variant="primary" 
+                  <Button
+                    variant="primary"
                     onClick={handleCheckout}
                     fullWidth
                   >
