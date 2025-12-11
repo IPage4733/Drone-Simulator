@@ -3,6 +3,7 @@ import React, { useState } from 'react';
 import { ShoppingCart, X, Trash2 } from 'lucide-react';
 import { useCart } from '../context/CartContext';
 import Button from './Button';
+import { STRIPE_PRICE_IDS } from '../config/stripePriceIds';
 
 const MiniCart: React.FC = () => {
   const { items, totalItems, totalPrice, removeItem } = useCart();
@@ -12,7 +13,7 @@ const MiniCart: React.FC = () => {
     if (items.length === 0) return;
 
     const item = items[0];
-    const stripe_price_id = item.stripe_price_id || 'price_1RcJttCKYG7gRDVPBkHPkocp';
+    const stripe_price_id = item.stripe_price_id || STRIPE_PRICE_IDS.DEFAULT_CUSTOM_ITEM;
 
     const token = sessionStorage.getItem('auth_token');
     if (!token) {
