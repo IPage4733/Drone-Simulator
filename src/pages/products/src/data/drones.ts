@@ -1,4 +1,5 @@
 import { Drone } from '../types';
+import { STRIPE_PRICE_IDS } from '../config/stripePriceIds';
 
 const drones: Drone[] = [
   {
@@ -8,6 +9,7 @@ const drones: Drone[] = [
     image: '/images/drones/Agridrone.jpeg',
     includedIn: ['pro', 'institution'],
     price: 499,
+    stripe_price_id: STRIPE_PRICE_IDS.DEFAULT_CUSTOM_ITEM,
   },
   {
     id: 2,
@@ -16,6 +18,7 @@ const drones: Drone[] = [
     image: '/images/drones/DJIMatrice.jpeg',
     includedIn: ['pro', 'institution'],
     price: 499,
+    stripe_price_id: STRIPE_PRICE_IDS.DEFAULT_CUSTOM_ITEM,
   },
   {
     id: 3,
@@ -24,6 +27,7 @@ const drones: Drone[] = [
     image: '/images/drones/FPV.png',
     includedIn: ['pro', 'institution'],
     price: 499,
+    stripe_price_id: STRIPE_PRICE_IDS.DEFAULT_CUSTOM_ITEM,
   },
   {
     id: 4,
@@ -32,6 +36,7 @@ const drones: Drone[] = [
     image: '/images/drones/Vtol.jpeg',
     includedIn: ['pro', 'institution'],
     price: 499,
+    stripe_price_id: STRIPE_PRICE_IDS.DEFAULT_CUSTOM_ITEM,
   },
   {
     id: 5,
@@ -40,6 +45,7 @@ const drones: Drone[] = [
     image: '/images/drones/model-v.jpeg',
     includedIn: ['free', 'pro', 'institution'],
     price: 0,
+    stripe_price_id: STRIPE_PRICE_IDS.DEFAULT_CUSTOM_ITEM,
   },
   {
     id: 6,
@@ -48,6 +54,7 @@ const drones: Drone[] = [
     image: '/images/drones/Mavic.jpeg',
     includedIn: ['free', 'pro', 'institution'],
     price: 0,
+    stripe_price_id: STRIPE_PRICE_IDS.DEFAULT_CUSTOM_ITEM,
   },
 ];
 

@@ -1,4 +1,5 @@
 import { Plan } from '../types';
+import { STRIPE_PRICE_IDS } from '../config/stripePriceIds';
 
 const plans: Plan[] = [
   {
@@ -14,7 +15,7 @@ const plans: Plan[] = [
     buttonText: 'Start Free',
     buttonVariant: 'secondary',
     mostPopular: false,
-    stripe_price_id: 'price_1RcJttCKYG7gRDVPBkHPkocp'
+    stripe_price_id: STRIPE_PRICE_IDS.FREE_PLAN
   },
   // {
   //   id: 'Student',
@@ -32,7 +33,7 @@ const plans: Plan[] = [
   //   buttonText: 'Add to Cart',
   //   buttonVariant: 'primary',
   //   mostPopular: false,
-  //   stripe_price_id: 'price_1ReFCPCKYG7gRDVPCr3307yG'
+  //   stripe_price_id: STRIPE_PRICE_IDS.STUDENT_PLAN
   // },
   {
     id: 'zone',
@@ -49,7 +50,7 @@ const plans: Plan[] = [
     buttonText: 'Add to Cart',
     buttonVariant: 'primary',
     mostPopular: false,
-    stripe_price_id: ''
+    stripe_price_id: STRIPE_PRICE_IDS.ZONE_PLAN
   },
   {
     id: 'pro',
@@ -65,7 +66,7 @@ const plans: Plan[] = [
     buttonText: 'Add to Cart',
     buttonVariant: 'primary',
     mostPopular: true,
-    stripe_price_id: 'price_1ReFBMCKYG7gRDVPSE55nhzo'
+    stripe_price_id: STRIPE_PRICE_IDS.PRO_PLAN
   },
   {
     id: 'institution',
@@ -84,7 +85,7 @@ const plans: Plan[] = [
     buttonText: 'Contact Us',
     buttonVariant: 'secondary',
     mostPopular: false,
-    stripe_price_id: 'price_1RcJttCKYG7gRDVPBkHPkocp'
+    stripe_price_id: STRIPE_PRICE_IDS.ENTERPRISE_PLAN
   },
 ];
 

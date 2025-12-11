@@ -5,6 +5,7 @@ import Button from '../components/Button';
 import { useCart } from '../context/CartContext';
 import drones from '../data/drones';
 import scenarios from '../data/scenarios';
+import { STRIPE_PRICE_IDS } from '../config/stripePriceIds';
 
 interface Addon {
   id: string;
@@ -50,7 +51,7 @@ const CustomPlanSection: React.FC = () => {
       name: 'All Drones Bundle',
       price: 1999,
       type: 'drone',
-      stripe_price_id: 'price_1RcJttCKYG7gRDVPBkHPkocp'
+      stripe_price_id: STRIPE_PRICE_IDS.ALL_DRONES_BUNDLE
     });
   };
 
@@ -60,9 +61,7 @@ const CustomPlanSection: React.FC = () => {
       name: 'All Scenarios Bundle',
       price: 1999,
       type: 'scenario',
-      stripe_price_id: 'price_1RcJttCKYG7gRDVPBkHPkocp'
-
-
+      stripe_price_id: STRIPE_PRICE_IDS.ALL_SCENARIOS_BUNDLE
     });
   };
 
@@ -72,7 +71,7 @@ const CustomPlanSection: React.FC = () => {
       name: addon.name,
       price: addon.price,
       type: 'addon',
-      stripe_price_id: 'price_1RcJttCKYG7gRDVPBkHPkocp'
+      stripe_price_id: STRIPE_PRICE_IDS.DEFAULT_CUSTOM_ITEM
     });
   };
 
@@ -87,72 +86,69 @@ const CustomPlanSection: React.FC = () => {
             Create a personalized experience by selecting only the drones, scenarios, and features you need.
           </p>
         </div>
-        
+
         <div className="bg-white rounded-xl shadow-md overflow-hidden max-w-5xl mx-auto">
           <div className="flex border-b">
             <button
-              className={`flex-1 py-4 px-6 text-center font-medium ${
-                selectedTab === 'drones' 
-                  ? 'text-orange-500 border-b-2 border-orange-500' 
+              className={`flex-1 py-4 px-6 text-center font-medium ${selectedTab === 'drones'
+                  ? 'text-orange-500 border-b-2 border-orange-500'
                   : 'text-gray-500 hover:text-gray-700'
-              }`}
+                }`}
               onClick={() => setSelectedTab('drones')}
             >
               Select Drones
             </button>
             <button
-              className={`flex-1 py-4 px-6 text-center font-medium ${
-                selectedTab === 'scenarios' 
-                  ? 'text-orange-500 border-b-2 border-orange-500' 
+              className={`flex-1 py-4 px-6 text-center font-medium ${selectedTab === 'scenarios'
+                  ? 'text-orange-500 border-b-2 border-orange-500'
                   : 'text-gray-500 hover:text-gray-700'
-              }`}
+                }`}
               onClick={() => setSelectedTab('scenarios')}
             >
               Select Scenarios
             </button>
             <button
-              className={`flex-1 py-4 px-6 text-center font-medium ${
-                selectedTab === 'addons' 
-                  ? 'text-orange-500 border-b-2 border-orange-500' 
+              className={`flex-1 py-4 px-6 text-center font-medium ${selectedTab === 'addons'
+                  ? 'text-orange-500 border-b-2 border-orange-500'
                   : 'text-gray-500 hover:text-gray-700'
-              }`}
+                }`}
               onClick={() => setSelectedTab('addons')}
             >
               Add Features
             </button>
           </div>
-          
+
           <div className="p-6">
             {selectedTab === 'drones' && (
               <div>
                 <div className="flex justify-between items-center mb-6">
                   <h3 className="text-lg font-bold">Available Drones</h3>
-                  <Button 
-                    variant="primary" 
+                  <Button
+                    variant="primary"
                     size="sm"
                     onClick={handleAllDrones}
                   >
                     Add All Drones ($1,999)
                   </Button>
                 </div>
-                
+
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   {drones
                     .filter(drone => !drone.includedIn.includes('free'))
                     .map(drone => (
                       <Card key={drone.id} className="flex p-4">
-                        <img 
-                          src={drone.image} 
+                        <img
+                          src={drone.image}
                           alt={drone.name}
-                          className="w-16 h-16 object-cover rounded-lg mr-4" 
+                          className="w-16 h-16 object-cover rounded-lg mr-4"
                         />
                         <div className="flex-grow">
                           <h4 className="font-medium">{drone.name}</h4>
                           <p className="text-sm text-gray-500 mb-2">{drone.description.slice(0, 60)}...</p>
                           <div className="flex justify-between items-center">
                             <span className="text-orange-500 font-semibold">${drone.price}</span>
-                            <Button 
-                              variant="outline" 
+                            <Button
+                              variant="outline"
                               size="sm"
                               onClick={() => addItem({
                                 id: drone.id.toString(),
@@ -172,42 +168,42 @@ const CustomPlanSection: React.FC = () => {
                 </div>
               </div>
             )}
-            
+
             {selectedTab === 'scenarios' && (
               <div>
                 <div className="flex justify-between items-center mb-6">
                   <h3 className="text-lg font-bold">Available Scenarios</h3>
-                  <Button 
-                    variant="primary" 
+                  <Button
+                    variant="primary"
                     size="sm"
                     onClick={handleAllScenarios}
                   >
                     Add All Scenarios ($1,999)
                   </Button>
                 </div>
-                
+
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   {scenarios.map(scenario => (
                     <Card key={scenario.id} className="flex p-4">
-                      <img 
-                        src={scenario.image} 
+                      <img
+                        src={scenario.image}
                         alt={scenario.name}
-                        className="w-16 h-16 object-cover rounded-lg mr-4" 
+                        className="w-16 h-16 object-cover rounded-lg mr-4"
                       />
                       <div className="flex-grow">
                         <h4 className="font-medium">{scenario.name}</h4>
                         <p className="text-sm text-gray-500 mb-2">{scenario.description.slice(0, 60)}...</p>
                         <div className="flex justify-between items-center">
                           <span className="text-orange-500 font-semibold">${scenario.price}</span>
-                          <Button 
-                            variant="outline" 
+                          <Button
+                            variant="outline"
                             size="sm"
                             onClick={() => addItem({
                               id: scenario.id.toString(),
                               name: scenario.name,
                               price: scenario.price,
                               type: 'scenario',
-                            stripe_price_id: scenario.stripe_price_id, // ✅ Needed for Stripe checkout
+                              stripe_price_id: scenario.stripe_price_id, // ✅ Needed for Stripe checkout
 
                             })}
                           >
@@ -220,7 +216,7 @@ const CustomPlanSection: React.FC = () => {
                 </div>
               </div>
             )}
-            
+
             {selectedTab === 'addons' && (
               <div>
                 <h3 className="text-lg font-bold mb-6">Additional Features</h3>
@@ -231,8 +227,8 @@ const CustomPlanSection: React.FC = () => {
                       <p className="text-sm text-gray-500 mb-4">{addon.description}</p>
                       <div className="flex justify-between items-center">
                         <span className="text-orange-500 font-semibold">${addon.price}</span>
-                        <Button 
-                          variant="outline" 
+                        <Button
+                          variant="outline"
                           size="sm"
                           onClick={() => handleAddAddon(addon)}
                         >

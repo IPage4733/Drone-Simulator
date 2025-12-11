@@ -1,5 +1,6 @@
 import { Scenario } from '../types';
 import { Landmark } from "lucide-react";
+import { STRIPE_PRICE_IDS } from '../config/stripePriceIds';
 
 const scenarios: Scenario[] = [
   {
@@ -10,6 +11,7 @@ const scenarios: Scenario[] = [
     image: '/images/scenarios/RPTOzone.jpeg',
     includedIn: ['pro', 'institution'],
     price: 499,
+    stripe_price_id: STRIPE_PRICE_IDS.DEFAULT_CUSTOM_ITEM,
   },
   {
     id: 2,
@@ -19,6 +21,7 @@ const scenarios: Scenario[] = [
     image: '/images/scenarios/AgriZone.jpeg',
     includedIn: ['pro', 'institution'],
     price: 499,
+    stripe_price_id: STRIPE_PRICE_IDS.DEFAULT_CUSTOM_ITEM,
   },
   {
     id: 3,
@@ -28,6 +31,7 @@ const scenarios: Scenario[] = [
     image: '/images/scenarios/Defencezone.jpeg',
     includedIn: ['pro', 'institution'],
     price: 499,
+    stripe_price_id: STRIPE_PRICE_IDS.DEFAULT_CUSTOM_ITEM,
   },
   {
     id: 4,
@@ -37,6 +41,7 @@ const scenarios: Scenario[] = [
     image: '/images/scenarios/HVSOLARZone.jpeg',
     includedIn: ['pro', 'institution'],
     price: 499,
+    stripe_price_id: STRIPE_PRICE_IDS.DEFAULT_CUSTOM_ITEM,
   },
   {
     id: 5,
@@ -46,6 +51,7 @@ const scenarios: Scenario[] = [
     image: '/images/scenarios/FactoryZone.jpeg',
     includedIn: ['pro', 'institution'],
     price: 499,
+    stripe_price_id: STRIPE_PRICE_IDS.DEFAULT_CUSTOM_ITEM,
   },
   {
     id: 6,
@@ -55,6 +61,7 @@ const scenarios: Scenario[] = [
     image: '/images/scenarios/Roadinspectionzone.png',
     includedIn: ['pro', 'institution'],
     price: 499,
+    stripe_price_id: STRIPE_PRICE_IDS.DEFAULT_CUSTOM_ITEM,
   },
   {
     id: 7,
@@ -64,6 +71,7 @@ const scenarios: Scenario[] = [
     image: '/images/scenarios/Urbanplanningzone.jpeg',
     includedIn: ['pro', 'institution'],
     price: 499,
+    stripe_price_id: STRIPE_PRICE_IDS.DEFAULT_CUSTOM_ITEM,
   },
 ];
 
