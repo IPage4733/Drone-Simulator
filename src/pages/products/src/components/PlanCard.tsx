@@ -5,13 +5,16 @@ import {
   GraduationCap,
   Airplay,
   Satellite,
-  Mail
+  Mail,
+  Loader2
 } from 'lucide-react';
 import { Plan } from '../types';
 import Card from './Card';
 import Button from './Button';
 import { useCart } from '../context/CartContext';
 import { Link } from 'react-router-dom'; // Import Link for redirection
+import axios from 'axios';
+import { API_ENDPOINTS } from '../../../../config/api';
 
 interface PlanCardProps {
   plan: Plan;
@@ -23,6 +26,7 @@ const PlanCard: React.FC<PlanCardProps> = ({ plan }) => {
 
   const [showModal, setShowModal] = useState(false);
   const [modalMode, setModalMode] = useState<'login' | 'verify' | 'restricted' | 'taken'>('login');
+  const [isLoadingDemo, setIsLoadingDemo] = useState(false);
 
   const [studentEmail, setStudentEmail] = useState('');
   const [error, setError] = useState('');
@@ -40,63 +44,90 @@ const PlanCard: React.FC<PlanCardProps> = ({ plan }) => {
 
 
 
- const handleAddToCart = () => {
-  const userEmail = sessionStorage.getItem('auth_email');
-  const user = JSON.parse(sessionStorage.getItem('auth_user') || '{}');
-  const currentPlan = user.plan;
-  const cartItems = JSON.parse(sessionStorage.getItem('cart') || '[]');
+  const handleAddToCart = () => {
+    const userEmail = sessionStorage.getItem('auth_email');
+    const user = JSON.parse(sessionStorage.getItem('auth_user') || '{}');
+    const currentPlan = user.plan;
+    const cartItems = JSON.parse(sessionStorage.getItem('cart') || '[]');
 
-  // Redirect immediately for institution
-  if (plan.id === 'institution') {
-    window.location.href = '/salesform';
-    return;
-  }
+    // Redirect immediately for institution
+    if (plan.id === 'institution') {
+      window.location.href = '/salesform';
+      return;
+    }
 
-  // ✅ Block switching from Pro or Student plan
-const blockedPlans = ['pro', 'student', 'premium'];
+    // ✅ Block switching from Pro or Student plan
+    const blockedPlans = ['pro', 'student', 'premium'];
 
-  if (user?.plan && blockedPlans.includes(user.plan.toLowerCase())) {
-    setModalMode('taken');
-    setShowModal(true);
-    return;
-  }
-
-  if (!userEmail) {
-    setModalMode('login');
-    setShowModal(true);
-    return;
-  }
-
-  // Student email check
-  if (plan.id === 'Student') {
-    const isEducational = /@[\w.-]+\.(edu|ac)(\.[a-z]{2,})?$|\.university$/i.test(userEmail);
-    if (!isEducational) {
-      setModalMode('restricted');
+    if (user?.plan && blockedPlans.includes(user.plan.toLowerCase())) {
+      setModalMode('taken');
       setShowModal(true);
       return;
     }
-  }
 
-  if (plan.id === 'free') {
-    window.location.href = '/auth/register';
-    return;
-  }
+    if (!userEmail) {
+      setModalMode('login');
+      setShowModal(true);
+      return;
+    }
 
-  const alreadyInCart = cartItems.find((item: any) => item.id === plan.id);
-  if (alreadyInCart) return;
+    // Student email check
+    if (plan.id === 'Student') {
+      const isEducational = /@[\w.-]+\.(edu|ac)(\.[a-z]{2,})?$|\.university$/i.test(userEmail);
+      if (!isEducational) {
+        setModalMode('restricted');
+        setShowModal(true);
+        return;
+      }
+    }
 
-  const newItem = {
-    id: plan.id,
-    name: plan.name,
-    price: plan.price,
-    type: 'plan' as 'plan',
-    stripe_price_id: plan.stripe_price_id,
+    if (plan.id === 'free') {
+      // Call the demo license API
+      const handleRequestDemo = async () => {
+        setIsLoadingDemo(true);
+        try {
+          const response = await axios.post(
+            API_ENDPOINTS.PAYMENT_REQUEST_DEMO,
+            { email: userEmail },
+            {
+              headers: {
+                Authorization: `Token ${sessionStorage.getItem('auth_token')}`,
+              },
+            }
+          );
+
+          if (response.data.status === 'success') {
+            alert('Demo license request successful! Check your email for the license key.');
+          } else {
+            alert(response.data.message || 'Failed to request demo license. Please try again.');
+          }
+        } catch (error: any) {
+          console.error('Error requesting demo license:', error);
+          alert(error.response?.data?.message || 'An error occurred while requesting the demo license.');
+        } finally {
+          setIsLoadingDemo(false);
+        }
+      };
+
+      handleRequestDemo();
+      return;
+    }
+
+    const alreadyInCart = cartItems.find((item: any) => item.id === plan.id);
+    if (alreadyInCart) return;
+
+    const newItem = {
+      id: plan.id,
+      name: plan.name,
+      price: plan.price,
+      type: 'plan' as 'plan',
+      stripe_price_id: plan.stripe_price_id,
+    };
+
+    const updatedCart = [...cartItems, newItem];
+    sessionStorage.setItem('cart', JSON.stringify(updatedCart));
+    addItem(newItem);
   };
-
-  const updatedCart = [...cartItems, newItem];
-  sessionStorage.setItem('cart', JSON.stringify(updatedCart));
-  addItem(newItem);
-};
 
 
 
@@ -170,7 +201,7 @@ const blockedPlans = ['pro', 'student', 'premium'];
 
             {plan.id === 'institution' && (
               <>
-                
+
               </>
             )}
 
@@ -185,7 +216,7 @@ const blockedPlans = ['pro', 'student', 'premium'];
                   </li>
                 );
               }
-              
+
               // For other plans, keep the existing behavior
               const parts = feature.split(/(Available Drones-\d+:?|Permitted Zones?-?\d*\s*\(?[^)]*\)?:?)/g);
               return (
@@ -193,8 +224,8 @@ const blockedPlans = ['pro', 'student', 'premium'];
                   <CheckCircle size={12} className="text-orange-500 mr-2 flex-shrink-0 mt-0.5" />
                   <span className="text-sm text-gray-700">
                     {parts.map((part, i) => {
-                      if (part.match(/^Available Drones-\d+:?/i) || 
-                          part.match(/^Permitted Zones?-?\d*\s*\(?[^)]*\)?:?/i)) {
+                      if (part.match(/^Available Drones-\d+:?/i) ||
+                        part.match(/^Permitted Zones?-?\d*\s*\(?[^)]*\)?:?/i)) {
                         return <strong key={i} className="font-semibold">{part}</strong>;
                       }
                       return part;
@@ -205,8 +236,20 @@ const blockedPlans = ['pro', 'student', 'premium'];
             })}
           </ul>
 
-          <Button variant={plan.buttonVariant} onClick={handleAddToCart} fullWidth className="text-sm py-2">
-            {plan.buttonText}
+          <Button
+            variant={plan.buttonVariant}
+            onClick={handleAddToCart}
+            disabled={plan.id === 'free' && isLoadingDemo}
+            fullWidth
+          >
+            {plan.id === 'free' && isLoadingDemo ? (
+              <span className="flex items-center justify-center gap-2">
+                <Loader2 className="w-4 h-4 animate-spin" />
+                Loading...
+              </span>
+            ) : (
+              plan.buttonText
+            )}
           </Button>
         </div>
       </Card>

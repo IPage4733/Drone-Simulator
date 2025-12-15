@@ -23,6 +23,9 @@ export const API_ENDPOINTS = {
     UPDATE_USER: `${API_BASE_URL}/update-user-details/`,
     GET_ALL_USERS: `${API_BASE_URL}/get-all-users/`,
 
+    // Get Demo License
+    PAYMENT_REQUEST_DEMO: `${API_BASE_URL}/stripe/license/request-demo/`,
+
     // Contact & Inquiry
     CONTACT: `${API_BASE_URL}/contact/`,
     CONTACT_MY: `${API_BASE_URL}/contact/my/`,
