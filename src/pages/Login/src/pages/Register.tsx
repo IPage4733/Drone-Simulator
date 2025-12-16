@@ -1,146 +1,25 @@
 import { API_ENDPOINTS } from '@/config/api'
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 import Logo from '../components/Logo'
 import Navigation from '@/components/Navigation'
-// Country data with codes and phone prefixes
-const countries = [
-  { code: 'US', name: 'United States', phone: '+1' },
-  { code: 'CA', name: 'Canada', phone: '+1' },
-  { code: 'GB', name: 'United Kingdom', phone: '+44' },
-  { code: 'AU', name: 'Australia', phone: '+61' },
-  { code: 'DE', name: 'Germany', phone: '+49' },
-  { code: 'FR', name: 'France', phone: '+33' },
-  { code: 'IT', name: 'Italy', phone: '+39' },
-  { code: 'ES', name: 'Spain', phone: '+34' },
-  { code: 'NL', name: 'Netherlands', phone: '+31' },
-  { code: 'BE', name: 'Belgium', phone: '+32' },
-  { code: 'CH', name: 'Switzerland', phone: '+41' },
-  { code: 'AT', name: 'Austria', phone: '+43' },
-  { code: 'SE', name: 'Sweden', phone: '+46' },
-  { code: 'NO', name: 'Norway', phone: '+47' },
-  { code: 'DK', name: 'Denmark', phone: '+45' },
-  { code: 'FI', name: 'Finland', phone: '+358' },
-  { code: 'IE', name: 'Ireland', phone: '+353' },
-  { code: 'PT', name: 'Portugal', phone: '+351' },
-  { code: 'GR', name: 'Greece', phone: '+30' },
-  { code: 'PL', name: 'Poland', phone: '+48' },
-  { code: 'CZ', name: 'Czech Republic', phone: '+420' },
-  { code: 'HU', name: 'Hungary', phone: '+36' },
-  { code: 'SK', name: 'Slovakia', phone: '+421' },
-  { code: 'SI', name: 'Slovenia', phone: '+386' },
-  { code: 'HR', name: 'Croatia', phone: '+385' },
-  { code: 'BG', name: 'Bulgaria', phone: '+359' },
-  { code: 'RO', name: 'Romania', phone: '+40' },
-  { code: 'LT', name: 'Lithuania', phone: '+370' },
-  { code: 'LV', name: 'Latvia', phone: '+371' },
-  { code: 'EE', name: 'Estonia', phone: '+372' },
-  { code: 'MT', name: 'Malta', phone: '+356' },
-  { code: 'CY', name: 'Cyprus', phone: '+357' },
-  { code: 'LU', name: 'Luxembourg', phone: '+352' },
-  { code: 'IS', name: 'Iceland', phone: '+354' },
-  { code: 'JP', name: 'Japan', phone: '+81' },
-  { code: 'KR', name: 'South Korea', phone: '+82' },
-  { code: 'CN', name: 'China', phone: '+86' },
-  { code: 'IN', name: 'India', phone: '+91' },
-  { code: 'SG', name: 'Singapore', phone: '+65' },
-  { code: 'HK', name: 'Hong Kong', phone: '+852' },
-  { code: 'TW', name: 'Taiwan', phone: '+886' },
-  { code: 'MY', name: 'Malaysia', phone: '+60' },
-  { code: 'TH', name: 'Thailand', phone: '+66' },
-  { code: 'PH', name: 'Philippines', phone: '+63' },
-  { code: 'ID', name: 'Indonesia', phone: '+62' },
-  { code: 'VN', name: 'Vietnam', phone: '+84' },
-  { code: 'BD', name: 'Bangladesh', phone: '+880' },
-  { code: 'PK', name: 'Pakistan', phone: '+92' },
-  { code: 'LK', name: 'Sri Lanka', phone: '+94' },
-  { code: 'NP', name: 'Nepal', phone: '+977' },
-  { code: 'BT', name: 'Bhutan', phone: '+975' },
-  { code: 'MV', name: 'Maldives', phone: '+960' },
-  { code: 'AE', name: 'United Arab Emirates', phone: '+971' },
-  { code: 'SA', name: 'Saudi Arabia', phone: '+966' },
-  { code: 'QA', name: 'Qatar', phone: '+974' },
-  { code: 'KW', name: 'Kuwait', phone: '+965' },
-  { code: 'BH', name: 'Bahrain', phone: '+973' },
-  { code: 'OM', name: 'Oman', phone: '+968' },
-  { code: 'JO', name: 'Jordan', phone: '+962' },
-  { code: 'LB', name: 'Lebanon', phone: '+961' },
-  { code: 'IL', name: 'Israel', phone: '+972' },
-  { code: 'TR', name: 'Turkey', phone: '+90' },
-  { code: 'EG', name: 'Egypt', phone: '+20' },
-  { code: 'ZA', name: 'South Africa', phone: '+27' },
-  { code: 'NG', name: 'Nigeria', phone: '+234' },
-  { code: 'KE', name: 'Kenya', phone: '+254' },
-  { code: 'GH', name: 'Ghana', phone: '+233' },
-  { code: 'UG', name: 'Uganda', phone: '+256' },
-  { code: 'TZ', name: 'Tanzania', phone: '+255' },
-  { code: 'ET', name: 'Ethiopia', phone: '+251' },
-  { code: 'MA', name: 'Morocco', phone: '+212' },
-  { code: 'DZ', name: 'Algeria', phone: '+213' },
-  { code: 'TN', name: 'Tunisia', phone: '+216' },
-  { code: 'LY', name: 'Libya', phone: '+218' },
-  { code: 'SD', name: 'Sudan', phone: '+249' },
-  { code: 'BR', name: 'Brazil', phone: '+55' },
-  { code: 'AR', name: 'Argentina', phone: '+54' },
-  { code: 'CL', name: 'Chile', phone: '+56' },
-  { code: 'CO', name: 'Colombia', phone: '+57' },
-  { code: 'PE', name: 'Peru', phone: '+51' },
-  { code: 'VE', name: 'Venezuela', phone: '+58' },
-  { code: 'EC', name: 'Ecuador', phone: '+593' },
-  { code: 'UY', name: 'Uruguay', phone: '+598' },
-  { code: 'PY', name: 'Paraguay', phone: '+595' },
-  { code: 'BO', name: 'Bolivia', phone: '+591' },
-  { code: 'GY', name: 'Guyana', phone: '+592' },
-  { code: 'SR', name: 'Suriname', phone: '+597' },
-  { code: 'GF', name: 'French Guiana', phone: '+594' },
-  { code: 'MX', name: 'Mexico', phone: '+52' },
-  { code: 'GT', name: 'Guatemala', phone: '+502' },
-  { code: 'BZ', name: 'Belize', phone: '+501' },
-  { code: 'SV', name: 'El Salvador', phone: '+503' },
-  { code: 'HN', name: 'Honduras', phone: '+504' },
-  { code: 'NI', name: 'Nicaragua', phone: '+505' },
-  { code: 'CR', name: 'Costa Rica', phone: '+506' },
-  { code: 'PA', name: 'Panama', phone: '+507' },
-  { code: 'CU', name: 'Cuba', phone: '+53' },
-  { code: 'JM', name: 'Jamaica', phone: '+1876' },
-  { code: 'HT', name: 'Haiti', phone: '+509' },
-  { code: 'DO', name: 'Dominican Republic', phone: '+1809' },
-  { code: 'PR', name: 'Puerto Rico', phone: '+1787' },
-  { code: 'TT', name: 'Trinidad and Tobago', phone: '+1868' },
-  { code: 'BB', name: 'Barbados', phone: '+1246' },
-  { code: 'RU', name: 'Russia', phone: '+7' },
-  { code: 'UA', name: 'Ukraine', phone: '+380' },
-  { code: 'BY', name: 'Belarus', phone: '+375' },
-  { code: 'MD', name: 'Moldova', phone: '+373' },
-  { code: 'GE', name: 'Georgia', phone: '+995' },
-  { code: 'AM', name: 'Armenia', phone: '+374' },
-  { code: 'AZ', name: 'Azerbaijan', phone: '+994' },
-  { code: 'KZ', name: 'Kazakhstan', phone: '+7' },
-  { code: 'KG', name: 'Kyrgyzstan', phone: '+996' },
-  { code: 'TJ', name: 'Tajikistan', phone: '+992' },
-  { code: 'TM', name: 'Turkmenistan', phone: '+993' },
-  { code: 'UZ', name: 'Uzbekistan', phone: '+998' },
-  { code: 'MN', name: 'Mongolia', phone: '+976' },
-  { code: 'NZ', name: 'New Zealand', phone: '+64' },
-  { code: 'FJ', name: 'Fiji', phone: '+679' },
-  { code: 'PG', name: 'Papua New Guinea', phone: '+675' },
-  { code: 'NC', name: 'New Caledonia', phone: '+687' },
-  { code: 'VU', name: 'Vanuatu', phone: '+678' },
-  { code: 'SB', name: 'Solomon Islands', phone: '+677' },
-  { code: 'TO', name: 'Tonga', phone: '+676' },
-  { code: 'WS', name: 'Samoa', phone: '+685' },
-  { code: 'KI', name: 'Kiribati', phone: '+686' },
-  { code: 'TV', name: 'Tuvalu', phone: '+688' },
-  { code: 'NR', name: 'Nauru', phone: '+674' },
-  { code: 'PW', name: 'Palau', phone: '+680' },
-  { code: 'FM', name: 'Micronesia', phone: '+691' },
-  { code: 'MH', name: 'Marshall Islands', phone: '+692' }
-].sort((a, b) => a.name.localeCompare(b.name))
+// Types for API data
+interface Country {
+  name: { common: string };
+  cca2: string;
+  idd: { root: string; suffixes?: string[] };
+}
+
+interface State {
+  name: string;
+  state_code: string;
+}
 
 const Register: React.FC = () => {
   const [formData, setFormData] = useState({
     email: '',
+    username: '',
     password: '',
     password_confirm: '',
     full_name: '',
@@ -159,6 +38,80 @@ const Register: React.FC = () => {
   const navigate = useNavigate()
   const [showVerificationPopup, setShowVerificationPopup] = useState(false);
 
+  // API data states
+  const [countries, setCountries] = useState<Array<{ code: string; name: string; phone: string }>>([])
+  const [states, setStates] = useState<Array<{ name: string; code: string }>>([])
+  const [loadingCountries, setLoadingCountries] = useState(true)
+  const [loadingStates, setLoadingStates] = useState(false)
+
+  // Fetch countries on component mount
+  useEffect(() => {
+    const fetchCountries = async () => {
+      try {
+        const response = await fetch('https://restcountries.com/v3.1/all?fields=name,cca2,idd');
+        const data: Country[] = await response.json();
+
+        const formattedCountries = data
+          .map(country => {
+            const phoneCode = country.idd?.root
+              ? `${country.idd.root}${country.idd.suffixes?.[0] || ''}`
+              : '';
+
+            return {
+              code: country.cca2,
+              name: country.name.common,
+              phone: phoneCode
+            };
+          })
+          .filter(c => c.phone) // Only include countries with phone codes
+          .sort((a, b) => a.name.localeCompare(b.name));
+
+        setCountries(formattedCountries);
+      } catch (error) {
+        console.error('Error fetching countries:', error);
+        // Fallback to India if API fails
+        setCountries([{ code: 'IN', name: 'India', phone: '+91' }]);
+      } finally {
+        setLoadingCountries(false);
+      }
+    };
+
+    fetchCountries();
+  }, []);
+
+  // Fetch states when country changes
+  useEffect(() => {
+    const fetchStates = async () => {
+      if (!formData.country_code) return;
+
+      setLoadingStates(true);
+      try {
+        const response = await fetch(
+          `https://api.countrystatecity.in/v1/countries/${formData.country_code}/states`,
+          {
+            headers: {
+              'X-CSCAPI-KEY': 'NHhvOEcyWk50N2Vna3VFTE00bFp3MjFKR0ZEOUhkZlg4RTk1MlJlaA==' // Free API key
+            }
+          }
+        );
+
+        if (response.ok) {
+          const data: State[] = await response.json();
+          setStates(data.map(state => ({ name: state.name, code: state.state_code })));
+        } else {
+          setStates([]);
+        }
+      } catch (error) {
+        console.error('Error fetching states:', error);
+        setStates([]);
+      } finally {
+        setLoadingStates(false);
+      }
+    };
+
+    fetchStates();
+  }, [formData.country_code]);
+
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target
 
@@ -170,7 +123,8 @@ const Register: React.FC = () => {
           ...prev,
           [name]: value,
           country: selectedCountry.name,
-          phone_code: selectedCountry.phone
+          phone_code: selectedCountry.phone,
+          state_province: '' // Reset state when country changes
         }))
       }
     } else {
@@ -205,6 +159,14 @@ const Register: React.FC = () => {
       newErrors.password_confirm = 'Please confirm your password'
     } else if (formData.password !== formData.password_confirm) {
       newErrors.password_confirm = 'Passwords do not match'
+    }
+
+    if (!formData.username) {
+      newErrors.username = 'Username is required'
+    } else if (formData.username.length < 3) {
+      newErrors.username = 'Username must be at least 3 characters'
+    } else if (!/^[a-zA-Z0-9_]+$/.test(formData.username)) {
+      newErrors.username = 'Username can only contain letters, numbers, and underscores'
     }
 
     if (!formData.full_name) {
@@ -247,6 +209,7 @@ const Register: React.FC = () => {
     try {
       const requestBody = {
         email: formData.email,
+        username: formData.username,
         password: formData.password,
         password_confirm: formData.password_confirm,
         full_name: formData.full_name,
@@ -377,22 +340,36 @@ const Register: React.FC = () => {
                 {errors.email && <p className="text-red-500 text-xs mt-0.5">{errors.email}</p>}
               </div>
               <div>
-                <label className="block text-xs font-medium text-gray-700 mb-0.5">Full Name</label>
+                <label className="block text-xs font-medium text-gray-700 mb-0.5">Username</label>
                 <input
                   type="text"
-                  name="full_name"
-                  value={formData.full_name}
+                  name="username"
+                  value={formData.username}
                   onChange={handleChange}
-                  className={`w-full px-1.5 py-1 border rounded text-xs focus:ring-1 focus:ring-orange-500 focus:border-transparent ${errors.full_name ? 'border-red-500' : 'border-gray-300'}`}
-                  placeholder="Your name"
+                  className={`w-full px-1.5 py-1 border rounded text-xs focus:ring-1 focus:ring-orange-500 focus:border-transparent ${errors.username ? 'border-red-500' : 'border-gray-300'}`}
+                  placeholder="username"
                 />
-                {errors.full_name && <p className="text-red-500 text-xs mt-0.5">{errors.full_name}</p>}
+                {errors.username && <p className="text-red-500 text-xs mt-0.5">{errors.username}</p>}
               </div>
+            </div>
+
+            {/* Row 2: Full Name */}
+            <div>
+              <label className="block text-xs font-medium text-gray-700 mb-0.5">Full Name</label>
+              <input
+                type="text"
+                name="full_name"
+                value={formData.full_name}
+                onChange={handleChange}
+                className={`w-full px-1.5 py-1 border rounded text-xs focus:ring-1 focus:ring-orange-500 focus:border-transparent ${errors.full_name ? 'border-red-500' : 'border-gray-300'}`}
+                placeholder="Your full name"
+              />
+              {errors.full_name && <p className="text-red-500 text-xs mt-0.5">{errors.full_name}</p>}
             </div>
 
 
 
-            {/* Row 2: Password & Confirm */}
+            {/* Row 3: Password & Confirm */}
             <div className="grid grid-cols-2 gap-1.5">
               <div>
                 <label className="block text-xs font-medium text-gray-700 mb-0.5">Password</label>
@@ -420,7 +397,7 @@ const Register: React.FC = () => {
               </div>
             </div>
 
-            {/* Row 3: Full Name & Country */}
+            {/* Row 4: Country & Phone */}
             <div className="grid grid-cols-2 gap-1.5">
               {/* Country Field */}
               <div>
@@ -429,13 +406,18 @@ const Register: React.FC = () => {
                   name="country_code"
                   value={formData.country_code}
                   onChange={handleChange}
-                  className="w-full px-1.5 py-1 border border-gray-300 rounded text-xs focus:ring-1 focus:ring-orange-500 focus:border-transparent"
+                  disabled={loadingCountries}
+                  className="w-full px-1.5 py-1 border border-gray-300 rounded text-xs focus:ring-1 focus:ring-orange-500 focus:border-transparent disabled:bg-gray-100 disabled:cursor-not-allowed"
                 >
-                  {countries.map((country) => (
-                    <option key={country.code} value={country.code}>
-                      {country.name}
-                    </option>
-                  ))}
+                  {loadingCountries ? (
+                    <option>Loading countries...</option>
+                  ) : (
+                    countries.map((country) => (
+                      <option key={country.code} value={country.code}>
+                        {country.name}
+                      </option>
+                    ))
+                  )}
                 </select>
               </div>
 
@@ -460,10 +442,10 @@ const Register: React.FC = () => {
             </div>
 
 
-            {/* Row 4: Phone Number - Compact */}
+            {/* Row 5: Removed - Phone moved up */}
 
 
-            {/* Row 5: City, State & Purpose in 3 columns */}
+            {/* Row 6: City, State & Purpose in 3 columns */}
             <div className="grid grid-cols-3 gap-1.5">
               <div>
                 <label className="block text-xs font-medium text-gray-700 mb-0.5">City</label>
@@ -479,14 +461,22 @@ const Register: React.FC = () => {
               </div>
               <div>
                 <label className="block text-xs font-medium text-gray-700 mb-0.5">State</label>
-                <input
-                  type="text"
+                <select
                   name="state_province"
                   value={formData.state_province}
                   onChange={handleChange}
-                  className={`w-full px-1.5 py-1 border rounded text-xs focus:ring-1 focus:ring-orange-500 focus:border-transparent ${errors.state_province ? 'border-red-500' : 'border-gray-300'}`}
-                  placeholder="State"
-                />
+                  disabled={loadingStates || states.length === 0}
+                  className={`w-full px-1.5 py-1 border rounded text-xs focus:ring-1 focus:ring-orange-500 focus:border-transparent disabled:bg-gray-100 disabled:cursor-not-allowed ${errors.state_province ? 'border-red-500' : 'border-gray-300'}`}
+                >
+                  <option value="">
+                    {loadingStates ? 'Loading states...' : states.length === 0 ? 'No states available' : 'Select state'}
+                  </option>
+                  {states.map((state) => (
+                    <option key={state.code} value={state.name}>
+                      {state.name}
+                    </option>
+                  ))}
+                </select>
                 {errors.state_province && <p className="text-red-500 text-xs mt-0.5">{errors.state_province}</p>}
               </div>
               <div>
