@@ -432,7 +432,7 @@ const Profile: React.FC = () => {
     { id: 'overview', name: 'Overview', icon: BarChart3 },
     { id: 'profile', name: 'Profile', icon: User },
     { id: 'purchases', name: 'Purchases', icon: ShoppingBag },
-    { id: 'licencekey', name: 'Licence Key', icon: Key, redirect: '/product' },
+    { id: 'licencekey', name: 'Add Licence Key', icon: Key, redirect: '/product' },
     // { id: 'achievements', name: 'Achievements', icon: Award }
   ]
   const groupScenarioSummary = (scenarios: any[]) => {
