@@ -34,6 +34,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
     // { path: '/Dash/master/plans', label: 'Subscription Plans', icon: CreditCard },
     // { path: '/Dash/master/products', label: 'Products', icon: Package },
     // { path: '/Dash/master/annotations', label: 'Change Logs', icon: FileText },
+    { path: '/Dash/master/license-key', label: 'License Management', icon: UserCog },
     { path: '/Dash/master/employees', label: 'Employee Management', icon: UserCog },
     { path: '/Dash/master/income', label: 'Income Reports', icon: TrendingUp },
     { path: '/Dash/master/metrics', label: 'User Metrics', icon: BarChart3 },
@@ -41,7 +42,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
     { path: '/Dash/master/cont', label: 'ContactUs', icon: MessageCircle },
     { path: '/Dash/master/inqui', label: 'Sales Inquiries', icon: Mail },
     { path: '/Dash/master/feed', label: 'Feedbacks', icon: ThumbsUp },
-     { path: '/Dash/master/down', label: 'Downloads History', icon: ThumbsUp },
+    { path: '/Dash/master/down', label: 'Downloads History', icon: ThumbsUp },
   ];
 
   const adminNavItems = [
