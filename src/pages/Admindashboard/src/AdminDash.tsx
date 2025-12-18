@@ -35,6 +35,7 @@ import { AdminAnnotations } from './pages/admin/Annotations';
 import { AdminSearch } from './pages/admin/Search';
 import { AdminUserMetrics } from './pages/admin/UserMetrics';
 import { AdminAnalytics } from './pages/admin/Analytics';
+import AdminLicenseGenerator from './pages/master/LicenseKey';
 
 function AdminDash() {
   return (
@@ -56,6 +57,7 @@ function AdminDash() {
           <Route path="master/dashboard" element={<ProtectedRoute requiredRole="master"><MasterDashboard /></ProtectedRoute>} />
           <Route path="master/users" element={<ProtectedRoute requiredRole="master"><MasterUsers /></ProtectedRoute>} />
           <Route path="master/users/:id" element={<ProtectedRoute requiredRole="master"><MasterUserDetail /></ProtectedRoute>} />
+          <Route path="master/license-key" element={<ProtectedRoute requiredRole="master"><AdminLicenseGenerator /></ProtectedRoute>} />
           <Route path="master/plans" element={<ProtectedRoute requiredRole="master"><MasterPlans /></ProtectedRoute>} />
           <Route path="master/products" element={<ProtectedRoute requiredRole="master"><MasterProducts /></ProtectedRoute>} />
           <Route path="master/annotations" element={<ProtectedRoute requiredRole="master"><MasterAnnotations /></ProtectedRoute>} />

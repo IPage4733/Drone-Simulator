@@ -55,6 +55,7 @@ export const API_ENDPOINTS = {
     // Admin
     ADMIN_GROUPS: `${API_BASE_URL}/admin/groups/`,
     ADMIN_CREATE_USER: `${API_BASE_URL}/admin/create-user/`,
+    GENERATE_LICENSE: `${API_BASE_URL}/admin/generate-license/`,
 
     // Neodove Integration
     NEODOVE_DOWNLOAD_LEADS: `${NEODOVE_BASE_URL}/da0b1545-0690-4f36-b538-100a870026eb/leads`,

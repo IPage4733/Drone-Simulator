@@ -34,7 +34,8 @@ import {
   Users,
   Globe,
   Menu,
-  ChevronDown
+  ChevronDown,
+  Key
 } from 'lucide-react'
 
 const Profile: React.FC = () => {
@@ -431,6 +432,7 @@ const Profile: React.FC = () => {
     { id: 'overview', name: 'Overview', icon: BarChart3 },
     { id: 'profile', name: 'Profile', icon: User },
     { id: 'purchases', name: 'Purchases', icon: ShoppingBag },
+    { id: 'licencekey', name: 'Add Licence Key', icon: Key, redirect: '/product' },
     // { id: 'achievements', name: 'Achievements', icon: Award }
   ]
   const groupScenarioSummary = (scenarios: any[]) => {
@@ -731,7 +733,13 @@ const Profile: React.FC = () => {
                 return (
                   <button
                     key={tab.id}
-                    onClick={() => setActiveTab(tab.id)}
+                    onClick={() => {
+                      if (tab.redirect) {
+                        navigate(tab.redirect)
+                      } else {
+                        setActiveTab(tab.id)
+                      }
+                    }}
                     className={`flex items-center gap-2 px-3 py-3 text-xs font-medium border-b-2 transition-colors whitespace-nowrap flex-shrink-0 ${activeTab === tab.id
                       ? 'border-orange-500 text-orange-600 bg-orange-50'
                       : 'border-transparent text-gray-500 hover:text-gray-700 hover:bg-gray-50'
@@ -753,7 +761,13 @@ const Profile: React.FC = () => {
               return (
                 <button
                   key={tab.id}
-                  onClick={() => setActiveTab(tab.id)}
+                  onClick={() => {
+                    if (tab.redirect) {
+                      navigate(tab.redirect)
+                    } else {
+                      setActiveTab(tab.id)
+                    }
+                  }}
                   className={`flex items-center gap-2 px-6 py-4 text-sm font-medium border-b-2 transition-colors ${activeTab === tab.id
                     ? 'border-orange-500 text-orange-600 bg-orange-50'
                     : 'border-transparent text-gray-500 hover:text-gray-700 hover:bg-gray-50'
