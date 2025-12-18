@@ -55,6 +55,7 @@ const PLANS = [
 ];
 const ZONES = ['Zone A', 'Zone B', 'Zone C', 'Zone D', 'Zone E'];
 const AdminLicenseGenerator: React.FC = () => {
+    const [activeTab, setActiveTab] = useState<'register' | 'license'>('register');
     const [userInfo, setUserInfo] = useState<UserInfo>({
         fullName: '',
         username: '',
@@ -67,6 +68,7 @@ const AdminLicenseGenerator: React.FC = () => {
         stateProvince: '',
         password: ''
     });
+    const [licenseEmail, setLicenseEmail] = useState('');
     const [selectedPlan, setSelectedPlan] = useState('pro');
     const [quantity, setQuantity] = useState(1);
     const [selectedZones, setSelectedZones] = useState<string[]>([]);
@@ -77,6 +79,7 @@ const AdminLicenseGenerator: React.FC = () => {
     const [generatedLicense, setGeneratedLicense] = useState<LicenseResponse | null>(null);
     const [loading, setLoading] = useState(false);
     const [errors, setErrors] = useState<{ [key: string]: string }>({});
+    const [successMessage, setSuccessMessage] = useState<string>('');
 
     // API data states
     const [countries, setCountries] = useState<Array<{ code: string; name: string; phone: string }>>([]);
@@ -197,7 +200,7 @@ const AdminLicenseGenerator: React.FC = () => {
         }
     };
 
-    const validateForm = (): boolean => {
+    const validateRegistrationForm = (): boolean => {
         const newErrors: { [key: string]: string } = {};
 
         if (!userInfo.fullName.trim()) {
@@ -236,6 +239,19 @@ const AdminLicenseGenerator: React.FC = () => {
             newErrors.country = 'Country is required';
         }
 
+        setErrors(newErrors);
+        return Object.keys(newErrors).length === 0;
+    };
+
+    const validateLicenseForm = (): boolean => {
+        const newErrors: { [key: string]: string } = {};
+
+        if (!licenseEmail.trim()) {
+            newErrors.licenseEmail = 'Email is required';
+        } else if (!/\S+@\S+\.\S+/.test(licenseEmail)) {
+            newErrors.licenseEmail = 'Email is invalid';
+        }
+
         if (!selectedPlan) {
             newErrors.plan = 'Plan type is required';
         }
@@ -252,15 +268,15 @@ const AdminLicenseGenerator: React.FC = () => {
         return Object.keys(newErrors).length === 0;
     };
     const handleGenerateUser = async () => {
-        // First, validate and create the user account
-        if (!validateForm()) return;
+        // Validate and create the user account
+        if (!validateRegistrationForm()) return;
 
         setLoading(true);
         setErrors({});
         setGeneratedLicense(null);
 
         try {
-            // Step 1: Register the user
+            // Register the user
             const requestBody = {
                 full_name: userInfo.fullName,
                 username: userInfo.username,
@@ -284,8 +300,25 @@ const AdminLicenseGenerator: React.FC = () => {
             console.log("🔴 Full registration response:", data); // For debugging
 
             if (response.ok) {
-                // Step 2: Generate license key using admin endpoint
-                await handleGenerateLicense();
+                // ✅ Registration successful - switch to license tab
+                const registeredEmail = userInfo.email;
+                setSuccessMessage(`User registered successfully! Email: ${registeredEmail}. Now generate a license key.`);
+                setLicenseEmail(registeredEmail); // Pre-fill the email in license tab
+                setActiveTab('license'); // Switch to license generation tab
+
+                // Reset registration form
+                setUserInfo({
+                    fullName: '',
+                    username: '',
+                    email: '',
+                    phone: '',
+                    country: 'India',
+                    countryCode: 'IN',
+                    phoneCode: '+91',
+                    city: '',
+                    stateProvince: '',
+                    password: ''
+                });
             } else {
                 // ✅ Extract field-level errors like: "email already exists"
                 if (data?.errors && typeof data.errors === 'object') {
@@ -303,15 +336,17 @@ const AdminLicenseGenerator: React.FC = () => {
 
         } catch (err: any) {
             console.error('Error creating user:', err);
+            setErrors({ submit: 'An unexpected error occurred. Please try again.' });
         } finally {
             setLoading(false);
         }
     };
-    const handleGenerateLicense = async () => {
-        if (!validateForm()) return;
+    const handleGenerateLicenseOnly = async () => {
+        if (!validateLicenseForm()) return;
 
         setLoading(true);
         setErrors({});
+        setSuccessMessage('');
         setGeneratedLicense(null);
 
         try {
@@ -324,7 +359,7 @@ const AdminLicenseGenerator: React.FC = () => {
             const response = await axios.post<LicenseResponse>(
                 API_ENDPOINTS.GENERATE_LICENSE,
                 {
-                    user_email: userInfo.email,
+                    user_email: licenseEmail,
                     plan_type: selectedPlan,
                     expires_at: expiresAt.toISOString(),
                 },
@@ -349,221 +384,331 @@ const AdminLicenseGenerator: React.FC = () => {
     };
     return (
         <div className="space-y-6 animate-fade-in max-w-5xl">
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                {/* Section 1: User Information */}
-                <div className="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
-                    <h2 className="text-lg font-bold text-slate-800 mb-4 flex items-center gap-2">
-                        <span className="bg-orange-100 text-orange-600 w-6 h-6 rounded flex items-center justify-center text-xs">1</span>
-                        User Information
-                    </h2>
-                    <div className="space-y-3">
-                        <div className="flex flex-col mb-4 w-full">
-                            <label className="text-gray-600 text-sm font-medium mb-1.5">Full Name *</label>
-                            <input
-                                type="text"
-                                value={userInfo.fullName}
-                                onChange={(e) => handleUserInfoChange('fullName', e.target.value)}
-                                placeholder="e.g. John Pilot"
-                                className={`w-full px-4 py-2.5 rounded-md border ${errors.fullName ? 'border-red-500' : 'border-gray-300'} focus:outline-none focus:ring-2 focus:ring-orange-500`}
-                            />
-                            {errors.fullName && <p className="text-red-500 text-xs mt-1">{errors.fullName}</p>}
-                        </div>
-                        <div className="flex flex-col mb-4 w-full">
-                            <label className="text-gray-600 text-sm font-medium mb-1.5">Username *</label>
-                            <input
-                                type="text"
-                                value={userInfo.username}
-                                onChange={(e) => handleUserInfoChange('username', e.target.value)}
-                                placeholder="e.g. pilot_01"
-                                className={`w-full px-4 py-2.5 rounded-md border ${errors.username ? 'border-red-500' : 'border-gray-300'} focus:outline-none focus:ring-2 focus:ring-orange-500`}
-                            />
-                            {errors.username && <p className="text-red-500 text-xs mt-1">{errors.username}</p>}
-                        </div>
-                        <div className="flex flex-col mb-4 w-full">
-                            <label className="text-gray-600 text-sm font-medium mb-1.5">Email Address (ID) *</label>
-                            <input
-                                type="email"
-                                value={userInfo.email}
-                                onChange={(e) => handleUserInfoChange('email', e.target.value)}
-                                placeholder="pilot@example.com"
-                                className={`w-full px-4 py-2.5 rounded-md border ${errors.email ? 'border-red-500' : 'border-gray-300'} focus:outline-none focus:ring-2 focus:ring-orange-500`}
-                            />
-                            {errors.email && <p className="text-red-500 text-xs mt-1">{errors.email}</p>}
-                        </div>
-                        <div className="flex flex-col mb-4 w-full">
-                            <label className="text-gray-600 text-sm font-medium mb-1.5">Country *</label>
-                            <select
-                                value={userInfo.countryCode}
-                                onChange={(e) => handleUserInfoChange('countryCode', e.target.value)}
-                                disabled={loadingCountries}
-                                className={`w-full px-4 py-2.5 rounded-md border ${errors.country ? 'border-red-500' : 'border-gray-300'} focus:outline-none focus:ring-2 focus:ring-orange-500 disabled:bg-gray-100 disabled:cursor-not-allowed`}
-                            >
-                                {loadingCountries ? (
-                                    <option>Loading countries...</option>
-                                ) : (
-                                    countries.map((country) => (
-                                        <option key={country.code} value={country.code}>
-                                            {country.name}
-                                        </option>
-                                    ))
-                                )}
-                            </select>
-                            {errors.country && <p className="text-red-500 text-xs mt-1">{errors.country}</p>}
-                        </div>
-                        <div className="flex flex-col mb-4 w-full">
-                            <label className="text-gray-600 text-sm font-medium mb-1.5">Phone Number *</label>
-                            <div className="flex">
-                                <div className="flex items-center px-3 py-2.5 bg-gray-50 border border-r-0 border-gray-300 rounded-l text-sm font-medium text-gray-700 min-w-[60px] justify-center">
-                                    {userInfo.phoneCode}
-                                </div>
-                                <input
-                                    type="tel"
-                                    value={userInfo.phone}
-                                    onChange={(e) => handleUserInfoChange('phone', e.target.value)}
-                                    placeholder="1234567890"
-                                    className={`flex-1 px-4 py-2.5 border rounded-r ${errors.phone ? 'border-red-500' : 'border-gray-300'} focus:outline-none focus:ring-2 focus:ring-orange-500`}
-                                />
-                            </div>
-                            {errors.phone && <p className="text-red-500 text-xs mt-1">{errors.phone}</p>}
-                        </div>
-                        <div className="grid grid-cols-2 gap-3">
-                            <div className="flex flex-col mb-4 w-full">
-                                <label className="text-gray-600 text-sm font-medium mb-1.5">City *</label>
-                                <input
-                                    type="text"
-                                    value={userInfo.city}
-                                    onChange={(e) => handleUserInfoChange('city', e.target.value)}
-                                    placeholder="City"
-                                    className={`w-full px-4 py-2.5 rounded-md border ${errors.city ? 'border-red-500' : 'border-gray-300'} focus:outline-none focus:ring-2 focus:ring-orange-500`}
-                                />
-                                {errors.city && <p className="text-red-500 text-xs mt-1">{errors.city}</p>}
-                            </div>
-                            <div className="flex flex-col mb-4 w-full">
-                                <label className="text-gray-600 text-sm font-medium mb-1.5">State/Province *</label>
-                                <select
-                                    value={userInfo.stateProvince}
-                                    onChange={(e) => handleUserInfoChange('stateProvince', e.target.value)}
-                                    disabled={loadingStates || states.length === 0}
-                                    className={`w-full px-4 py-2.5 rounded-md border ${errors.stateProvince ? 'border-red-500' : 'border-gray-300'} focus:outline-none focus:ring-2 focus:ring-orange-500 disabled:bg-gray-100 disabled:cursor-not-allowed`}
-                                >
-                                    <option value="">
-                                        {loadingStates ? 'Loading states...' : states.length === 0 ? 'No states available' : 'Select state'}
-                                    </option>
-                                    {states.map((state) => (
-                                        <option key={state.code} value={state.name}>
-                                            {state.name}
-                                        </option>
-                                    ))}
-                                </select>
-                                {errors.stateProvince && <p className="text-red-500 text-xs mt-1">{errors.stateProvince}</p>}
-                            </div>
-                        </div>
-                        <div className="bg-slate-50 p-4 rounded border border-slate-200">
-                            <label className="text-xs text-slate-500 font-bold uppercase mb-2 block">Auto-Generated Password</label>
-                            <p className="font-mono font-bold text-slate-800 text-lg mb-3">{userInfo.password || 'Fill in user details...'}</p>
-                            <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 mt-2">
-                                <p className="text-xs text-blue-800 font-medium mb-1">📋 Password Format:</p>
-                                <p className="text-xs text-blue-700">• First 4 characters of email (first letter uppercase)</p>
-                                <p className="text-xs text-blue-700">• @ symbol</p>
-                                <p className="text-xs text-blue-700">• Last 4 digits of phone number</p>
-                                <p className="text-xs text-blue-600 mt-2 italic">Example: john@1234 (from john@example.com, phone ending in 1234)</p>
-                            </div>
-                        </div>
-                    </div>
+            {/* Tab Navigation */}
+            <div className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
+                <div className="flex border-b border-slate-200">
+                    <button
+                        onClick={() => {
+                            setActiveTab('register');
+                            setErrors({});
+                            setGeneratedLicense(null);
+                            setSuccessMessage('');
+                        }}
+                        className={`flex-1 px-6 py-4 font-bold text-sm transition-colors ${activeTab === 'register'
+                            ? 'bg-orange-600 text-white'
+                            : 'bg-white text-slate-600 hover:bg-slate-50'
+                            }`}
+                    >
+                        📝 Register New User
+                    </button>
+                    <button
+                        onClick={() => {
+                            setActiveTab('license');
+                            setErrors({});
+                            setGeneratedLicense(null);
+                            setSuccessMessage('');
+                        }}
+                        className={`flex-1 px-6 py-4 font-bold text-sm transition-colors ${activeTab === 'license'
+                            ? 'bg-orange-600 text-white'
+                            : 'bg-white text-slate-600 hover:bg-slate-50'
+                            }`}
+                    >
+                        🔑 Generate License Key
+                    </button>
                 </div>
-                {/* Section 2 & 3: Plan Config & Validity */}
-                <div className="space-y-6">
-                    <div className="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
-                        <h2 className="text-lg font-bold text-slate-800 mb-4 flex items-center gap-2">
-                            <span className="bg-orange-100 text-orange-600 w-6 h-6 rounded flex items-center justify-center text-xs">2</span>
-                            Plan Configuration
-                        </h2>
-                        <div className="space-y-4">
-                            <div className="flex flex-col mb-4 w-full">
-                                <label className="text-gray-600 text-sm font-medium mb-1.5">Select Plan Type *</label>
-                                <select
-                                    value={selectedPlan}
-                                    onChange={(e) => setSelectedPlan(e.target.value)}
-                                    className="w-full px-4 py-2.5 rounded-md border border-gray-300 focus:outline-none focus:ring-2 focus:ring-orange-500"
-                                >
-                                    {PLANS.map(p => (
-                                        <option key={p.id} value={p.id}>
-                                            {p.title} ({p.duration})
-                                        </option>
-                                    ))}
-                                </select>
-                            </div>
-                            {selectedPlan === 'zone' && (
-                                <div className="bg-slate-50 p-4 rounded-lg border border-slate-200 animate-fade-in mt-2">
-                                    <p className="text-sm font-bold text-black mb-3 uppercase tracking-wide">Permitted Zones *</p>
-                                    <div className="grid grid-cols-2 gap-3">
-                                        {ZONES.map(z => (
-                                            <label key={z} className="flex items-center gap-3 cursor-pointer group p-2 hover:bg-white rounded-lg transition-colors">
-                                                <div className="relative flex items-center">
-                                                    <input
-                                                        type="checkbox"
-                                                        checked={selectedZones.includes(z)}
-                                                        onChange={(e) => {
-                                                            if (e.target.checked) {
-                                                                setSelectedZones([...selectedZones, z]);
-                                                            } else {
-                                                                setSelectedZones(selectedZones.filter(iz => iz !== z));
-                                                            }
-                                                        }}
-                                                        className="peer h-5 w-5 cursor-pointer appearance-none rounded border border-slate-300 shadow-sm transition-all checked:border-orange-600 checked:bg-orange-600 hover:border-orange-400"
-                                                    />
-                                                    <svg className="pointer-events-none absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 text-white opacity-0 peer-checked:opacity-100" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round" width="12" height="12">
-                                                        <polyline points="20 6 9 17 4 12"></polyline>
-                                                    </svg>
-                                                </div>
-                                                <span className="text-sm font-bold text-black group-hover:text-orange-700 transition-colors">{z}</span>
-                                            </label>
-                                        ))}
+            </div>
+
+            {/* Tab Content - Register New User */}
+            {activeTab === 'register' && (
+                <>
+                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                        {/* Section 1: User Information */}
+                        <div className="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
+                            <h2 className="text-lg font-bold text-slate-800 mb-4 flex items-center gap-2">
+                                <span className="bg-orange-100 text-orange-600 w-6 h-6 rounded flex items-center justify-center text-xs">1</span>
+                                User Information
+                            </h2>
+                            <div className="space-y-3">
+                                <div className="flex flex-col mb-4 w-full">
+                                    <label className="text-gray-600 text-sm font-medium mb-1.5">Full Name *</label>
+                                    <input
+                                        type="text"
+                                        value={userInfo.fullName}
+                                        onChange={(e) => handleUserInfoChange('fullName', e.target.value)}
+                                        placeholder="e.g. John Pilot"
+                                        className={`w-full px-4 py-2.5 rounded-md border ${errors.fullName ? 'border-red-500' : 'border-gray-300'} focus:outline-none focus:ring-2 focus:ring-orange-500`}
+                                    />
+                                    {errors.fullName && <p className="text-red-500 text-xs mt-1">{errors.fullName}</p>}
+                                </div>
+                                <div className="flex flex-col mb-4 w-full">
+                                    <label className="text-gray-600 text-sm font-medium mb-1.5">Username *</label>
+                                    <input
+                                        type="text"
+                                        value={userInfo.username}
+                                        onChange={(e) => handleUserInfoChange('username', e.target.value)}
+                                        placeholder="e.g. pilot_01"
+                                        className={`w-full px-4 py-2.5 rounded-md border ${errors.username ? 'border-red-500' : 'border-gray-300'} focus:outline-none focus:ring-2 focus:ring-orange-500`}
+                                    />
+                                    {errors.username && <p className="text-red-500 text-xs mt-1">{errors.username}</p>}
+                                </div>
+                                <div className="flex flex-col mb-4 w-full">
+                                    <label className="text-gray-600 text-sm font-medium mb-1.5">Email Address (ID) *</label>
+                                    <input
+                                        type="email"
+                                        value={userInfo.email}
+                                        onChange={(e) => handleUserInfoChange('email', e.target.value)}
+                                        placeholder="pilot@example.com"
+                                        className={`w-full px-4 py-2.5 rounded-md border ${errors.email ? 'border-red-500' : 'border-gray-300'} focus:outline-none focus:ring-2 focus:ring-orange-500`}
+                                    />
+                                    {errors.email && <p className="text-red-500 text-xs mt-1">{errors.email}</p>}
+                                </div>
+                                <div className="flex flex-col mb-4 w-full">
+                                    <label className="text-gray-600 text-sm font-medium mb-1.5">Country *</label>
+                                    <select
+                                        value={userInfo.countryCode}
+                                        onChange={(e) => handleUserInfoChange('countryCode', e.target.value)}
+                                        disabled={loadingCountries}
+                                        className={`w-full px-4 py-2.5 rounded-md border ${errors.country ? 'border-red-500' : 'border-gray-300'} focus:outline-none focus:ring-2 focus:ring-orange-500 disabled:bg-gray-100 disabled:cursor-not-allowed`}
+                                    >
+                                        {loadingCountries ? (
+                                            <option>Loading countries...</option>
+                                        ) : (
+                                            countries.map((country) => (
+                                                <option key={country.code} value={country.code}>
+                                                    {country.name}
+                                                </option>
+                                            ))
+                                        )}
+                                    </select>
+                                    {errors.country && <p className="text-red-500 text-xs mt-1">{errors.country}</p>}
+                                </div>
+                                <div className="flex flex-col mb-4 w-full">
+                                    <label className="text-gray-600 text-sm font-medium mb-1.5">Phone Number *</label>
+                                    <div className="flex">
+                                        <div className="flex items-center px-3 py-2.5 bg-gray-50 border border-r-0 border-gray-300 rounded-l text-sm font-medium text-gray-700 min-w-[60px] justify-center">
+                                            {userInfo.phoneCode}
+                                        </div>
+                                        <input
+                                            type="tel"
+                                            value={userInfo.phone}
+                                            onChange={(e) => handleUserInfoChange('phone', e.target.value)}
+                                            placeholder="1234567890"
+                                            className={`flex-1 px-4 py-2.5 border rounded-r ${errors.phone ? 'border-red-500' : 'border-gray-300'} focus:outline-none focus:ring-2 focus:ring-orange-500`}
+                                        />
+                                    </div>
+                                    {errors.phone && <p className="text-red-500 text-xs mt-1">{errors.phone}</p>}
+                                </div>
+                                <div className="grid grid-cols-2 gap-3">
+                                    <div className="flex flex-col mb-4 w-full">
+                                        <label className="text-gray-600 text-sm font-medium mb-1.5">City *</label>
+                                        <input
+                                            type="text"
+                                            value={userInfo.city}
+                                            onChange={(e) => handleUserInfoChange('city', e.target.value)}
+                                            placeholder="City"
+                                            className={`w-full px-4 py-2.5 rounded-md border ${errors.city ? 'border-red-500' : 'border-gray-300'} focus:outline-none focus:ring-2 focus:ring-orange-500`}
+                                        />
+                                        {errors.city && <p className="text-red-500 text-xs mt-1">{errors.city}</p>}
+                                    </div>
+                                    <div className="flex flex-col mb-4 w-full">
+                                        <label className="text-gray-600 text-sm font-medium mb-1.5">State/Province *</label>
+                                        <select
+                                            value={userInfo.stateProvince}
+                                            onChange={(e) => handleUserInfoChange('stateProvince', e.target.value)}
+                                            disabled={loadingStates || states.length === 0}
+                                            className={`w-full px-4 py-2.5 rounded-md border ${errors.stateProvince ? 'border-red-500' : 'border-gray-300'} focus:outline-none focus:ring-2 focus:ring-orange-500 disabled:bg-gray-100 disabled:cursor-not-allowed`}
+                                        >
+                                            <option value="">
+                                                {loadingStates ? 'Loading states...' : states.length === 0 ? 'No states available' : 'Select state'}
+                                            </option>
+                                            {states.map((state) => (
+                                                <option key={state.code} value={state.name}>
+                                                    {state.name}
+                                                </option>
+                                            ))}
+                                        </select>
+                                        {errors.stateProvince && <p className="text-red-500 text-xs mt-1">{errors.stateProvince}</p>}
                                     </div>
                                 </div>
-                            )}
+                            </div>
                         </div>
-                    </div>
-                    <div className="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
-                        <h2 className="text-lg font-bold text-slate-800 mb-4 flex items-center gap-2">
-                            <span className="bg-orange-100 text-orange-600 w-6 h-6 rounded flex items-center justify-center text-xs">3</span>
-                            Validity Period
-                        </h2>
-                        <div className="grid grid-cols-2 gap-4">
-                            <div>
-                                <label className="text-gray-600 text-sm font-medium mb-1">End Date *</label>
-                                <input
-                                    type="date"
-                                    value={validity.end}
-                                    onChange={(e) => setValidity({ ...validity, end: e.target.value })}
-                                    className="w-full px-3 py-2 border border-gray-300 rounded focus:ring-orange-500 focus:outline-none"
-                                />
+                        {/* Section 2: Password Information */}
+                        <div className="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
+                            <h2 className="text-lg font-bold text-slate-800 mb-4 flex items-center gap-2">
+                                <span className="bg-orange-100 text-orange-600 w-6 h-6 rounded flex items-center justify-center text-xs">2</span>
+                                Auto-Generated Password
+                            </h2>
+                            <div className="bg-slate-50 p-4 rounded border border-slate-200">
+                                <label className="text-xs text-slate-500 font-bold uppercase mb-2 block">Generated Password</label>
+                                <p className="font-mono font-bold text-slate-800 text-2xl mb-4 break-all">{userInfo.password || 'Fill in user details...'}</p>
+                                <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mt-3">
+                                    <p className="text-xs text-blue-800 font-medium mb-2">📋 Password Format:</p>
+                                    <p className="text-xs text-blue-700 mb-1">• First 4 characters of email (first letter uppercase)</p>
+                                    <p className="text-xs text-blue-700 mb-1">• @ symbol</p>
+                                    <p className="text-xs text-blue-700 mb-1">• Last 4 digits of phone number</p>
+                                    <p className="text-xs text-blue-600 mt-3 italic font-medium">Example: John@1234</p>
+                                    <p className="text-xs text-blue-600 italic">From: john@example.com, phone ending in 1234</p>
+                                </div>
+                            </div>
+                            <div className="mt-4 bg-orange-50 border border-orange-200 rounded-lg p-4">
+                                <p className="text-xs text-orange-800 font-medium mb-2">ℹ️ Note:</p>
+                                <p className="text-xs text-orange-700">This password will be automatically set for the new user. After registration, you'll be redirected to generate their license key.</p>
                             </div>
                         </div>
                     </div>
-                </div>
-            </div>
-            {/* Error Display */}
-            {errors.submit && (
-                <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg">
-                    <p className="font-medium">Error:</p>
-                    <p className="text-sm">{errors.submit}</p>
-                </div>
+                    {/* Error Display */}
+                    {errors.submit && (
+                        <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg">
+                            <p className="font-medium">Error:</p>
+                            <p className="text-sm">{errors.submit}</p>
+                        </div>
+                    )}
+                    {/* Action Button */}
+                    <div className="flex justify-end gap-4 pt-4 border-t border-slate-200">
+                        <button
+                            onClick={handleGenerateUser}
+                            disabled={loading}
+                            className="w-full md:w-auto px-8 py-3 bg-orange-600 text-white font-bold rounded-lg hover:bg-orange-700 disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors"
+                        >
+                            {loading ? 'Registering User...' : 'Register User'}
+                        </button>
+                    </div>
+                </>
             )}
-            {errors.plan && <p className="text-red-500 text-sm">{errors.plan}</p>}
-            {errors.zones && <p className="text-red-500 text-sm">{errors.zones}</p>}
-            {errors.validity && <p className="text-red-500 text-sm">{errors.validity}</p>}
-            {/* Action Button */}
-            <div className="flex justify-end gap-4 pt-4 border-t border-slate-200">
-                <button
-                    onClick={handleGenerateUser}
-                    disabled={loading}
-                    className="w-full md:w-auto px-8 py-3 bg-orange-600 text-white font-bold rounded-lg hover:bg-orange-700 disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors"
-                >
-                    {loading ? 'Registering User & Generating License...' : 'Register User & Generate License'}
-                </button>
-            </div>
-            {/* Success Display */}
+
+            {/* Tab Content - Generate License Key */}
+            {activeTab === 'license' && (
+                <>
+                    {/* Success Message */}
+                    {successMessage && (
+                        <div className="bg-green-50 border border-green-200 text-green-700 px-4 py-3 rounded-lg">
+                            <p className="font-medium">✓ Success!</p>
+                            <p className="text-sm">{successMessage}</p>
+                        </div>
+                    )}
+                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                        {/* Section 1: Email Input */}
+                        <div className="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
+                            <h2 className="text-lg font-bold text-slate-800 mb-4 flex items-center gap-2">
+                                <span className="bg-orange-100 text-orange-600 w-6 h-6 rounded flex items-center justify-center text-xs">1</span>
+                                User Email
+                            </h2>
+                            <div className="space-y-3">
+                                <div className="flex flex-col mb-4 w-full">
+                                    <label className="text-gray-600 text-sm font-medium mb-1.5">Email Address *</label>
+                                    <input
+                                        type="email"
+                                        value={licenseEmail}
+                                        onChange={(e) => {
+                                            setLicenseEmail(e.target.value);
+                                            if (errors.licenseEmail) {
+                                                setErrors(prev => ({ ...prev, licenseEmail: '' }));
+                                            }
+                                        }}
+                                        placeholder="user@example.com"
+                                        className={`w-full px-4 py-2.5 rounded-md border ${errors.licenseEmail ? 'border-red-500' : 'border-gray-300'} focus:outline-none focus:ring-2 focus:ring-orange-500`}
+                                    />
+                                    {errors.licenseEmail && <p className="text-red-500 text-xs mt-1">{errors.licenseEmail}</p>}
+                                    <p className="text-xs text-slate-500 mt-2">Enter the email address of the registered user for whom you want to generate a license key.</p>
+                                </div>
+                            </div>
+                        </div>
+                        {/* Section 2 & 3: Plan Config & Validity */}
+                        <div className="space-y-6">
+                            <div className="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
+                                <h2 className="text-lg font-bold text-slate-800 mb-4 flex items-center gap-2">
+                                    <span className="bg-orange-100 text-orange-600 w-6 h-6 rounded flex items-center justify-center text-xs">2</span>
+                                    Plan Configuration
+                                </h2>
+                                <div className="space-y-4">
+                                    <div className="flex flex-col mb-4 w-full">
+                                        <label className="text-gray-600 text-sm font-medium mb-1.5">Select Plan Type *</label>
+                                        <select
+                                            value={selectedPlan}
+                                            onChange={(e) => setSelectedPlan(e.target.value)}
+                                            className="w-full px-4 py-2.5 rounded-md border border-gray-300 focus:outline-none focus:ring-2 focus:ring-orange-500"
+                                        >
+                                            {PLANS.map(p => (
+                                                <option key={p.id} value={p.id}>
+                                                    {p.title} ({p.duration})
+                                                </option>
+                                            ))}
+                                        </select>
+                                    </div>
+                                    {selectedPlan === 'zone' && (
+                                        <div className="bg-slate-50 p-4 rounded-lg border border-slate-200 animate-fade-in mt-2">
+                                            <p className="text-sm font-bold text-black mb-3 uppercase tracking-wide">Permitted Zones *</p>
+                                            <div className="grid grid-cols-2 gap-3">
+                                                {ZONES.map(z => (
+                                                    <label key={z} className="flex items-center gap-3 cursor-pointer group p-2 hover:bg-white rounded-lg transition-colors">
+                                                        <div className="relative flex items-center">
+                                                            <input
+                                                                type="checkbox"
+                                                                checked={selectedZones.includes(z)}
+                                                                onChange={(e) => {
+                                                                    if (e.target.checked) {
+                                                                        setSelectedZones([...selectedZones, z]);
+                                                                    } else {
+                                                                        setSelectedZones(selectedZones.filter(iz => iz !== z));
+                                                                    }
+                                                                }}
+                                                                className="peer h-5 w-5 cursor-pointer appearance-none rounded border border-slate-300 shadow-sm transition-all checked:border-orange-600 checked:bg-orange-600 hover:border-orange-400"
+                                                            />
+                                                            <svg className="pointer-events-none absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 text-white opacity-0 peer-checked:opacity-100" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round" width="12" height="12">
+                                                                <polyline points="20 6 9 17 4 12"></polyline>
+                                                            </svg>
+                                                        </div>
+                                                        <span className="text-sm font-bold text-black group-hover:text-orange-700 transition-colors">{z}</span>
+                                                    </label>
+                                                ))}
+                                            </div>
+                                        </div>
+                                    )}
+                                </div>
+                            </div>
+                            <div className="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
+                                <h2 className="text-lg font-bold text-slate-800 mb-4 flex items-center gap-2">
+                                    <span className="bg-orange-100 text-orange-600 w-6 h-6 rounded flex items-center justify-center text-xs">3</span>
+                                    Validity Period
+                                </h2>
+                                <div className="grid grid-cols-2 gap-4">
+                                    <div>
+                                        <label className="text-gray-600 text-sm font-medium mb-1">End Date *</label>
+                                        <input
+                                            type="date"
+                                            value={validity.end}
+                                            onChange={(e) => setValidity({ ...validity, end: e.target.value })}
+                                            className="w-full px-3 py-2 border border-gray-300 rounded focus:ring-orange-500 focus:outline-none"
+                                        />
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {/* Error Display */}
+                    {errors.submit && (
+                        <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg">
+                            <p className="font-medium">Error:</p>
+                            <p className="text-sm">{errors.submit}</p>
+                        </div>
+                    )}
+                    {errors.plan && <p className="text-red-500 text-sm">{errors.plan}</p>}
+                    {errors.zones && <p className="text-red-500 text-sm">{errors.zones}</p>}
+                    {errors.validity && <p className="text-red-500 text-sm">{errors.validity}</p>}
+                    {/* Action Button */}
+                    <div className="flex justify-end gap-4 pt-4 border-t border-slate-200">
+                        <button
+                            onClick={handleGenerateLicenseOnly}
+                            disabled={loading}
+                            className="w-full md:w-auto px-8 py-3 bg-orange-600 text-white font-bold rounded-lg hover:bg-orange-700 disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors"
+                        >
+                            {loading ? 'Generating License Key...' : 'Generate License Key'}
+                        </button>
+                    </div>
+                </>
+            )}
+
+            {/* Success Display - Shared for both tabs */}
             {generatedLicense && generatedLicense.success && (
                 <div className="bg-white p-6 rounded-xl shadow-lg border border-green-200 animate-scale-in">
                     <div className="flex justify-between items-center mb-4">
