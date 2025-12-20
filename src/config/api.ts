@@ -28,6 +28,8 @@ export const API_ENDPOINTS = {
 
     // Support
     SUPPORT: `${API_BASE_URL}/support/`,
+    SUPPORT_ADMIN_ALL: `${API_BASE_URL}/admin/support/`,
+    SUPPORT_ADMIN_UPDATE: `${API_BASE_URL}/admin/support/update/`,
 
     // Contact & Inquiry
     CONTACT: `${API_BASE_URL}/contact/`,
