@@ -26,6 +26,9 @@ export const API_ENDPOINTS = {
     // Get Demo License
     PAYMENT_REQUEST_DEMO: `${API_BASE_URL}/stripe/license/request-demo/`,
 
+    // Support
+    SUPPORT: `${API_BASE_URL}/support/`,
+
     // Contact & Inquiry
     CONTACT: `${API_BASE_URL}/contact/`,
     CONTACT_MY: `${API_BASE_URL}/contact/my/`,

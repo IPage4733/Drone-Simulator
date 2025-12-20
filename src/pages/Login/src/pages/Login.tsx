@@ -1,17 +1,10 @@
 import React, { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
-import { GoogleLogin } from '@react-oauth/google'
-import { jwtDecode } from 'jwt-decode'
 import { useAuth } from '../context/AuthContext'
 import Navigation from '@/components/Navigation'
 import Logo from '../components/Logo'
 import { Eye, EyeOff } from 'lucide-react'
 import { API_ENDPOINTS } from '@/config/api'
-
-interface CustomJwtPayload {
-  email: string
-  name?: string
-}
 
 const Login: React.FC = () => {
   const [showPassword, setShowPassword] = useState(false);
@@ -75,32 +68,7 @@ const Login: React.FC = () => {
     }
   }
 
-  const handleGoogleLoginSuccess = async (credentialResponse: any) => {
-    try {
-      const decoded = jwtDecode<CustomJwtPayload>(credentialResponse.credential)
-      const email = decoded.email
-      const username = decoded.name || email.split('@')[0]
 
-      const response = await fetch(API_ENDPOINTS.SOCIAL_LOGIN, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ token: credentialResponse.credential, email, username })
-      })
-
-      const result = await response.json()
-      if (!response.ok || !result.data?.token) throw new Error(result.message || 'Social login failed')
-
-      sessionStorage.setItem('auth_token', result.data.token)
-      sessionStorage.setItem('auth_user', JSON.stringify(result.data.user))
-      sessionStorage.setItem('auth_email', email)
-      sessionStorage.setItem('auth_username', username)
-
-      navigate('/')
-    } catch (error) {
-      console.error('Google Login Error:', error)
-      setErrors({ submit: 'Google sign-in failed. Please try again later.' })
-    }
-  }
 
   return (
     <>
@@ -174,20 +142,16 @@ const Login: React.FC = () => {
 
           </form>
 
-          <div className="mt-2 text-center">
-            <p className="text-[10px] text-gray-400 mb-0">or</p>
-            <div className="flex justify-center">
-              <GoogleLogin
-                onSuccess={handleGoogleLoginSuccess}
-                onError={() => setErrors({ submit: 'Google sign-in was cancelled or failed.' })}
-              />
-            </div>
-          </div>
-
           <div className="mt-4 text-center text-[11px]">
-            <Link to="/auth/forgot-password" className="text-orange-500 hover:text-orange-600 font-medium">
-              Forgot password?
-            </Link>
+            <div className="flex justify-center gap-3">
+              <Link to="/auth/forgot-password" className="text-orange-500 hover:text-orange-600 font-medium">
+                Forgot password?
+              </Link>
+              <span className="text-gray-400">|</span>
+              <Link to="/auth/support" className="text-orange-500 hover:text-orange-600 font-medium">
+                Support
+              </Link>
+            </div>
             <button
               type="button"
               onClick={() => navigate('/auth/studentregister')}
