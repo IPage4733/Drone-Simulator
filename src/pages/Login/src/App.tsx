@@ -7,6 +7,7 @@ import ForgotPassword from './pages/ForgotPassword'
 import Profile from './pages/Profile'
 import { AuthProvider } from './context/AuthContext'
 import Studentregister from './pages/studentregister'
+import Support from './pages/Support'
 
 function AppAuth() {
   return (
@@ -16,10 +17,11 @@ function AppAuth() {
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
           <Route path="/forgot-password" element={<ForgotPassword />} />
+          <Route path="/support" element={<Support />} />
           <Route path="/profile" element={<Profile />} />
           <Route path="/studentregister" element={<Studentregister />} />
           <Route path="/" element={<Navigate to="/auth/login" replace />} />
-         
+
         </Routes>
       </Layout>
     </AuthProvider>

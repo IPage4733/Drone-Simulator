@@ -26,6 +26,11 @@ export const API_ENDPOINTS = {
     // Get Demo License
     PAYMENT_REQUEST_DEMO: `${API_BASE_URL}/stripe/license/request-demo/`,
 
+    // Support
+    SUPPORT: `${API_BASE_URL}/support/`,
+    SUPPORT_ADMIN_ALL: `${API_BASE_URL}/admin/support/`,
+    SUPPORT_ADMIN_UPDATE: `${API_BASE_URL}/admin/support/update/`,
+
     // Contact & Inquiry
     CONTACT: `${API_BASE_URL}/contact/`,
     CONTACT_MY: `${API_BASE_URL}/contact/my/`,
@@ -42,10 +47,16 @@ export const API_ENDPOINTS = {
     FEEDBACK_ADMIN_DELETE: (id: string | number) => `${API_BASE_URL}/feedback/admin/${id}/delete/`,
 
     // Stripe/Payments
+    STRIPE_BASE: `${API_BASE_URL}/stripe`,
     STRIPE_CREATE_CHECKOUT: `${API_BASE_URL}/stripe/create-checkout-session/`,
     STRIPE_MY_TRANSACTIONS: `${API_BASE_URL}/stripe/my-transactions/`,
     STRIPE_TRANSACTIONS: `${API_BASE_URL}/stripe/transactions/`,
     STRIPE_ANALYTICS: `${API_BASE_URL}/stripe/analytics/`,
+
+    // Zone Plan Upgrade
+    STRIPE_MY_ZONE_PLAN: `${API_BASE_URL}/stripe/my-zone-plan/`,
+    STRIPE_UPGRADE_ZONE_PLAN: `${API_BASE_URL}/stripe/upgrade-zone-plan/`,
+
 
     // Downloads
     DOWNLOAD_APP: `${API_BASE_URL}/download-app/`,
@@ -54,7 +65,7 @@ export const API_ENDPOINTS = {
 
     // Admin
     ADMIN_GROUPS: `${API_BASE_URL}/admin/groups/`,
-    ADMIN_CREATE_USER: `${API_BASE_URL}/admin/create-user/`,
+    ADMIN_CREATE_USER: `${API_BASE_URL}/admin/register-user/`,
     GENERATE_LICENSE: `${API_BASE_URL}/admin/generate-license/`,
 
     // Neodove Integration

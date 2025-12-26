@@ -12,25 +12,29 @@ export const MasterUsers: React.FC = () => {
   const [users, setUsers] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const { user: currentUser } = useAuth();
+
+  // Pagination state
+  const [currentPage, setCurrentPage] = useState(1);
+  const [pageSize, setPageSize] = useState(10);
+  const [totalPages, setTotalPages] = useState(1);
+  const [totalCount, setTotalCount] = useState(0);
+  const [hasNext, setHasNext] = useState(false);
+  const [hasPrevious, setHasPrevious] = useState(false);
+  const [statistics, setStatistics] = useState<any>(null);
+
+  // Search and filters
   const [searchTerm, setSearchTerm] = useState('');
+  const [debouncedSearchTerm, setDebouncedSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
   const [planFilter, setPlanFilter] = useState('all');
   const [startDate, setStartDate] = useState('');
   const [endDate, setEndDate] = useState('');
 
   const [editingUser, setEditingUser] = useState<string | null>(null);
-  const filteredUsers = users.filter(user => {
-    const matchesSearch = user.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      user.email.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesStatus = statusFilter === 'all' || user.status === statusFilter;
-    const matchesPlan = planFilter === 'all' || user.plan === planFilter;
 
-    const joinedDate = new Date(user.registrationDate);
-    const matchesStart = startDate ? joinedDate >= new Date(startDate) : true;
-    const matchesEnd = endDate ? joinedDate <= new Date(endDate) : true;
-
-    return matchesSearch && matchesStatus && matchesPlan && matchesStart && matchesEnd;
-  });
+  // Filters are now server-side, so we use the raw user data
+  // No client-side filtering needed - backend handles everything
+  const filteredUsers = users;
 
 
   const handleEditUser = async (
@@ -46,8 +50,6 @@ export const MasterUsers: React.FC = () => {
       email: userToUpdate.email,
       username: userToUpdate.name,
       full_name: userToUpdate.name,
-      password: 'TempPass@123',  // or fetch if user provides it
-      password_confirm: 'TempPass@123',
       phone_number: userToUpdate.phone_number || '',
       city: userToUpdate.city || '',
       state_province: userToUpdate.state_province || '',
@@ -170,40 +172,73 @@ export const MasterUsers: React.FC = () => {
       return { status: `Due in ${daysUntilPayment} days`, color: 'text-green-600' };
     }
   };
+  // Debounce search term
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedSearchTerm(searchTerm);
+      setCurrentPage(1); // Reset to page 1 when search changes
+    }, 500);
+
+    return () => clearTimeout(timer);
+  }, [searchTerm]);
+
   useEffect(() => {
     const fetchUsers = async () => {
+      setLoading(true);
       try {
         const token =
           sessionStorage.getItem('drone_auth_token') ||
           localStorage.getItem('drone_auth_token');
 
-        const [usersRes, transactionsRes] = await Promise.all([
-          axiosInstance.get('/get-all-users/'),
-          axios.get(API_ENDPOINTS.STRIPE_TRANSACTIONS, {
-            headers: {
-              Authorization: `Token ${token}`,
-            },
-          }).catch(() => ({ data: { results: [] } })) // fallback if Stripe API fails
-        ]);
+        // Build query parameters with filters
+        const params = new URLSearchParams({
+          page: currentPage.toString(),
+          page_size: pageSize.toString(),
+        });
+
+        // Search parameter
+        if (debouncedSearchTerm) {
+          params.append('search', debouncedSearchTerm);
+        }
+
+        // Server-side filters (backend now supports these!)
+        if (statusFilter !== 'all') {
+          params.append('status', statusFilter.toLowerCase());
+        }
+        if (planFilter !== 'all') {
+          // Map frontend plan names to backend values
+          const planMapping: { [key: string]: string } = {
+            'free': 'basic',
+            'zone': 'zone',
+            'pro': 'premium',
+            'enterprise': 'enterprise'
+          };
+          params.append('plan', planMapping[planFilter] || planFilter.toLowerCase());
+        }
+        if (startDate) {
+          params.append('start_date', startDate);
+        }
+        if (endDate) {
+          params.append('end_date', endDate);
+        }
+
+        // Single optimized API call (backend should include transaction data)
+        const usersRes = await axiosInstance.get(`/get-all-users/?${params.toString()}`);
 
         const userList = usersRes.data.data;
-        const transactions = transactionsRes.data.results || [];
+        const pagination = usersRes.data.pagination;
+        const stats = usersRes.data.statistics;
 
-        const normalizeEmail = (email: string) => (email || '').trim().toLowerCase();
-        const formattedUsers = await Promise.all(userList.map(async (user: any) => {
-          const txn = transactions.find((t: any) =>
-            normalizeEmail(t.user_email) === normalizeEmail(user.email)
-          );
-
-          let scenarios = [];
-          try {
-            const scenarioRes = await axiosInstance.post('/get-single-user-details/', {
-              email: user.email
-            });
-            scenarios = scenarioRes.data?.data?.all_scenarios?.scenarios || [];
-          } catch (err) {
-            console.warn(`Failed to load scenarios for ${user.email}`);
-          }
+        // Update pagination state
+        setTotalPages(pagination.total_pages);
+        setTotalCount(pagination.total_count);
+        setHasNext(pagination.has_next);
+        setHasPrevious(pagination.has_previous);
+        setStatistics(stats);
+        // Transform user data (transaction data should come from backend)
+        const formattedUsers = userList.map((user: any) => {
+          // Backend should provide transaction data in user.transaction
+          const txn = user.transaction || user.latest_transaction;
 
           return {
             id: user.user_id,
@@ -211,23 +246,22 @@ export const MasterUsers: React.FC = () => {
             email: user.email,
             status: user.is_active ? 'Active' : 'Inactive',
             plan: (() => {
-              if (txn?.plan_name_display) {
-                switch (txn.plan_name_display.toLowerCase()) {
+              // Use transaction data if available, otherwise fall back to user.plan
+              const planSource = txn?.plan_name || user.plan;
+              if (planSource) {
+                switch (planSource.toLowerCase()) {
                   case 'trial': return 'Demo';
                   case 'basic': return 'Free';
-                  case 'premium': return 'Premium';
-                  default: return txn.plan_name_display;
-                }
-              } else {
-                switch ((user.plan || '').toLowerCase()) {
-                  case 'trial': return 'Demo';
-                  case 'premium': return 'Premium';
-                  case 'basic': return 'Free';
-                  default: return user.plan || 'Free';
+                  case 'premium': return 'Pro';
+                  case 'pro': return 'Pro';
+                  case 'zone': return 'Zone';
+                  case 'enterprise': return 'Enterprise';
+                  default: return planSource.charAt(0).toUpperCase() + planSource.slice(1);
                 }
               }
+              return 'Free';
             })(),
-            paidAmount: txn ? parseFloat(txn.amount) : 0,
+            paidAmount: txn ? parseFloat(txn.amount || 0) : 0,
             paymentDate: txn?.payment_date || null,
             nextPaymentDate: txn?.plan_expiry_date || user.plan_expiry_date || null,
             addOns: {},
@@ -235,24 +269,33 @@ export const MasterUsers: React.FC = () => {
             usage: {
               simulationsThisMonth: user.statistics?.total_scenarios_completed || 0,
               totalSimulations: user.statistics?.total_app_sessions || 0,
+              totalDuration: user.statistics?.total_duration_formatted || '00:00:00',
             },
             registrationDate: new Date(user.created_at).toLocaleDateString(),
-            scenarios // ✅ Add this
+            phone_number: user.phone_number || '',
+            city: user.city || '',
+            state_province: user.state_province || '',
+            country: user.country || '',
+            purpose_of_use: user.purpose_of_use || '',
           };
-        }));
-
+        });
 
         setUsers(formattedUsers);
       } catch (error) {
         console.error('Error fetching users or transactions:', error);
         setUsers([]);
+        setTotalCount(0);
+        setTotalPages(1);
       } finally {
         setLoading(false);
       }
     };
 
     fetchUsers();
-  }, []);
+  }, [currentPage, pageSize, debouncedSearchTerm, statusFilter, planFilter, startDate, endDate]);
+
+  // Note: Client-side filtering removed - now handled by backend
+  // All filters (status, plan, dates) work server-side across entire dataset
 
   const [sortConfig, setSortConfig] = useState<{ key: string | null, direction: 'asc' | 'desc' }>({
     key: null,
@@ -356,7 +399,16 @@ export const MasterUsers: React.FC = () => {
           <p className="text-gray-500 mt-1">Manage all platform users and their subscriptions</p>
         </div>
         <div className="text-sm text-gray-600">
-          Total: {users.length} users • Active: {users.filter(u => u.status === 'Active').length}
+          {statistics ? (
+            <>
+              Total: {statistics.total_users} users • Active: {statistics.active_users}
+              {debouncedSearchTerm && ` • Search results: ${totalCount}`}
+            </>
+          ) : (
+            <>
+              Total: {totalCount} users • Active: {users.filter(u => u.status === 'Active').length}
+            </>
+          )}
         </div>
       </div>
 
@@ -368,18 +420,26 @@ export const MasterUsers: React.FC = () => {
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
               <input
                 type="text"
-                placeholder="Search users by name or email..."
+                placeholder="Search users by name, email, phone, location..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               />
+              {loading && (
+                <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
+                  <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-600"></div>
+                </div>
+              )}
             </div>
           </div>
           <div>
             <input
               type="date"
               value={startDate}
-              onChange={(e) => setStartDate(e.target.value)}
+              onChange={(e) => {
+                setStartDate(e.target.value);
+                setCurrentPage(1); // Reset to page 1 when filter changes
+              }}
               className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
             />
           </div>
@@ -387,7 +447,10 @@ export const MasterUsers: React.FC = () => {
             <input
               type="date"
               value={endDate}
-              onChange={(e) => setEndDate(e.target.value)}
+              onChange={(e) => {
+                setEndDate(e.target.value);
+                setCurrentPage(1); // Reset to page 1 when filter changes
+              }}
               className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
             />
           </div>
@@ -413,9 +476,10 @@ export const MasterUsers: React.FC = () => {
             className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
           >
             <option value="all">All Plans</option>
-            <option value="Demo">Demo</option>
-            <option value="Free">Free</option>
-            <option value="Premium">Premium</option>
+            <option value="free">Free</option>
+            <option value="zone">Zone</option>
+            <option value="pro">Pro</option>
+            <option value="enterprise">Enterprise</option>
           </select>
 
           <button
@@ -518,9 +582,9 @@ export const MasterUsers: React.FC = () => {
 
                     {/* Usage */}
                     <td className="px-2 py-2 text-gray-600 whitespace-nowrap leading-tight">
-                      <div className="text-[10px] text-gray-900"> Count : {user.usage.simulationsThisMonth}</div>
+                      <div className="text-[10px] text-gray-900">Count : {user.usage.simulationsThisMonth}</div>
                       {/* <div className="text-[10px] text-gray-400">{user.usage.totalSimulations} total</div> */}
-                      <div className="text-[10px] text-gray-900">{getTotalDuration(user.scenarios)}</div>
+                      <div className="text-[10px] text-gray-900">{user.usage.totalDuration}</div>
                     </td>
 
                     {/* Joined */}
@@ -576,6 +640,98 @@ export const MasterUsers: React.FC = () => {
       </div>
 
 
+      {/* Pagination Controls */}
+      <div className="bg-white rounded-lg shadow-sm border border-gray-200 px-6 py-4">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-4">
+            <div className="text-sm text-gray-600">
+              Showing {users.length > 0 ? (currentPage - 1) * pageSize + 1 : 0} to {Math.min(currentPage * pageSize, totalCount)} of {totalCount} results
+            </div>
+            <select
+              value={pageSize}
+              onChange={(e) => {
+                setPageSize(Number(e.target.value));
+                setCurrentPage(1);
+              }}
+              className="px-3 py-1 border border-gray-300 rounded text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            >
+              <option value="10">10 per page</option>
+              <option value="25">25 per page</option>
+              <option value="50">50 per page</option>
+              <option value="100">100 per page</option>
+            </select>
+          </div>
+
+          <div className="flex items-center gap-2">
+            <button
+              onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
+              disabled={!hasPrevious || loading}
+              className="px-4 py-2 border border-gray-300 rounded text-sm font-medium text-gray-700 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              Previous
+            </button>
+
+            <div className="flex items-center gap-1">
+              {currentPage > 2 && (
+                <>
+                  <button
+                    onClick={() => setCurrentPage(1)}
+                    className="px-3 py-2 border border-gray-300 rounded text-sm hover:bg-gray-50"
+                  >
+                    1
+                  </button>
+                  {currentPage > 3 && <span className="px-2 text-gray-500">...</span>}
+                </>
+              )}
+
+              {currentPage > 1 && (
+                <button
+                  onClick={() => setCurrentPage(currentPage - 1)}
+                  className="px-3 py-2 border border-gray-300 rounded text-sm hover:bg-gray-50"
+                >
+                  {currentPage - 1}
+                </button>
+              )}
+
+              <button
+                className="px-3 py-2 border border-blue-500 bg-blue-50 text-blue-600 rounded text-sm font-medium"
+                disabled
+              >
+                {currentPage}
+              </button>
+
+              {currentPage < totalPages && (
+                <button
+                  onClick={() => setCurrentPage(currentPage + 1)}
+                  className="px-3 py-2 border border-gray-300 rounded text-sm hover:bg-gray-50"
+                >
+                  {currentPage + 1}
+                </button>
+              )}
+
+              {currentPage < totalPages - 1 && (
+                <>
+                  {currentPage < totalPages - 2 && <span className="px-2 text-gray-500">...</span>}
+                  <button
+                    onClick={() => setCurrentPage(totalPages)}
+                    className="px-3 py-2 border border-gray-300 rounded text-sm hover:bg-gray-50"
+                  >
+                    {totalPages}
+                  </button>
+                </>
+              )}
+            </div>
+
+            <button
+              onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
+              disabled={!hasNext || loading}
+              className="px-4 py-2 border border-gray-300 rounded text-sm font-medium text-gray-700 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              Next
+            </button>
+          </div>
+        </div>
+      </div>
 
 
       {/* Edit User Modal */}

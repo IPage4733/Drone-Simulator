@@ -47,8 +47,10 @@ export interface CartItem {
   price: number;
   type: 'drone' | 'scenario' | 'plan' | 'addon';
   quantity: number;
-
+  zones?: string[];  // For zone plan
+  numberOfPCs?: number;  // For zone plan
 }
+
 
 export interface CartContextType {
   items: CartItem[];
