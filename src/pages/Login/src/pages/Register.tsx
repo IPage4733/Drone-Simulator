@@ -19,7 +19,6 @@ interface State {
 const Register: React.FC = () => {
   const [formData, setFormData] = useState({
     email: '',
-    username: '',
     password: '',
     password_confirm: '',
     full_name: '',
@@ -161,14 +160,6 @@ const Register: React.FC = () => {
       newErrors.password_confirm = 'Passwords do not match'
     }
 
-    if (!formData.username) {
-      newErrors.username = 'Username is required'
-    } else if (formData.username.length < 3) {
-      newErrors.username = 'Username must be at least 3 characters'
-    } else if (!/^[a-zA-Z0-9_]+$/.test(formData.username)) {
-      newErrors.username = 'Username can only contain letters, numbers, and underscores'
-    }
-
     if (!formData.full_name) {
       newErrors.full_name = 'Full name is required'
     }
@@ -209,7 +200,7 @@ const Register: React.FC = () => {
     try {
       const requestBody = {
         email: formData.email,
-        username: formData.username,
+        username: formData.email.split('@')[0],
         password: formData.password,
         password_confirm: formData.password_confirm,
         full_name: formData.full_name,
@@ -325,32 +316,18 @@ const Register: React.FC = () => {
 
           {/* Form - Ultra Compact */}
           <form onSubmit={handleSubmit} className="space-y-5">
-            {/* Row 1: Email & Username */}
-            <div className="grid grid-cols-2 gap-1.5">
-              <div>
-                <label className="block text-xs font-medium text-gray-700 mb-0.5">Email</label>
-                <input
-                  type="email"
-                  name="email"
-                  value={formData.email}
-                  onChange={handleChange}
-                  className={`w-full px-1.5 py-1 border rounded text-xs focus:ring-1 focus:ring-orange-500 focus:border-transparent ${errors.email ? 'border-red-500' : 'border-gray-300'}`}
-                  placeholder="email@domain.com"
-                />
-                {errors.email && <p className="text-red-500 text-xs mt-0.5">{errors.email}</p>}
-              </div>
-              <div>
-                <label className="block text-xs font-medium text-gray-700 mb-0.5">Username</label>
-                <input
-                  type="text"
-                  name="username"
-                  value={formData.username}
-                  onChange={handleChange}
-                  className={`w-full px-1.5 py-1 border rounded text-xs focus:ring-1 focus:ring-orange-500 focus:border-transparent ${errors.username ? 'border-red-500' : 'border-gray-300'}`}
-                  placeholder="username"
-                />
-                {errors.username && <p className="text-red-500 text-xs mt-0.5">{errors.username}</p>}
-              </div>
+            {/* Row 1: Email */}
+            <div className="w-full">
+              <label className="block text-xs font-medium text-gray-700 mb-0.5">Email</label>
+              <input
+                type="email"
+                name="email"
+                value={formData.email}
+                onChange={handleChange}
+                className={`w-full px-1.5 py-1 border rounded text-xs focus:ring-1 focus:ring-orange-500 focus:border-transparent ${errors.email ? 'border-red-500' : 'border-gray-300'}`}
+                placeholder="email@domain.com"
+              />
+              {errors.email && <p className="text-red-500 text-xs mt-0.5">{errors.email}</p>}
             </div>
 
             {/* Row 2: Full Name */}

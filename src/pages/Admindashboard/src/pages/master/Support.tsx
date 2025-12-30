@@ -561,7 +561,12 @@ export const AdminSupport: React.FC = () => {
                                                     type="checkbox"
                                                     id="is-resolved"
                                                     checked={isResolved}
-                                                    onChange={(e) => setIsResolved(e.target.checked)}
+                                                    onChange={(e) => {
+                                                        setIsResolved(e.target.checked);
+                                                        if (e.target.checked) {
+                                                            setTicketStatus('resolved');
+                                                        }
+                                                    }}
                                                     className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
                                                 />
                                                 <label htmlFor="is-resolved" className="ml-2 text-sm text-gray-900">

@@ -152,13 +152,13 @@ const Login: React.FC = () => {
                 Support
               </Link>
             </div>
-            <button
+            {/* <button
               type="button"
               onClick={() => navigate('/auth/studentregister')}
               className="btn-primary w-40 text-[11px] py-[6px] mt-2 mx-auto block"
             >
               Register as Student
-            </button>
+            </button> */}
 
             <div className="pt-3 border-t border-gray-200 mt-3">
               <p className="text-gray-600">

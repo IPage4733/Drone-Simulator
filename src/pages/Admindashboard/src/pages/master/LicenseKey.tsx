@@ -36,6 +36,13 @@ interface LicenseResponse {
         plan_name: string;
         expires_at: string;
         status: string;
+        total_licenses?: number;
+        licenses?: Array<{
+            license_key: string;
+            pc_number: number;
+            total_pcs: number;
+        }>;
+        selected_zones?: string[];
         user: {
             email: string;
             username: string;
@@ -53,7 +60,7 @@ const PLANS = [
     { id: 'pro', title: 'Pro Plan' },
     { id: 'enterprise', title: 'Enterprise Plan' }
 ];
-const ZONES = ['Zone A', 'Zone B', 'Zone C', 'Zone D', 'Zone E'];
+
 const AdminLicenseGenerator: React.FC = () => {
     const [activeTab, setActiveTab] = useState<'register' | 'license'>('register');
     const [userInfo, setUserInfo] = useState<UserInfo>({
@@ -71,6 +78,8 @@ const AdminLicenseGenerator: React.FC = () => {
     const [licenseEmail, setLicenseEmail] = useState('');
     const [selectedPlan, setSelectedPlan] = useState('pro');
     const [quantity, setQuantity] = useState(1);
+    const [pcCount, setPcCount] = useState(1);
+    const [availableZones, setAvailableZones] = useState<Array<{ id: string; name: string }>>([]);
     const [selectedZones, setSelectedZones] = useState<string[]>([]);
     const [validity, setValidity] = useState({
         start: new Date().toISOString().split('T')[0],
@@ -86,6 +95,7 @@ const AdminLicenseGenerator: React.FC = () => {
     const [states, setStates] = useState<Array<{ name: string; code: string }>>([]);
     const [loadingCountries, setLoadingCountries] = useState(true);
     const [loadingStates, setLoadingStates] = useState(false);
+    const [loadingZones, setLoadingZones] = useState(false);
 
     // Fetch countries on component mount
     useEffect(() => {
@@ -121,6 +131,56 @@ const AdminLicenseGenerator: React.FC = () => {
 
         fetchCountries();
     }, []);
+
+    // Fetch available zones on component mount
+    useEffect(() => {
+        const fetchZones = async () => {
+            setLoadingZones(true);
+            try {
+                const response = await fetch(API_ENDPOINTS.AVAILABLE_ZONES, {
+                    headers: {
+                        'Authorization': `Token ${localStorage.getItem('drone_auth_token')}`
+                    }
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    setAvailableZones(data.zones || []);
+                } else {
+                    console.error('Failed to fetch zones');
+                    setAvailableZones([]);
+                }
+            } catch (error) {
+                console.error('Error fetching zones:', error);
+                setAvailableZones([]);
+            } finally {
+                setLoadingZones(false);
+            }
+        };
+
+        fetchZones();
+    }, []);
+
+    // Auto-set validity period based on selected plan
+    useEffect(() => {
+        const today = new Date();
+        let endDate: Date;
+
+        if (selectedPlan === 'free') {
+            // Free plan: 1 day validity
+            endDate = new Date(today);
+            endDate.setDate(endDate.getDate() + 1);
+        } else {
+            // All other plans: 1 year validity
+            endDate = new Date(today);
+            endDate.setFullYear(endDate.getFullYear() + 1);
+        }
+
+        setValidity({
+            start: today.toISOString().split('T')[0],
+            end: endDate.toISOString().split('T')[0]
+        });
+    }, [selectedPlan]);
 
     // Fetch states when country changes
     useEffect(() => {
@@ -357,13 +417,22 @@ const AdminLicenseGenerator: React.FC = () => {
             const expiresAt = new Date(validity.end);
             expiresAt.setHours(23, 59, 59, 999);
 
+            // Build request body
+            const requestBody: any = {
+                user_email: licenseEmail,
+                plan_type: selectedPlan,
+                expires_at: expiresAt.toISOString(),
+            };
+
+            // Add zone-specific fields if zone plan selected
+            if (selectedPlan === 'zone') {
+                requestBody.selected_zones = selectedZones;
+                requestBody.total_pcs = pcCount;
+            }
+
             const response = await axios.post<LicenseResponse>(
                 API_ENDPOINTS.GENERATE_LICENSE,
-                {
-                    user_email: licenseEmail,
-                    plan_type: selectedPlan,
-                    expires_at: expiresAt.toISOString(),
-                },
+                requestBody,
                 {
                     headers: {
                         'Authorization': `Token ${token}`,
@@ -637,33 +706,55 @@ const AdminLicenseGenerator: React.FC = () => {
                                         </select>
                                     </div>
                                     {selectedPlan === 'zone' && (
-                                        <div className="bg-slate-50 p-4 rounded-lg border border-slate-200 animate-fade-in mt-2">
-                                            <p className="text-sm font-bold text-black mb-3 uppercase tracking-wide">Permitted Zones *</p>
-                                            <div className="grid grid-cols-2 gap-3">
-                                                {ZONES.map(z => (
-                                                    <label key={z} className="flex items-center gap-3 cursor-pointer group p-2 hover:bg-white rounded-lg transition-colors">
-                                                        <div className="relative flex items-center">
-                                                            <input
-                                                                type="checkbox"
-                                                                checked={selectedZones.includes(z)}
-                                                                onChange={(e) => {
-                                                                    if (e.target.checked) {
-                                                                        setSelectedZones([...selectedZones, z]);
-                                                                    } else {
-                                                                        setSelectedZones(selectedZones.filter(iz => iz !== z));
-                                                                    }
-                                                                }}
-                                                                className="peer h-5 w-5 cursor-pointer appearance-none rounded border border-slate-300 shadow-sm transition-all checked:border-orange-600 checked:bg-orange-600 hover:border-orange-400"
-                                                            />
-                                                            <svg className="pointer-events-none absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 text-white opacity-0 peer-checked:opacity-100" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round" width="12" height="12">
-                                                                <polyline points="20 6 9 17 4 12"></polyline>
-                                                            </svg>
-                                                        </div>
-                                                        <span className="text-sm font-bold text-black group-hover:text-orange-700 transition-colors">{z}</span>
-                                                    </label>
-                                                ))}
+                                        <>
+                                            {/* PC Count Input */}
+                                            <div className="bg-slate-50 p-4 rounded-lg border border-slate-200 animate-fade-in mt-2">
+                                                <label className="text-sm font-bold text-black mb-2 block uppercase tracking-wide">Number of PCs *</label>
+                                                <input
+                                                    type="number"
+                                                    min="1"
+                                                    max="50"
+                                                    value={pcCount}
+                                                    onChange={(e) => setPcCount(Math.max(1, Math.min(50, parseInt(e.target.value) || 1)))}
+                                                    className="w-full px-4 py-2.5 rounded-md border border-gray-300 focus:outline-none focus:ring-2 focus:ring-orange-500"
+                                                />
+                                                <p className="text-xs text-gray-500 mt-1">Specify how many PCs this license will cover (1-50). Multiple licenses will be generated.</p>
                                             </div>
-                                        </div>
+                                            {/* Zone Selection */}
+                                            <div className="bg-slate-50 p-4 rounded-lg border border-slate-200 animate-fade-in mt-2">
+                                                <p className="text-sm font-bold text-black mb-3 uppercase tracking-wide">Permitted Zones *</p>
+                                                {loadingZones ? (
+                                                    <div className="text-center py-4 text-gray-500">Loading zones...</div>
+                                                ) : availableZones.length === 0 ? (
+                                                    <div className="text-center py-4 text-gray-500">No zones available</div>
+                                                ) : (
+                                                    <div className="grid grid-cols-2 gap-3">
+                                                        {availableZones.map(zone => (
+                                                            <label key={zone.id} className="flex items-center gap-3 cursor-pointer group p-2 hover:bg-white rounded-lg transition-colors">
+                                                                <div className="relative flex items-center">
+                                                                    <input
+                                                                        type="checkbox"
+                                                                        checked={selectedZones.includes(zone.id)}
+                                                                        onChange={(e) => {
+                                                                            if (e.target.checked) {
+                                                                                setSelectedZones([...selectedZones, zone.id]);
+                                                                            } else {
+                                                                                setSelectedZones(selectedZones.filter(id => id !== zone.id));
+                                                                            }
+                                                                        }}
+                                                                        className="peer h-5 w-5 cursor-pointer appearance-none rounded border border-slate-300 shadow-sm transition-all checked:border-orange-600 checked:bg-orange-600 hover:border-orange-400"
+                                                                    />
+                                                                    <svg className="pointer-events-none absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 text-white opacity-0 peer-checked:opacity-100" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round" width="12" height="12">
+                                                                        <polyline points="20 6 9 17 4 12"></polyline>
+                                                                    </svg>
+                                                                </div>
+                                                                <span className="text-sm font-bold text-black group-hover:text-orange-700 transition-colors">{zone.name}</span>
+                                                            </label>
+                                                        ))}
+                                                    </div>
+                                                )}
+                                            </div>
+                                        </>
                                     )}
                                 </div>
                             </div>
@@ -714,7 +805,12 @@ const AdminLicenseGenerator: React.FC = () => {
                 <div className="bg-white p-6 rounded-xl shadow-lg border border-green-200 animate-scale-in">
                     <div className="flex justify-between items-center mb-4">
                         <div>
-                            <h3 className="font-bold text-green-700 text-lg">License Key Generated Successfully</h3>
+                            <h3 className="font-bold text-green-700 text-lg">
+                                {generatedLicense.data?.total_licenses > 1
+                                    ? `${generatedLicense.data.total_licenses} License Keys Generated Successfully`
+                                    : 'License Key Generated Successfully'
+                                }
+                            </h3>
                             <p className="text-sm text-slate-500">
                                 {generatedLicense.data?.user.full_name} ({generatedLicense.data?.user.email})
                             </p>
@@ -726,17 +822,53 @@ const AdminLicenseGenerator: React.FC = () => {
                             <p className="text-sm">{generatedLicense.warning}</p>
                         </div>
                     )}
-                    <div className="bg-slate-100 p-4 rounded-lg space-y-3">
-                        <div className="flex justify-between items-center border-b border-slate-200 pb-2">
-                            <span className="text-sm text-slate-600">License Key:</span>
-                            <span className="font-mono font-bold text-slate-800 select-all">
-                                {generatedLicense.data?.license_key}
-                            </span>
+
+                    {/* Display all licenses */}
+                    {generatedLicense.data?.licenses && generatedLicense.data.licenses.length > 1 ? (
+                        // Multiple licenses - show list
+                        <div className="space-y-3 mb-4">
+                            <p className="text-sm font-semibold text-slate-700 mb-2">Generated License Keys:</p>
+                            {generatedLicense.data.licenses.map((license: any, index: number) => (
+                                <div key={index} className="bg-slate-50 p-4 rounded-lg border border-slate-200">
+                                    <div className="flex justify-between items-center mb-2">
+                                        <span className="text-xs font-semibold text-orange-600 uppercase">
+                                            PC #{license.pc_number} of {license.total_pcs}
+                                        </span>
+                                    </div>
+                                    <div className="font-mono font-bold text-slate-800 text-lg select-all break-all">
+                                        {license.license_key}
+                                    </div>
+                                </div>
+                            ))}
                         </div>
+                    ) : (
+                        // Single license - simple display
+                        <div className="bg-slate-100 p-4 rounded-lg mb-4">
+                            <div className="flex justify-between items-center">
+                                <span className="text-sm text-slate-600">License Key:</span>
+                                <span className="font-mono font-bold text-slate-800 select-all">
+                                    {generatedLicense.data?.license_key}
+                                </span>
+                            </div>
+                        </div>
+                    )}
+
+                    {/* Plan and Status Info */}
+                    <div className="bg-slate-100 p-4 rounded-lg space-y-3">
                         <div className="flex justify-between items-center border-b border-slate-200 pb-2">
                             <span className="text-sm text-slate-600">Plan:</span>
                             <span className="font-bold text-slate-800">{generatedLicense.data?.plan_name}</span>
                         </div>
+
+                        {generatedLicense.data?.selected_zones && generatedLicense.data.selected_zones.length > 0 && (
+                            <div className="flex justify-between items-center border-b border-slate-200 pb-2">
+                                <span className="text-sm text-slate-600">Zones:</span>
+                                <span className="font-bold text-slate-800">
+                                    {generatedLicense.data.selected_zones.join(', ')}
+                                </span>
+                            </div>
+                        )}
+
                         <div className="flex justify-between items-center border-b border-slate-200 pb-2">
                             <span className="text-sm text-slate-600">Status:</span>
                             <span className="font-bold text-green-600 uppercase">{generatedLicense.data?.status}</span>
@@ -749,8 +881,8 @@ const AdminLicenseGenerator: React.FC = () => {
                         </div>
                     </div>
                     <div className="mt-4 text-sm text-slate-600">
-                        <p>✓ License key has been sent to the user's email address</p>
-                        <p>✓ User can activate the key in their application</p>
+                        <p>✓ License key(s) have been sent to the user's email address</p>
+                        <p>✓ User can activate the key(s) in their application</p>
                     </div>
                 </div>
             )}

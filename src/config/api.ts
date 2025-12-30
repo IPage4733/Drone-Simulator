@@ -56,6 +56,7 @@ export const API_ENDPOINTS = {
     // Zone Plan Upgrade
     STRIPE_MY_ZONE_PLAN: `${API_BASE_URL}/stripe/my-zone-plan/`,
     STRIPE_UPGRADE_ZONE_PLAN: `${API_BASE_URL}/stripe/upgrade-zone-plan/`,
+    AVAILABLE_ZONES: `${API_BASE_URL}/stripe/available-zones/`,
 
 
     // Downloads

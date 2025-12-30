@@ -7,9 +7,24 @@ interface ZonePlanUpgradeProps {
     onClose: () => void;
 }
 
+interface ZoneLicense {
+    id: number;
+    license_key: string;
+    license_key_masked: string;
+    device_id: string;
+    total_pcs: number;
+    pc_number: number;
+    expires_at: string;
+    purchased_zones: { [key: string]: string };
+    status: string;
+    created_at: string;
+}
+
 const ZonePlanUpgrade: React.FC<ZonePlanUpgradeProps> = ({ isOpen, onClose }) => {
-    const [zonePlanData, setZonePlanData] = useState<any>(null);
+    const [zoneLicenses, setZoneLicenses] = useState<ZoneLicense[]>([]);
+    const [selectedLicenseIds, setSelectedLicenseIds] = useState<{ [key: number]: boolean }>({});
     const [selectedNewZones, setSelectedNewZones] = useState<{ [key: string]: boolean }>({});
+    const [availableZones, setAvailableZones] = useState<string[]>([]);
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState('');
     const [isUpgrading, setIsUpgrading] = useState(false);
@@ -18,11 +33,16 @@ const ZonePlanUpgrade: React.FC<ZonePlanUpgradeProps> = ({ isOpen, onClose }) =>
 
     useEffect(() => {
         if (isOpen) {
-            fetchZonePlanData();
+            fetchZoneLicenses();
         }
     }, [isOpen]);
 
-    const fetchZonePlanData = async () => {
+    // Clear selected zones when license selection changes
+    useEffect(() => {
+        setSelectedNewZones({});
+    }, [selectedLicenseIds]);
+
+    const fetchZoneLicenses = async () => {
         setIsLoading(true);
         setError('');
 
@@ -32,34 +52,63 @@ const ZonePlanUpgrade: React.FC<ZonePlanUpgradeProps> = ({ isOpen, onClose }) =>
                 throw new Error('Please login to upgrade your plan');
             }
 
-            const response = await fetch(`${API_ENDPOINTS.STRIPE_BASE}/my-zone-plan/`, {
+            // Fetch all zone licenses
+            const licensesResponse = await fetch(`${API_ENDPOINTS.STRIPE_BASE}/my-zone-licenses/`, {
                 headers: {
                     'Authorization': `Token ${token}`
                 }
             });
 
-            if (!response.ok) {
-                const errorData = await response.json();
-                throw new Error(errorData.message || 'Failed to fetch zone plan details');
+            if (!licensesResponse.ok) {
+                const errorData = await licensesResponse.json();
+                throw new Error(errorData.message || 'Failed to fetch zone licenses');
             }
 
-            const data = await response.json();
+            const licensesData = await licensesResponse.json();
 
-            if (!data.has_zone_plan) {
-                throw new Error('You do not have an active zone plan');
+            if (!licensesData.zone_licenses || licensesData.zone_licenses.length === 0) {
+                throw new Error('No zone licenses found');
             }
 
-            if (!data.is_upgradeable) {
-                throw new Error('Your zone plan cannot be upgraded at this time');
+            // Filter out expired licenses
+            const activeLicenses = licensesData.zone_licenses.filter((lic: ZoneLicense) => lic.status === 'active');
+
+            if (activeLicenses.length === 0) {
+                throw new Error('All your zone licenses have expired');
             }
 
-            setZonePlanData(data);
+            setZoneLicenses(activeLicenses);
+
+            // Don't auto-select - let user choose which licenses to upgrade
+            setSelectedLicenseIds({});
+
+            // Fetch available zones (from my-zone-plan)
+            const planResponse = await fetch(`${API_ENDPOINTS.STRIPE_BASE}/my-zone-plan/`, {
+                headers: {
+                    'Authorization': `Token ${token}`
+                }
+            });
+
+            if (!planResponse.ok) {
+                throw new Error('Failed to fetch zone plan details');
+            }
+
+            const planData = await planResponse.json();
+            setAvailableZones(planData.available_zones || []);
+
         } catch (err: any) {
             setError(err.message);
-            console.error('Error fetching zone plan:', err);
+            console.error('Error fetching zone licenses:', err);
         } finally {
             setIsLoading(false);
         }
+    };
+
+    const toggleLicense = (licenseId: number) => {
+        setSelectedLicenseIds(prev => ({
+            ...prev,
+            [licenseId]: !prev[licenseId]
+        }));
     };
 
     const toggleZone = (zoneName: string) => {
@@ -69,19 +118,74 @@ const ZonePlanUpgrade: React.FC<ZonePlanUpgradeProps> = ({ isOpen, onClose }) =>
         }));
     };
 
+    const getSelectedLicensesCount = () => {
+        return Object.values(selectedLicenseIds).filter(Boolean).length;
+    };
+
+    const getAvailableZonesForSelected = () => {
+        // If no licenses selected, return empty
+        if (getSelectedLicensesCount() === 0) {
+            return [];
+        }
+
+        // Get all possible zones from ALL licenses (union of all zones across all licenses)
+        const allPossibleZones = new Set<string>();
+        zoneLicenses.forEach(license => {
+            if (license.purchased_zones) {
+                Object.keys(license.purchased_zones).forEach(zone => {
+                    allPossibleZones.add(zone);
+                });
+            }
+        });
+        // Also add zones from the global availableZones list
+        availableZones.forEach(zone => allPossibleZones.add(zone));
+
+        // Get zones that the SELECTED licenses already have
+        const selectedLicenses = zoneLicenses.filter(lic => selectedLicenseIds[lic.id]);
+        const zonesInSelectedLicenses = new Set<string>();
+
+        selectedLicenses.forEach(license => {
+            if (license.purchased_zones) {
+                Object.keys(license.purchased_zones).forEach(zone => {
+                    zonesInSelectedLicenses.add(zone);
+                });
+            }
+        });
+
+        // Return zones that are NOT in the selected licenses
+        return Array.from(allPossibleZones).filter(zone => !zonesInSelectedLicenses.has(zone)).sort();
+    };
+
+
     const getSelectedNewZonesCount = () => {
         return Object.values(selectedNewZones).filter(Boolean).length;
     };
 
     const calculateUpgradePrice = () => {
         const zonesCount = getSelectedNewZonesCount();
-        const totalPCs = zonePlanData?.total_pcs || 1;
-        return zonesCount * totalPCs * BASE_PRICE;
+        let total = 0;
+
+        // Each selected license is charged as 1 PC
+        // (even if total_pcs shows the original purchase quantity, 
+        // each license key represents 1 PC when upgrading)
+        const selectedCount = getSelectedLicensesCount();
+        total = zonesCount * selectedCount * BASE_PRICE;
+
+        return total;
+    };
+
+    const getSelectedLicenses = () => {
+        return zoneLicenses.filter(lic => selectedLicenseIds[lic.id]);
     };
 
     const handleUpgrade = async () => {
         if (getSelectedNewZonesCount() === 0) {
             setError('Please select at least one zone to add');
+            return;
+        }
+
+        if (getSelectedLicensesCount() === 0) {
+            setError('Please select at least one license to upgrade');
             return;
         }
 
@@ -94,6 +198,10 @@ const ZonePlanUpgrade: React.FC<ZonePlanUpgradeProps> = ({ isOpen, onClose }) =>
                 .filter(([_, selected]) => selected)
                 .map(([zoneName, _]) => zoneName);
 
+            const selectedLicenses = Object.entries(selectedLicenseIds)
+                .filter(([_, selected]) => selected)
+                .map(([licenseId, _]) => parseInt(licenseId));
+
             const response = await fetch(`${API_ENDPOINTS.STRIPE_BASE}/upgrade-zone-plan/`, {
                 method: 'POST',
                 headers: {
@@ -101,7 +209,8 @@ const ZonePlanUpgrade: React.FC<ZonePlanUpgradeProps> = ({ isOpen, onClose }) =>
                     'Authorization': `Token ${token}`
                 },
                 body: JSON.stringify({
-                    new_zones: selectedZones
+                    new_zones: selectedZones,
+                    selected_license_ids: selectedLicenses
                 })
             });
 
@@ -130,7 +239,7 @@ const ZonePlanUpgrade: React.FC<ZonePlanUpgradeProps> = ({ isOpen, onClose }) =>
 
     return (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-60 px-4">
-            <div className="relative w-full max-w-5xl bg-white rounded-2xl shadow-2xl overflow-hidden max-h-[90vh] flex flex-col">
+            <div className="relative w-full max-w-6xl bg-white rounded-2xl shadow-2xl overflow-hidden max-h-[90vh] flex flex-col">
                 {/* Header */}
                 <div className="bg-white border-b border-gray-200 px-6 py-4 flex items-center justify-between flex-shrink-0">
                     <div className="flex items-center gap-3">
@@ -158,7 +267,7 @@ const ZonePlanUpgrade: React.FC<ZonePlanUpgradeProps> = ({ isOpen, onClose }) =>
                         <div className="flex items-center justify-center p-12">
                             <div className="text-center">
                                 <Loader2 className="w-12 h-12 text-orange-500 animate-spin mx-auto mb-4" />
-                                <p className="text-gray-600">Loading your zone plan...</p>
+                                <p className="text-gray-600">Loading your zone licenses...</p>
                             </div>
                         </div>
                     ) : error ? (
@@ -167,109 +276,156 @@ const ZonePlanUpgrade: React.FC<ZonePlanUpgradeProps> = ({ isOpen, onClose }) =>
                                 <p className="text-red-800">{error}</p>
                             </div>
                         </div>
-                    ) : zonePlanData ? (
-                        <div className="flex flex-col md:flex-row">
-                            {/* Left Section - Zone Selection */}
-                            <div className="flex-1 p-6 bg-gray-50">
-                                <div className="mb-6">
-                                    <div className="flex items-center gap-2 mb-2">
-                                        <div className="w-10 h-10 rounded-full bg-orange-100 flex items-center justify-center">
-                                            <svg className="w-5 h-5 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-                                            </svg>
-                                        </div>
-                                        <div>
-                                            <h3 className="text-lg font-bold text-gray-800">Add More Zones</h3>
-                                            <p className="text-sm text-orange-600">PC Count: {zonePlanData.total_pcs} (locked)</p>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                {/* Current Zones */}
-                                <div className="mb-6">
-                                    <h4 className="text-sm font-semibold text-gray-700 mb-3">Your Current Zones</h4>
-                                    <div className="space-y-2">
-                                        {Object.entries(zonePlanData.purchased_zones || {}).map(([zoneName, expiryDate]: [string, any]) => (
-                                            <div
-                                                key={zoneName}
-                                                className="flex items-center justify-between p-3 rounded-lg border-2 border-gray-300 bg-gray-100 opacity-75"
-                                            >
-                                                <div className="flex items-center gap-3">
-                                                    <div className="w-6 h-6 rounded-md bg-gray-400 flex items-center justify-center">
-                                                        <CheckCircle size={16} className="text-white" />
-                                                    </div>
-                                                    <span className="font-medium text-gray-600">{zoneName}</span>
-                                                </div>
-                                                <span className="text-xs text-gray-500">
-                                                    Expires: {new Date(expiryDate).toLocaleDateString()}
-                                                </span>
-                                            </div>
-                                        ))}
-                                    </div>
-                                </div>
-
-                                {/* Available Zones */}
+                    ) : zoneLicenses.length > 0 ? (
+                        <div className="flex flex-col lg:flex-row">
+                            {/* Left Section - License & Zone Selection */}
+                            <div className="flex-1 p-6 bg-gray-50 space-y-6">
+                                {/* License Selection */}
                                 <div>
-                                    <h4 className="text-sm font-semibold text-gray-700 mb-3">Available Zones to Add</h4>
-                                    <div className="space-y-2">
-                                        {zonePlanData.available_zones?.map((zoneName: string) => (
+                                    <h3 className="text-lg font-bold text-gray-800 mb-4">Select License Keys to Upgrade</h3>
+                                    <div className="space-y-3">
+                                        {zoneLicenses.map((license) => (
                                             <div
-                                                key={zoneName}
-                                                onClick={() => toggleZone(zoneName)}
-                                                className={`flex items-center justify-between p-3 rounded-lg border-2 cursor-pointer transition-all ${selectedNewZones[zoneName]
-                                                        ? 'border-orange-500 bg-orange-50'
-                                                        : 'border-gray-200 bg-white hover:border-orange-300'
+                                                key={license.id}
+                                                onClick={() => toggleLicense(license.id)}
+                                                className={`p-4 rounded-lg border-2 cursor-pointer transition-all ${selectedLicenseIds[license.id]
+                                                    ? 'border-orange-500 bg-orange-50'
+                                                    : 'border-gray-200 bg-white hover:border-orange-300'
                                                     }`}
                                             >
-                                                <div className="flex items-center gap-3">
-                                                    <div className={`w-6 h-6 rounded-md border-2 flex items-center justify-center ${selectedNewZones[zoneName]
+                                                <div className="flex items-start justify-between">
+                                                    <div className="flex items-start gap-3 flex-1">
+                                                        <div className={`w-6 h-6 rounded-md border-2 flex items-center justify-center mt-1 ${selectedLicenseIds[license.id]
                                                             ? 'bg-orange-500 border-orange-500'
                                                             : 'border-gray-300'
-                                                        }`}>
-                                                        {selectedNewZones[zoneName] && (
-                                                            <CheckCircle size={16} className="text-white" />
-                                                        )}
+                                                            }`}>
+                                                            {selectedLicenseIds[license.id] && (
+                                                                <CheckCircle size={16} className="text-white" />
+                                                            )}
+                                                        </div>
+                                                        <div className="flex-1">
+                                                            <div className="font-semibold text-gray-800 mb-1">
+                                                                License {license.license_key_masked}
+                                                            </div>
+                                                            <div className="text-sm text-gray-600 space-y-1">
+                                                                <div>
+                                                                    PC: <span className="font-medium text-orange-600">
+                                                                        #{license.pc_number || 1} of {license.total_pcs || 1}
+                                                                    </span>
+
+                                                                </div>
+                                                                <div> Device ID :
+                                                                    <span className="font-medium text-orange-600 pl-2">
+                                                                        {license.device_id}
+                                                                    </span>
+                                                                </div>
+
+                                                                {/* Zone expiry breakdown */}
+                                                                {typeof license.purchased_zones === 'object' && Object.keys(license.purchased_zones).length > 0 ? (
+                                                                    <div className="mt-2">
+                                                                        <div className="text-xs font-semibold text-gray-700 mb-1">Zones & Expiry:</div>
+                                                                        <div className="space-y-0.5">
+                                                                            {Object.entries(license.purchased_zones)
+                                                                                .sort((a, b) => new Date(b[1] as string).getTime() - new Date(a[1] as string).getTime())
+                                                                                .map(([zoneName, expiryDate]) => (
+                                                                                    <div key={zoneName} className="text-xs flex justify-between">
+                                                                                        <span className="text-gray-600">{zoneName}</span>
+                                                                                        <span className="text-gray-500">
+                                                                                            {new Date(expiryDate as string).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
+                                                                                        </span>
+                                                                                    </div>
+                                                                                ))}
+                                                                        </div>
+                                                                        <div className="text-xs text-gray-500 mt-1 pt-1 border-t border-gray-200">
+                                                                            Latest expiry: {new Date(license.expires_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
+                                                                        </div>
+                                                                    </div>
+                                                                ) : (
+                                                                    <div>Zones: {Object.keys(license.purchased_zones).join(', ')}</div>
+                                                                )}
+                                                            </div>
+                                                        </div>
                                                     </div>
-                                                    <span className={`font-medium ${selectedNewZones[zoneName] ? 'text-gray-800' : 'text-gray-600'
-                                                        }`}>
-                                                        {zoneName}
-                                                    </span>
                                                 </div>
-                                                {selectedNewZones[zoneName] && (
-                                                    <span className="text-orange-600 font-semibold text-sm">
-                                                        ${(zonePlanData.total_pcs * BASE_PRICE).toFixed(2)}
-                                                    </span>
-                                                )}
                                             </div>
                                         ))}
                                     </div>
+                                </div>
+
+                                {/* Zone Selection */}
+                                <div>
+                                    <h3 className="text-lg font-bold text-gray-800 mb-4">Select Zones to Add</h3>
+                                    {getSelectedLicensesCount() === 0 ? (
+                                        <div className="text-center py-8 text-gray-400">
+                                            <p className="text-sm">Please select at least one license first</p>
+                                        </div>
+                                    ) : (
+                                        <div className="space-y-2">
+                                            {getAvailableZonesForSelected().map((zoneName: string) => (
+                                                <div
+                                                    key={zoneName}
+                                                    onClick={() => toggleZone(zoneName)}
+                                                    className={`flex items-center justify-between p-3 rounded-lg border-2 cursor-pointer transition-all ${selectedNewZones[zoneName]
+                                                        ? 'border-orange-500 bg-orange-50'
+                                                        : 'border-gray-200 bg-white hover:border-orange-300'
+                                                        }`}
+                                                >
+                                                    <div className="flex items-center gap-3">
+                                                        <div className={`w-6 h-6 rounded-md border-2 flex items-center justify-center ${selectedNewZones[zoneName]
+                                                            ? 'bg-orange-500 border-orange-500'
+                                                            : 'border-gray-300'
+                                                            }`}>
+                                                            {selectedNewZones[zoneName] && (
+                                                                <CheckCircle size={16} className="text-white" />
+                                                            )}
+                                                        </div>
+                                                        <span className={`font-medium ${selectedNewZones[zoneName] ? 'text-gray-800' : 'text-gray-600'
+                                                            }`}>
+                                                            {zoneName}
+                                                        </span>
+                                                    </div>
+                                                </div>
+                                            ))}
+                                            {getAvailableZonesForSelected().length === 0 && (
+                                                <div className="text-center py-8 text-gray-400">
+                                                    <p className="text-sm">All zones are already in the selected license(s)</p>
+                                                </div>
+                                            )}
+                                        </div>
+                                    )}
                                 </div>
                             </div>
 
                             {/* Right Section - Order Summary */}
-                            <div className="w-full md:w-96 bg-white p-6 border-t md:border-t-0 md:border-l border-gray-200">
+                            <div className="w-full lg:w-96 bg-white p-6 border-t lg:border-t-0 lg:border-l border-gray-200">
                                 <h3 className="text-xl font-bold text-gray-800 mb-6">Upgrade Summary</h3>
 
-                                {/* Selected Zones */}
-                                <div className="space-y-3 mb-6">
-                                    {Object.entries(selectedNewZones)
-                                        .filter(([_, selected]) => selected)
-                                        .map(([zoneName, _]) => (
-                                            <div key={zoneName} className="pb-3 border-b border-gray-100">
-                                                <div className="flex justify-between items-start mb-1">
-                                                    <span className="text-gray-800 font-medium text-sm">
-                                                        {zoneName} × {zonePlanData.total_pcs} PC(s)
-                                                    </span>
-                                                    <span className="text-gray-800 font-semibold">
-                                                        ${(zonePlanData.total_pcs * BASE_PRICE).toFixed(2)}
-                                                    </span>
+                                {/* Per-License Breakdown */}
+                                <div className="space-y-4 mb-6">
+                                    {getSelectedLicenses().map((license) => {
+                                        const zonesCount = getSelectedNewZonesCount();
+                                        if (zonesCount === 0) return null;
+
+                                        return (
+                                            <div key={license.id} className="pb-4 border-b border-gray-200">
+                                                <div className="text-sm font-semibold text-gray-700 mb-2">
+                                                    License {license.license_key_masked}
                                                 </div>
-                                                <div className="text-xs text-orange-600">
-                                                    1 year validity from upgrade date
+                                                {Object.entries(selectedNewZones)
+                                                    .filter(([_, selected]) => selected)
+                                                    .map(([zoneName, _]) => (
+                                                        <div key={zoneName} className="flex justify-between text-sm text-gray-600 mb-1">
+                                                            <span>{zoneName} × 1 PC</span>
+                                                            <span className="font-medium">${BASE_PRICE.toFixed(2)}</span>
+                                                        </div>
+                                                    ))}
+                                                <div className="mt-2 pt-2 border-t border-gray-100 flex justify-between text-sm font-semibold text-gray-800">
+                                                    <span>Subtotal</span>
+                                                    <span>${(zonesCount * BASE_PRICE).toFixed(2)}</span>
                                                 </div>
                                             </div>
-                                        ))}
+                                        );
+                                    })}
 
                                     {getSelectedNewZonesCount() === 0 && (
                                         <div className="text-center py-8 text-gray-400">
@@ -289,17 +445,17 @@ const ZonePlanUpgrade: React.FC<ZonePlanUpgradeProps> = ({ isOpen, onClose }) =>
                                         ${calculateUpgradePrice().toFixed(2)}
                                     </div>
                                     <p className="text-xs text-gray-500 mt-2">
-                                        {getSelectedNewZonesCount()} zone(s) × {zonePlanData.total_pcs} PC(s) × ${BASE_PRICE}
+                                        {getSelectedNewZonesCount()} zone(s) × {getSelectedLicensesCount()} license(s)
                                     </p>
                                 </div>
 
                                 {/* Upgrade Button */}
                                 <button
                                     onClick={handleUpgrade}
-                                    disabled={getSelectedNewZonesCount() === 0 || isUpgrading}
-                                    className={`w-full py-4 rounded-xl font-bold text-white transition-all ${getSelectedNewZonesCount() === 0 || isUpgrading
-                                            ? 'bg-gray-300 cursor-not-allowed'
-                                            : 'bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 shadow-lg'
+                                    disabled={getSelectedNewZonesCount() === 0 || getSelectedLicensesCount() === 0 || isUpgrading}
+                                    className={`w-full py-4 rounded-xl font-bold text-white transition-all ${getSelectedNewZonesCount() === 0 || getSelectedLicensesCount() === 0 || isUpgrading
+                                        ? 'bg-gray-300 cursor-not-allowed'
+                                        : 'bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 shadow-lg'
                                         }`}
                                 >
                                     {isUpgrading ? (
@@ -319,7 +475,7 @@ const ZonePlanUpgrade: React.FC<ZonePlanUpgradeProps> = ({ isOpen, onClose }) =>
                                 {/* Info */}
                                 <div className="mt-6 p-4 bg-blue-50 rounded-lg">
                                     <p className="text-xs text-blue-800">
-                                        <strong>Note:</strong> New zones will have 1 year validity from the upgrade date.
+                                        <strong>Note:</strong> New zones will be added to each selected license with 1 year validity from the upgrade date.
                                         Your existing zones will keep their original expiration dates.
                                     </p>
                                 </div>

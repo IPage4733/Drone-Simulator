@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
-import { Users as UsersIcon, Search, Filter, Edit, Eye, UserX, Settings, Calendar, Download } from 'lucide-react';
+import { Users as UsersIcon, Search, Filter, Eye, UserX, Calendar, Download } from 'lucide-react';
 import { useData } from '../../hooks/useData';
-import { EditUserModal } from '../../components/modals/EditUserModal';
 import { useAuth } from '../../hooks/useAuth';
 import { useEffect } from 'react';
 import axios from 'axios';
@@ -30,60 +29,14 @@ export const MasterUsers: React.FC = () => {
   const [startDate, setStartDate] = useState('');
   const [endDate, setEndDate] = useState('');
 
-  const [editingUser, setEditingUser] = useState<string | null>(null);
+
 
   // Filters are now server-side, so we use the raw user data
   // No client-side filtering needed - backend handles everything
   const filteredUsers = users;
 
 
-  const handleEditUser = async (
-    userId: string,
-    newPlan: string,
-    addOns: any,
-    customPlan?: any
-  ) => {
-    const userToUpdate = users.find(u => u.id === userId);
-    if (!userToUpdate) return;
 
-    const updatePayload = {
-      email: userToUpdate.email,
-      username: userToUpdate.name,
-      full_name: userToUpdate.name,
-      phone_number: userToUpdate.phone_number || '',
-      city: userToUpdate.city || '',
-      state_province: userToUpdate.state_province || '',
-      country: userToUpdate.country || '',
-      purpose_of_use: userToUpdate.purpose_of_use || '',
-      plan:
-        newPlan === 'Demo' ? 'trial' :
-          newPlan === 'Free' ? 'basic' :
-            newPlan === 'Premium' ? 'premium' :
-              newPlan.toLowerCase(),
-    };
-
-    try {
-      const token = sessionStorage.getItem('drone_auth_token') || '';
-      await axios.put(API_ENDPOINTS.UPDATE_USER, updatePayload, {
-        headers: {
-          Authorization: `Token ${token}`,
-        },
-      });
-
-      // Locally update user state
-      updateUserPlan(userId, newPlan, currentUser?.name || 'Master Admin');
-      updateUserAddOns(userId, addOns, currentUser?.name || 'Master Admin');
-
-      if (newPlan === 'Custom' && customPlan) {
-        updateCustomPlan(userId, customPlan, currentUser?.name || 'Master Admin');
-      }
-
-      alert('User plan updated successfully!');
-    } catch (error) {
-      console.error('Error updating user:', error);
-      alert('Failed to update user plan.');
-    }
-  };
 
 
   const getStatusColor = (status: string) => {
@@ -98,10 +51,9 @@ export const MasterUsers: React.FC = () => {
   const getPlanColor = (plan: string) => {
     switch (plan) {
       case 'Free': return 'bg-gray-100 text-gray-800';
+      case 'Zone': return 'bg-purple-100 text-purple-800';
       case 'Pro': return 'bg-blue-100 text-blue-800';
-      case 'Institutional': return 'bg-purple-100 text-purple-800';
       case 'Enterprise': return 'bg-indigo-100 text-indigo-800';
-      case 'Custom': return 'bg-green-100 text-green-800';
       default: return 'bg-gray-100 text-gray-800';
     }
   };
@@ -206,14 +158,8 @@ export const MasterUsers: React.FC = () => {
           params.append('status', statusFilter.toLowerCase());
         }
         if (planFilter !== 'all') {
-          // Map frontend plan names to backend values
-          const planMapping: { [key: string]: string } = {
-            'free': 'basic',
-            'zone': 'zone',
-            'pro': 'premium',
-            'enterprise': 'enterprise'
-          };
-          params.append('plan', planMapping[planFilter] || planFilter.toLowerCase());
+          // Send plan filter directly - backend now handles zone plans correctly
+          params.append('plan', planFilter.toLowerCase());
         }
         if (startDate) {
           params.append('start_date', startDate);
@@ -240,30 +186,18 @@ export const MasterUsers: React.FC = () => {
           // Backend should provide transaction data in user.transaction
           const txn = user.transaction || user.latest_transaction;
 
+          // Get actual plan type from license_info (preferred) or fallback to user.plan
+          const actualPlanType = user.license_info?.plan_type || user.plan;
+
           return {
             id: user.user_id,
             name: user.full_name || user.username || 'N/A',
             email: user.email,
             status: user.is_active ? 'Active' : 'Inactive',
-            plan: (() => {
-              // Use transaction data if available, otherwise fall back to user.plan
-              const planSource = txn?.plan_name || user.plan;
-              if (planSource) {
-                switch (planSource.toLowerCase()) {
-                  case 'trial': return 'Demo';
-                  case 'basic': return 'Free';
-                  case 'premium': return 'Pro';
-                  case 'pro': return 'Pro';
-                  case 'zone': return 'Zone';
-                  case 'enterprise': return 'Enterprise';
-                  default: return planSource.charAt(0).toUpperCase() + planSource.slice(1);
-                }
-              }
-              return 'Free';
-            })(),
+            plan: user.plan || user?.transaction?.plan_display_name || "Free",
             paidAmount: txn ? parseFloat(txn.amount || 0) : 0,
             paymentDate: txn?.payment_date || null,
-            nextPaymentDate: txn?.plan_expiry_date || user.plan_expiry_date || null,
+            nextPaymentDate: txn?.plan_expiry_date || user.license_info?.expires_at || user.plan_expiry_date || null,
             addOns: {},
             customPlan: null,
             usage: {
@@ -573,10 +507,10 @@ export const MasterUsers: React.FC = () => {
                     {/* Payment */}
                     <td className="px-2 py-2 whitespace-nowrap leading-tight">
                       <div className="text-green-600 font-semibold text-[11px]">
-                        {user.paidAmount ? `₹${user.paidAmount}` : 'Free Plan'}
+                        {user.plan === 'Free' ? 'Free Plan' : (user.paidAmount ? `₹${user.paidAmount}` : '-')}
                       </div>
                       <div className="text-gray-400 text-[10px]">
-                        {user.nextPaymentDate && paymentStatus.status}
+                        {user.plan !== 'Free' && user.nextPaymentDate && paymentStatus.status}
                       </div>
                     </td>
 
@@ -602,22 +536,7 @@ export const MasterUsers: React.FC = () => {
                         >
                           <Eye className="w-4 h-4 text-blue-600" />
                         </button>
-                        <button
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            setEditingUser(user.id);
-                          }}
-                          title="Edit"
-                        >
-                          <Edit className="w-4 h-4 text-green-600" />
-                        </button>
-                        {user.plan === 'Custom' && (
-                          <Settings
-                            className="w-4 h-4 text-purple-600"
-                            onClick={(e) => e.stopPropagation()}
-                            title="Custom"
-                          />
-                        )}
+
                         <button
                           onClick={(e) => {
                             e.stopPropagation();
@@ -734,18 +653,7 @@ export const MasterUsers: React.FC = () => {
       </div>
 
 
-      {/* Edit User Modal */}
-      {editingUser && (
-        <EditUserModal
-          user={users.find(u => u.id === editingUser)!}
-          plans={plans.map(p => p.name)}
-          drones={drones}
-          scenarios={scenarios}
-          isOpen={!!editingUser}
-          onClose={() => setEditingUser(null)}
-          onSave={handleEditUser}
-        />
-      )}
+
     </div>
   );
 };

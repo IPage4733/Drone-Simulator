@@ -20,56 +20,79 @@ export const MasterUserDetail: React.FC = () => {
 
   const [isEditing, setIsEditing] = useState(false);
   const [editData, setEditData] = useState(user || {});
-  useEffect(() => {
-    const fetchUserDetails = async () => {
-      try {
-        const userDetailsRes = await axios.post(API_ENDPOINTS.GET_SINGLE_USER, {
-          email: email
-        });
 
-        if (userDetailsRes.data.status === 'success') {
-          const userData = userDetailsRes.data.data;
+  const fetchUserDetails = async () => {
+    try {
+      const userDetailsRes = await axios.post(API_ENDPOINTS.GET_SINGLE_USER, {
+        email: email
+      });
 
-          // Assuming scenarios are part of the user data returned by the API
-          const formatted = {
-            id: userData.user_id,
-            name: userData.full_name || userData.username || 'N/A',
-            email: userData.email,
-            status: userData.is_active ? 'Active' : 'Inactive',
-            plan: userData.plan?.toLowerCase() || 'trial',
-            planExpiry: userData.plan_expiry_date
-              ? new Date(userData.plan_expiry_date).toLocaleDateString()
-              : 'N/A',
-            addOns: {}, // assuming you fetch these from somewhere else
-            paidAmount: 0,
-            paymentDate: null,
-            nextPaymentDate: null,
-            customPlan: null,
-            usage: {
-              simulationsThisMonth: userData.statistics.total_scenarios_completed || 0,
-              totalSimulations: userData.statistics.total_app_sessions || 0
-            },
-            registrationDate: new Date(userData.created_at).toLocaleDateString(),
-            lastLogin: userData.last_login_date
-              ? new Date(userData.last_login_date).toLocaleString()
-              : 'N/A',
-            scenarios: userData.all_scenarios?.scenarios || [], // Include all scenarios here
-            raw: userData
-          };
+      if (userDetailsRes.data.status === 'success') {
+        const userData = userDetailsRes.data.data;
+        const transaction = userData.transaction;
 
-          setUser(formatted);
-          setEditData(formatted);
-        } else {
-          console.error('Failed to fetch user detail');
-        }
-      } catch (error) {
-        console.error('Error fetching user detail:', error);
-      } finally {
-        setLoading(false);
+        // Get actual plan type from license_info or fallback to user.plan
+        const actualPlanType = userData.license_info?.plan_type || userData.plan;
+
+        // Map plan names for display
+        const planDisplay = (() => {
+          if (actualPlanType) {
+            switch (actualPlanType.toLowerCase()) {
+              case 'free': return 'Free';
+              case 'zone': return 'Zone';
+              case 'pro': return 'Pro';
+              case 'enterprise': return 'Enterprise';
+              case 'trial': return 'Demo';
+              case 'basic': return 'Free';
+              case 'premium': return 'Pro';
+              default: return actualPlanType.charAt(0).toUpperCase() + actualPlanType.slice(1);
+            }
+          }
+          return 'Free';
+        })();
+
+        const formatted = {
+          id: userData.user_id,
+          name: userData.full_name || userData.username || 'N/A',
+          email: userData.email,
+          status: userData.is_active ? 'Active' : 'Inactive',
+          plan: planDisplay,
+          planExpiry: userData.plan_expiry_date
+            ? new Date(userData.plan_expiry_date).toLocaleDateString()
+            : 'N/A',
+          addOns: {},
+          paidAmount: userData.total_paid ? parseFloat(userData.total_paid) : 0,
+          paymentDate: transaction?.payment_date || null,
+          nextPaymentDate: transaction?.plan_expiry_date || userData.plan_expiry_date || null,
+          customPlan: null,
+          usage: {
+            simulationsThisMonth: userData.statistics.total_scenarios_completed || 0,
+            totalSimulations: userData.statistics.total_app_sessions || 0,
+            totalDuration: userData.statistics.total_duration_formatted || '00:00:00'
+          },
+          registrationDate: new Date(userData.created_at).toLocaleDateString(),
+          lastLogin: userData.last_login_date
+            ? new Date(userData.last_login_date).toLocaleString()
+            : 'N/A',
+          scenarios: userData.all_scenarios?.scenarios || [],
+          transactionHistory: userData.transaction_history || [],
+          zoneExpiries: {}, // Track zone-specific expiry date changes
+          raw: userData
+        };
+
+        setUser(formatted);
+        setEditData(formatted);
+      } else {
+        console.error('Failed to fetch user detail');
       }
+    } catch (error) {
+      console.error('Error fetching user detail:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
-    };
-
+  useEffect(() => {
     fetchUserDetails();
   }, [email]);
 
@@ -169,21 +192,38 @@ export const MasterUserDetail: React.FC = () => {
     }
 
     try {
+      const payload: any = {
+        email: editData.email,
+        full_name: editData.name,
+        plan: sanitizedPlan,
+        plan_expiry_date: formattedExpiry,
+        is_active: is_active,
+      };
+
+      // Include zone expiry changes if they exist
+      console.log('editData.zoneExpiries:', editData.zoneExpiries);
+      if (editData.zoneExpiries && Object.keys(editData.zoneExpiries).length > 0) {
+        payload.zone_expiries = editData.zoneExpiries;
+        console.log('Adding zone_expiries to payload:', payload.zone_expiries);
+      }
+
+      console.log('Full payload being sent:', payload);
+
       await axios.put(
         API_ENDPOINTS.UPDATE_USER,
-        {
-          email: editData.email,
-          full_name: editData.name,
-          plan: sanitizedPlan,
-          plan_expiry_date: formattedExpiry,
-          is_active: is_active,
-        },
+        payload,
         {
           headers: {
             Authorization: `Token ${sessionStorage.getItem("drone_auth_token")}`,
           },
         }
       );
+
+      console.log('Update successful');
+
+      // Refetch user details to immediately update UI
+      await fetchUserDetails();
+
     } catch (err) {
       console.error("Error updating user details:", err);
     }
@@ -299,7 +339,7 @@ export const MasterUserDetail: React.FC = () => {
                     <BarChart3 className="w-4 h-4 text-orange-600" />
                     <span className="text-xs font-medium text-black">Total</span>
                   </div>
-                  <p className="text-xl font-bold text-black mt-1">{overallDuration}</p>
+                  <p className="text-xl font-bold text-black mt-1">{user.usage.totalDuration}</p>
                   <p className="text-xs text-gray-600">{user.usage.totalSimulations} simulations</p>
                 </div>
 
@@ -317,85 +357,8 @@ export const MasterUserDetail: React.FC = () => {
         </div>
 
 
-        <div className="space-y-4 mt-6">
-          <div className="bg-white rounded-xl shadow-lg border border-orange-500 p-6">
-            <h2 className="text-lg font-semibold text-black mb-4">Subscription Plan</h2>
-            <div className="space-y-4">
-              <div className="p-4 bg-white border border-orange-500 rounded-lg">
-                <h3 className="font-medium text-black">Current Plan: {user.plan}</h3>
-                <p className="text-sm text-gray-600 mt-1">${plans.find(p => p.name === user.plan)?.price || 0}/month</p>
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-black mb-1">Plan Expiry Date</label>
-                {isEditing ? (
-                  <input
-                    type="date"
-                    value={editData.planExpiry?.split('T')[0]}
-                    onChange={(e) =>
-                      setEditData((prev) => ({
-                        ...prev,
-                        planExpiry: e.target.value
-                      }))
-                    }
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent"
-                  />
-                ) : (
-                  <p className="text-sm text-black">{user.planExpiry || 'N/A'}</p>
-                )}
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-black mb-2">Change Plan</label>
-                <select
-                  value={isEditing ? editData.plan : user.plan}
-                  onChange={(e) => setEditData(prev => ({ ...prev, plan: e.target.value }))}
-                  disabled={!isEditing}
-                  className={`w-full px-3 py-2 border border-gray-300 rounded-lg ${isEditing ? 'focus:ring-2 focus:ring-orange-500' : 'bg-gray-50'}`}
-                >
-                  <option value="trial">Trial - $0/month</option>
-                  <option value="basic">Basic - $10/month</option>
-                  <option value="premium">Premium - $25/month</option>
-                </select>
-              </div>
-
-              <div>
-
-                <div className="space-y-2">
-                  {Object.entries(user.addOns).map(([key, value]) => (
-                    <label key={key} className="flex items-center space-x-3">
-                      <input
-                        type="checkbox"
-                        checked={isEditing ? editData.addOns?.[key] : value}
-                        onChange={(e) => setEditData(prev => ({
-                          ...prev,
-                          addOns: { ...prev.addOns, [key]: e.target.checked }
-                        }))}
-                        disabled={!isEditing}
-                        className="w-4 h-4 text-orange-600 border-gray-300 rounded focus:ring-orange-500"
-                      />
-                      <span className="text-sm text-black capitalize">
-                        {key} Module
-                      </span>
-                    </label>
-                  ))}
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-
-
-
-
-
-
-
-
-        {/* Plan Management */}
-
       </div>
-      {/* ✅ Drone Flight Summary section placed AFTER the main grid */}
+      {/* ✅ Drone Flight Summary section */}
       <div className="mt-10">
         <h3 className="text-lg font-semibold text-gray-900 mb-4">Drone Flight Summary</h3>
         <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
@@ -442,6 +405,222 @@ export const MasterUserDetail: React.FC = () => {
         </div>
       </div>
 
+      {/* Subscription Plan - moved below Drone Flight Summary */}
+      <div className="mt-10">
+        <div className="bg-white rounded-xl shadow-lg border border-orange-500 p-6">
+          <h2 className="text-lg font-semibold text-black mb-4">Subscription Plan</h2>
+          <div className="space-y-4">
+            {/* Plan Information Card - Combined */}
+            <div className="p-4 bg-white border border-orange-500 rounded-lg">
+              <div className={`grid grid-cols-1 ${user.raw?.license_info?.plan_type === 'zone' ? 'md:grid-cols-1' : 'md:grid-cols-2'} gap-4`}>
+                <div>
+                  <h3 className="text-sm font-medium text-gray-600 mb-1">Current Plan</h3>
+                  <p className="font-semibold text-black text-lg">{user.plan}</p>
+                  <p className="text-xs text-gray-600 mt-1">
+                    {user.raw?.license_info?.plan_type === 'zone' ? 'Zone-based Plan' : `$${plans.find(p => p.name === user.plan)?.price || 0}/month`}
+                  </p>
+                </div>
+
+                {/* Only show Plan Expiry Date for non-zone plans */}
+                {user.raw?.license_info?.plan_type !== 'zone' && (
+                  <div>
+                    <h3 className="text-sm font-medium text-gray-600 mb-1">Plan Expiry Date</h3>
+                    {isEditing ? (
+                      <input
+                        type="date"
+                        value={editData.planExpiry?.split('T')[0]}
+                        onChange={(e) =>
+                          setEditData((prev) => ({
+                            ...prev,
+                            planExpiry: e.target.value
+                          }))
+                        }
+                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+                      />
+                    ) : (
+                      <p className="font-semibold text-black text-lg">{user.planExpiry || 'N/A'}</p>
+                    )}
+                  </div>
+                )}
+
+              </div>
+            </div>
+
+            {/* Payment Information */}
+            {user.raw?.transaction && (
+              <>
+                <div className="p-4 bg-green-50 border border-green-300 rounded-lg">
+                  <h3 className="font-medium text-green-800 mb-2">Payment Information</h3>
+                  <div className="grid grid-cols-2 gap-3 text-sm">
+                    <div>
+                      <p className="text-gray-600">Total Amount Paid</p>
+                      <p className="font-bold text-green-700 text-lg">
+                        ${parseFloat(user.raw.total_paid).toFixed(2)}
+                      </p>
+                    </div>
+                    <div>
+                      <p className="text-gray-600">Latest Payment</p>
+                      <p className="font-semibold text-green-700">
+                        ${parseFloat(user.raw.transaction.amount).toFixed(2)}
+                      </p>
+                    </div>
+                    <div>
+                      <p className="text-gray-600">Payment Date</p>
+                      <p className="font-semibold text-gray-900">
+                        {new Date(user.raw.transaction.payment_date).toLocaleDateString()}
+                      </p>
+                    </div>
+                    <div>
+                      <p className="text-gray-600">Payment Status</p>
+                      <p className="font-semibold text-green-700 capitalize">
+                        {user.raw.transaction.payment_status}
+                      </p>
+                    </div>
+                    {user.transactionHistory && user.transactionHistory.length > 1 && (
+                      <div className="col-span-2">
+                        <p className="text-gray-600 mb-1">Total Transactions</p>
+                        <p className="font-semibold text-gray-900">
+                          {user.transactionHistory.length} payment(s)
+                        </p>
+                      </div>
+                    )}
+                    <div>
+                      <p className="text-gray-600">Plan Expires</p>
+                      <p className="font-semibold text-gray-900">
+                        {new Date(user.raw.transaction.plan_expiry_date).toLocaleDateString()}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Transaction History and Zone Plan Details - Grid Layout */}
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                  {/* Transaction History Table */}
+                  {user.transactionHistory && user.transactionHistory.length > 1 && (
+                    <div className="p-4 bg-gray-50 border border-gray-300 rounded-lg">
+                      <h3 className="font-medium text-gray-800 mb-3">Transaction History</h3>
+                      <div className="overflow-x-auto">
+                        <table className="min-w-full text-sm">
+                          <thead className="bg-gray-100">
+                            <tr>
+                              <th className="px-3 py-2 text-left text-xs font-medium text-gray-700">Date</th>
+                              <th className="px-3 py-2 text-left text-xs font-medium text-gray-700">Amount</th>
+                              <th className="px-3 py-2 text-left text-xs font-medium text-gray-700">Plan</th>
+                              <th className="px-3 py-2 text-left text-xs font-medium text-gray-700">Status</th>
+                            </tr>
+                          </thead>
+                          <tbody className="divide-y divide-gray-200">
+                            {user.transactionHistory.map((txn: any, idx: number) => (
+                              <tr key={idx} className="hover:bg-gray-100">
+                                <td className="px-3 py-2 text-gray-900">
+                                  {new Date(txn.payment_date).toLocaleDateString()}
+                                </td>
+                                <td className="px-3 py-2 font-semibold text-green-700">
+                                  ${parseFloat(txn.amount).toFixed(2)}
+                                </td>
+                                <td className="px-3 py-2 text-gray-900 capitalize">
+                                  {txn.plan_name}
+                                  {txn.selected_zones && ` (${txn.selected_zones.length} zone${txn.selected_zones.length > 1 ? 's' : ''})`}
+                                </td>
+                                <td className="px-3 py-2">
+                                  <span className="px-2 py-1 bg-green-100 text-green-800 rounded text-xs capitalize">
+                                    {txn.payment_status}
+                                  </span>
+                                </td>
+                              </tr>
+                            ))}
+                          </tbody>
+                        </table>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Zone Plan Details */}
+                  {user.raw?.license_info?.plan_type === 'zone' && user.raw.license_info.selected_zones && (
+                    <div className="p-4 bg-blue-50 border border-blue-300 rounded-lg">
+                      <h3 className="font-medium text-blue-800 mb-2">Zone Plan Details</h3>
+                      <div className="mb-3">
+                        <p className="text-sm text-gray-600">Total PCs: <span className="font-semibold text-gray-900">{user.raw.license_info.total_pcs}</span></p>
+                        <p className="text-sm text-gray-600">Overall Plan Expires: <span className="font-semibold text-gray-900">{new Date(user.raw.license_info.expires_at).toLocaleDateString()}</span></p>
+                      </div>
+                      <div>
+                        <p className="text-sm font-medium text-gray-700 mb-2">Selected Zones {isEditing && <span className="text-xs text-gray-500">(Edit expiry dates)</span>}:</p>
+                        <div className="grid grid-cols-1 gap-2">
+                          {Object.entries(user.raw.license_info.selected_zones).map(([zone, expiry]) => (
+                            <div key={zone} className="bg-white p-3 rounded border border-blue-200">
+                              <div className="flex justify-between items-start">
+                                <span className="text-sm font-medium text-gray-900 capitalize flex-1">
+                                  {zone.replace(/_/g, ' ')}
+                                </span>
+                                <div className="flex-1 ml-4">
+                                  {isEditing ? (
+                                    <input
+                                      type="date"
+                                      value={
+                                        editData.zoneExpiries?.[zone] ||
+                                        new Date(expiry as string).toISOString().split('T')[0]
+                                      }
+                                      className="w-full px-2 py-1 text-xs border border-gray-300 rounded focus:ring-2 focus:ring-blue-500"
+                                      onChange={(e) => {
+                                        // Store zone expiry changes in editData
+                                        console.log(`Zone ${zone} expiry changed to:`, e.target.value);
+                                        const zoneExpiries = { ...(editData.zoneExpiries || {}) };
+                                        zoneExpiries[zone] = e.target.value;
+                                        console.log('Updated zoneExpiries object:', zoneExpiries);
+                                        setEditData(prev => ({ ...prev, zoneExpiries }));
+                                      }}
+                                    />
+                                  ) : (
+                                    <span className="text-xs text-gray-600">
+                                      Expires: {new Date(expiry as string).toLocaleDateString('en-GB', {
+                                        day: '2-digit',
+                                        month: '2-digit',
+                                        year: 'numeric'
+                                      })}
+                                    </span>
+                                  )}
+                                </div>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                        {isEditing && (
+                          <p className="text-xs text-gray-500 mt-2">
+                            💡 Tip: You can set different expiry dates for each zone
+                          </p>
+                        )}
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </>
+            )}
+
+            <div>
+
+              <div className="space-y-2">
+                {Object.entries(user.addOns).map(([key, value]) => (
+                  <label key={key} className="flex items-center space-x-3">
+                    <input
+                      type="checkbox"
+                      checked={isEditing ? editData.addOns?.[key] : value}
+                      onChange={(e) => setEditData(prev => ({
+                        ...prev,
+                        addOns: { ...prev.addOns, [key]: e.target.checked }
+                      }))}
+                      disabled={!isEditing}
+                      className="w-4 h-4 text-orange-600 border-gray-300 rounded focus:ring-orange-500"
+                    />
+                    <span className="text-sm text-black capitalize">
+                      {key} Module
+                    </span>
+                  </label>
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
 
     </div>
 

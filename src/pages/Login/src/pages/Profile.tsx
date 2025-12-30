@@ -265,12 +265,6 @@ const Profile: React.FC = () => {
       newErrors.email = 'Email is invalid'
     }
 
-    if (!formData.username) {
-      newErrors.username = 'Username is required'
-    } else if (formData.username.length < 3) {
-      newErrors.username = 'Username must be at least 3 characters'
-    }
-
     if (!formData.full_name) {
       newErrors.full_name = 'Full name is required'
     }
@@ -603,8 +597,11 @@ const Profile: React.FC = () => {
               </div>
               <div className="min-w-0 flex-1 w-full">
                 <h2 className="text-xl lg:text-2xl font-bold text-gray-900 mb-1 truncate">{currentUser.full_name}</h2>
-                <p className="text-gray-600 text-sm lg:text-base mb-2 truncate">@{currentUser.username}</p>
                 <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-4 text-xs lg:text-sm text-gray-500">
+                  <div className="flex items-center gap-1.5">
+                    <Mail className="w-3 h-3 flex-shrink-0" />
+                    <span className="truncate">{currentUser.email}</span>
+                  </div>
                   <div className="flex items-center gap-1.5">
                     <Calendar className="w-3 h-3 flex-shrink-0" />
                     <span className="truncate">
@@ -989,29 +986,6 @@ const Profile: React.FC = () => {
                         />
                       </div>
                       {errors.email && <p className="mt-1 text-sm text-red-600">{errors.email}</p>}
-                    </div>
-
-                    {/* Username */}
-                    <div className="w-full">
-                      <label className="block text-sm font-semibold text-gray-700 mb-2">
-                        Username
-                      </label>
-                      <div className="relative w-full">
-                        <User className="absolute left-3 top-3 w-4 h-4 text-gray-400" />
-                        <input
-                          type="text"
-                          name="username"
-                          value={formData.username}
-                          onChange={handleChange}
-                          disabled={!isEditing}
-                          className={`w-full pl-10 pr-3 py-3 border rounded-xl transition-colors text-sm ${!isEditing
-                            ? 'bg-gray-100 text-gray-500 cursor-not-allowed border-gray-200'
-                            : 'bg-white hover:border-gray-400 focus:border-orange-500 focus:ring-4 focus:ring-orange-100 border-gray-300'
-                            } ${errors.username ? 'border-red-300' : ''
-                            }`}
-                        />
-                      </div>
-                      {errors.username && <p className="mt-1 text-sm text-red-600">{errors.username}</p>}
                     </div>
 
                     {/* Full Name */}

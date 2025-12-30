@@ -219,6 +219,14 @@ const PlanCard: React.FC<PlanCardProps> = ({ plan }) => {
         setShowModal(true);
         return;
       }
+
+      // ✅ Block Pro plan users from buying Zone plan (they already have full access)
+      if (user?.plan && ['pro', 'premium'].includes(user.plan.toLowerCase())) {
+        setModalMode('taken');
+        setShowModal(true);
+        return;
+      }
+
       setShowZoneCheckout(true);
       return;
     }
