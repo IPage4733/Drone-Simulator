@@ -76,6 +76,7 @@ export const MasterUserDetail: React.FC = () => {
             : 'N/A',
           scenarios: userData.all_scenarios?.scenarios || [],
           transactionHistory: userData.transaction_history || [],
+          licenseKeys: userData.license_keys || [],  // Add license keys array
           zoneExpiries: {}, // Track zone-specific expiry date changes
           raw: userData
         };
@@ -619,6 +620,132 @@ export const MasterUserDetail: React.FC = () => {
               </div>
             </div>
           </div>
+        </div>
+      </div>
+
+      {/* License Keys Section */}
+      <div className="mt-10">
+        <div className="bg-white rounded-xl shadow-lg border border-orange-500 p-6">
+          <h2 className="text-lg font-semibold text-black mb-4">License Keys</h2>
+
+          {user.licenseKeys && user.licenseKeys.length > 0 ? (
+            <div className="overflow-x-auto">
+              <table className="min-w-full text-sm">
+                <thead className="bg-orange-50">
+                  <tr>
+                    <th className="px-4 py-3 text-left text-xs font-medium text-orange-700">License Key</th>
+                    <th className="px-4 py-3 text-left text-xs font-medium text-orange-700">Plan Type</th>
+                    <th className="px-4 py-3 text-left text-xs font-medium text-orange-700">Status</th>
+                    <th className="px-4 py-3 text-left text-xs font-medium text-orange-700">Expires</th>
+                    <th className="px-4 py-3 text-left text-xs font-medium text-orange-700">Device ID</th>
+                    <th className="px-4 py-3 text-left text-xs font-medium text-orange-700">Created</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-gray-200">
+                  {user.licenseKeys.map((license: any, idx: number) => {
+                    const isExpired = license.expires_at && new Date(license.expires_at) < new Date();
+                    const statusColors = {
+                      activated: 'bg-green-100 text-green-800',
+                      generated: 'bg-blue-100 text-blue-800',
+                      expired: 'bg-red-100 text-red-800',
+                      revoked: 'bg-gray-100 text-gray-800'
+                    };
+
+                    return (
+                      <React.Fragment key={idx}>
+                        <tr className="hover:bg-orange-50">
+                          <td className="px-4 py-3">
+                            <span className="font-mono text-xs bg-gray-100 px-2 py-1 rounded">
+                              {license.key}
+                            </span>
+                          </td>
+                          <td className="px-4 py-3">
+                            <span className="capitalize font-medium text-gray-900">
+                              {license.plan_type}
+                            </span>
+                            {license.plan_type === 'zone' && license.pc_number && (
+                              <span className="ml-2 text-xs text-gray-500">
+                                (PC {license.pc_number}/{license.total_pcs})
+                              </span>
+                            )}
+                          </td>
+                          <td className="px-4 py-3">
+                            <span className={`px-2 py-1 rounded-full text-xs font-semibold capitalize ${statusColors[license.status as keyof typeof statusColors] || 'bg-gray-100 text-gray-800'
+                              }`}>
+                              {license.status}
+                            </span>
+                          </td>
+                          <td className="px-4 py-3">
+                            {license.expires_at ? (
+                              <span className={isExpired ? 'text-red-600 font-semibold' : 'text-gray-900'}>
+                                {new Date(license.expires_at).toLocaleDateString()}
+                                {isExpired && <span className="ml-1">⚠️</span>}
+                              </span>
+                            ) : (
+                              <span className="text-gray-400">-</span>
+                            )}
+                          </td>
+                          <td className="px-4 py-3">
+                            {license.device_id ? (
+                              <span className="font-mono text-xs text-gray-700">{license.device_id}</span>
+                            ) : (
+                              <span className="text-gray-400">Not activated</span>
+                            )}
+                          </td>
+                          <td className="px-4 py-3 text-gray-600">
+                            {new Date(license.created_at).toLocaleDateString()}
+                          </td>
+                        </tr>
+
+                        {/* Zone details row for zone plans */}
+                        {license.plan_type === 'zone' && license.selected_zones && (
+                          <tr className="bg-blue-50">
+                            <td colSpan={6} className="px-4 py-2">
+                              <div className="flex items-start">
+                                <span className="text-xs font-medium text-blue-800 mr-2">Zones:</span>
+                                <div className="flex flex-wrap gap-2">
+                                  {typeof license.selected_zones === 'object' && !Array.isArray(license.selected_zones) ? (
+                                    // Zone plan with expiry dates (new format)
+                                    Object.entries(license.selected_zones).map(([zone, expiry]: [string, any]) => {
+                                      const zoneExpired = new Date(expiry) < new Date();
+                                      return (
+                                        <span
+                                          key={zone}
+                                          className={`text-xs px-2 py-1 rounded ${zoneExpired ? 'bg-red-100 text-red-800' : 'bg-blue-100 text-blue-800'
+                                            }`}
+                                        >
+                                          {zone.replace(/_/g, ' ')}
+                                          <span className="ml-1 text-xs opacity-75">
+                                            (exp: {new Date(expiry).toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit', year: '2-digit' })})
+                                          </span>
+                                          {zoneExpired && ' ⚠️'}
+                                        </span>
+                                      );
+                                    })
+                                  ) : Array.isArray(license.selected_zones) ? (
+                                    // Old format - array of zones
+                                    license.selected_zones.map((zone: string) => (
+                                      <span key={zone} className="text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded">
+                                        {zone.replace(/_/g, ' ')}
+                                      </span>
+                                    ))
+                                  ) : null}
+                                </div>
+                              </div>
+                            </td>
+                          </tr>
+                        )}
+                      </React.Fragment>
+                    );
+                  })}
+                </tbody>
+              </table>
+            </div>
+          ) : (
+            <div className="text-center py-8">
+              <p className="text-gray-500">No license keys found for this user.</p>
+            </div>
+          )}
         </div>
       </div>
 
