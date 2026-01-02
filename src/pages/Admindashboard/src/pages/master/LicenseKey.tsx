@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import axios from 'axios';
 import { API_ENDPOINTS } from '@/config/api';
 
@@ -78,7 +78,7 @@ const AdminLicenseGenerator: React.FC = () => {
     const [licenseEmail, setLicenseEmail] = useState('');
     const [selectedPlan, setSelectedPlan] = useState('pro');
     const [quantity, setQuantity] = useState(1);
-    const [pcCount, setPcCount] = useState(1);
+    const [pcCount, setPcCount] = useState<number | ''>(1);
     const [availableZones, setAvailableZones] = useState<Array<{ id: string; name: string }>>([]);
     const [selectedZones, setSelectedZones] = useState<string[]>([]);
     const [validity, setValidity] = useState({
@@ -89,6 +89,10 @@ const AdminLicenseGenerator: React.FC = () => {
     const [loading, setLoading] = useState(false);
     const [errors, setErrors] = useState<{ [key: string]: string }>({});
     const [successMessage, setSuccessMessage] = useState<string>('');
+    const [justGenerated, setJustGenerated] = useState(false); // Track if license was just generated
+
+    // Ref for auto-scrolling to generated license
+    const licenseDisplayRef = useRef<HTMLDivElement>(null);
 
     // API data states
     const [countries, setCountries] = useState<Array<{ code: string; name: string; phone: string }>>([]);
@@ -422,12 +426,12 @@ const AdminLicenseGenerator: React.FC = () => {
                 user_email: licenseEmail,
                 plan_type: selectedPlan,
                 expires_at: expiresAt.toISOString(),
+                total_pcs: pcCount === '' ? 1 : pcCount, // Include for all plan types, default to 1 if empty
             };
 
-            // Add zone-specific fields if zone plan selected
+            // Add zone-specific fields only if zone plan selected
             if (selectedPlan === 'zone') {
                 requestBody.selected_zones = selectedZones;
-                requestBody.total_pcs = pcCount;
             }
 
             const response = await axios.post<LicenseResponse>(
@@ -442,8 +446,17 @@ const AdminLicenseGenerator: React.FC = () => {
             );
 
             setGeneratedLicense(response.data);
-            // Reset form or keep for next generation
-            // Optionally clear the form here
+            setJustGenerated(true);
+
+            // Auto-scroll to the generated license display
+            setTimeout(() => {
+                licenseDisplayRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }, 100);
+
+            // Reset justGenerated after 3 seconds
+            setTimeout(() => {
+                setJustGenerated(false);
+            }, 3000);
         } catch (err: any) {
             const errorMessage = err.response?.data?.error || err.response?.data?.message || err.message || 'Failed to generate license key';
             setErrors({ submit: errorMessage });
@@ -463,6 +476,7 @@ const AdminLicenseGenerator: React.FC = () => {
                             setErrors({});
                             setGeneratedLicense(null);
                             setSuccessMessage('');
+                            setJustGenerated(false);
                         }}
                         className={`flex-1 px-6 py-4 font-bold text-sm transition-colors ${activeTab === 'register'
                             ? 'bg-orange-600 text-white'
@@ -477,6 +491,7 @@ const AdminLicenseGenerator: React.FC = () => {
                             setErrors({});
                             setGeneratedLicense(null);
                             setSuccessMessage('');
+                            setJustGenerated(false);
                         }}
                         className={`flex-1 px-6 py-4 font-bold text-sm transition-colors ${activeTab === 'license'
                             ? 'bg-orange-600 text-white'
@@ -705,21 +720,42 @@ const AdminLicenseGenerator: React.FC = () => {
                                             ))}
                                         </select>
                                     </div>
+                                    {/* PC Count Input - Show for all plans */}
+                                    <div className="bg-slate-50 p-4 rounded-lg border border-slate-200 animate-fade-in mt-2">
+                                        <label className="text-sm font-bold text-black mb-2 block uppercase tracking-wide">Number of PCs *</label>
+                                        <input
+                                            type="number"
+                                            min="1"
+                                            max="40"
+                                            value={pcCount}
+                                            onChange={(e) => {
+                                                const value = e.target.value;
+                                                // Allow empty string for user to clear and retype
+                                                if (value === '') {
+                                                    setPcCount('');
+                                                    return;
+                                                }
+                                                const numValue = parseInt(value);
+                                                // Only update if it's a valid number
+                                                if (!isNaN(numValue)) {
+                                                    // Clamp between 1 and 40
+                                                    setPcCount(Math.max(1, Math.min(40, numValue)));
+                                                }
+                                            }}
+                                            onBlur={(e) => {
+                                                // Ensure valid value on blur
+                                                const value = e.target.value;
+                                                if (value === '' || parseInt(value) < 1) {
+                                                    setPcCount(1);
+                                                }
+                                            }}
+                                            className="w-full px-4 py-2.5 rounded-md border border-gray-300 focus:outline-none focus:ring-2 focus:ring-orange-500"
+                                        />
+                                        <p className="text-xs text-gray-500 mt-1">Specify how many PCs this license will cover (1-40). Multiple licenses will be generated.</p>
+                                    </div>
+                                    {/* Zone Selection - Only for Zone plan */}
                                     {selectedPlan === 'zone' && (
                                         <>
-                                            {/* PC Count Input */}
-                                            <div className="bg-slate-50 p-4 rounded-lg border border-slate-200 animate-fade-in mt-2">
-                                                <label className="text-sm font-bold text-black mb-2 block uppercase tracking-wide">Number of PCs *</label>
-                                                <input
-                                                    type="number"
-                                                    min="1"
-                                                    max="50"
-                                                    value={pcCount}
-                                                    onChange={(e) => setPcCount(Math.max(1, Math.min(50, parseInt(e.target.value) || 1)))}
-                                                    className="w-full px-4 py-2.5 rounded-md border border-gray-300 focus:outline-none focus:ring-2 focus:ring-orange-500"
-                                                />
-                                                <p className="text-xs text-gray-500 mt-1">Specify how many PCs this license will cover (1-50). Multiple licenses will be generated.</p>
-                                            </div>
                                             {/* Zone Selection */}
                                             <div className="bg-slate-50 p-4 rounded-lg border border-slate-200 animate-fade-in mt-2">
                                                 <p className="text-sm font-bold text-black mb-3 uppercase tracking-wide">Permitted Zones *</p>
@@ -791,10 +827,10 @@ const AdminLicenseGenerator: React.FC = () => {
                     <div className="flex justify-end gap-4 pt-4 border-t border-slate-200">
                         <button
                             onClick={handleGenerateLicenseOnly}
-                            disabled={loading}
+                            disabled={loading || justGenerated}
                             className="w-full md:w-auto px-8 py-3 bg-orange-600 text-white font-bold rounded-lg hover:bg-orange-700 disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors"
                         >
-                            {loading ? 'Generating License Key...' : 'Generate License Key'}
+                            {loading ? 'Generating License Key...' : justGenerated ? '✓ Generated' : 'Generate License Key'}
                         </button>
                     </div>
                 </>
@@ -802,87 +838,89 @@ const AdminLicenseGenerator: React.FC = () => {
 
             {/* Success Display - Shared for both tabs */}
             {generatedLicense && generatedLicense.success && (
-                <div className="bg-white p-6 rounded-xl shadow-lg border border-green-200 animate-scale-in">
-                    <div className="flex justify-between items-center mb-4">
-                        <div>
-                            <h3 className="font-bold text-green-700 text-lg">
-                                {generatedLicense.data?.total_licenses > 1
-                                    ? `${generatedLicense.data.total_licenses} License Keys Generated Successfully`
-                                    : 'License Key Generated Successfully'
-                                }
-                            </h3>
-                            <p className="text-sm text-slate-500">
-                                {generatedLicense.data?.user.full_name} ({generatedLicense.data?.user.email})
-                            </p>
-                        </div>
-                    </div>
-                    {generatedLicense.warning && (
-                        <div className="bg-yellow-50 border border-yellow-200 text-yellow-800 px-4 py-3 rounded-lg mb-4">
-                            <p className="font-medium">Warning:</p>
-                            <p className="text-sm">{generatedLicense.warning}</p>
-                        </div>
-                    )}
-
-                    {/* Display all licenses */}
-                    {generatedLicense.data?.licenses && generatedLicense.data.licenses.length > 1 ? (
-                        // Multiple licenses - show list
-                        <div className="space-y-3 mb-4">
-                            <p className="text-sm font-semibold text-slate-700 mb-2">Generated License Keys:</p>
-                            {generatedLicense.data.licenses.map((license: any, index: number) => (
-                                <div key={index} className="bg-slate-50 p-4 rounded-lg border border-slate-200">
-                                    <div className="flex justify-between items-center mb-2">
-                                        <span className="text-xs font-semibold text-orange-600 uppercase">
-                                            PC #{license.pc_number} of {license.total_pcs}
-                                        </span>
-                                    </div>
-                                    <div className="font-mono font-bold text-slate-800 text-lg select-all break-all">
-                                        {license.license_key}
-                                    </div>
-                                </div>
-                            ))}
-                        </div>
-                    ) : (
-                        // Single license - simple display
-                        <div className="bg-slate-100 p-4 rounded-lg mb-4">
-                            <div className="flex justify-between items-center">
-                                <span className="text-sm text-slate-600">License Key:</span>
-                                <span className="font-mono font-bold text-slate-800 select-all">
-                                    {generatedLicense.data?.license_key}
-                                </span>
+                <div ref={licenseDisplayRef}>
+                    <div className="bg-white p-6 rounded-xl shadow-lg border border-green-200 animate-scale-in">
+                        <div className="flex justify-between items-center mb-4">
+                            <div>
+                                <h3 className="font-bold text-green-700 text-lg">
+                                    {generatedLicense.data?.total_licenses > 1
+                                        ? `${generatedLicense.data.total_licenses} License Keys Generated Successfully`
+                                        : 'License Key Generated Successfully'
+                                    }
+                                </h3>
+                                <p className="text-sm text-slate-500">
+                                    {generatedLicense.data?.user.full_name} ({generatedLicense.data?.user.email})
+                                </p>
                             </div>
                         </div>
-                    )}
-
-                    {/* Plan and Status Info */}
-                    <div className="bg-slate-100 p-4 rounded-lg space-y-3">
-                        <div className="flex justify-between items-center border-b border-slate-200 pb-2">
-                            <span className="text-sm text-slate-600">Plan:</span>
-                            <span className="font-bold text-slate-800">{generatedLicense.data?.plan_name}</span>
-                        </div>
-
-                        {generatedLicense.data?.selected_zones && generatedLicense.data.selected_zones.length > 0 && (
-                            <div className="flex justify-between items-center border-b border-slate-200 pb-2">
-                                <span className="text-sm text-slate-600">Zones:</span>
-                                <span className="font-bold text-slate-800">
-                                    {generatedLicense.data.selected_zones.join(', ')}
-                                </span>
+                        {generatedLicense.warning && (
+                            <div className="bg-yellow-50 border border-yellow-200 text-yellow-800 px-4 py-3 rounded-lg mb-4">
+                                <p className="font-medium">Warning:</p>
+                                <p className="text-sm">{generatedLicense.warning}</p>
                             </div>
                         )}
 
-                        <div className="flex justify-between items-center border-b border-slate-200 pb-2">
-                            <span className="text-sm text-slate-600">Status:</span>
-                            <span className="font-bold text-green-600 uppercase">{generatedLicense.data?.status}</span>
+                        {/* Display all licenses */}
+                        {generatedLicense.data?.licenses && generatedLicense.data.licenses.length > 1 ? (
+                            // Multiple licenses - show list
+                            <div className="space-y-3 mb-4">
+                                <p className="text-sm font-semibold text-slate-700 mb-2">Generated License Keys:</p>
+                                {generatedLicense.data.licenses.map((license: any, index: number) => (
+                                    <div key={index} className="bg-slate-50 p-4 rounded-lg border border-slate-200">
+                                        <div className="flex justify-between items-center mb-2">
+                                            <span className="text-xs font-semibold text-orange-600 uppercase">
+                                                PC #{license.pc_number} of {license.total_pcs}
+                                            </span>
+                                        </div>
+                                        <div className="font-mono font-bold text-slate-800 text-lg select-all break-all">
+                                            {license.license_key}
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                        ) : (
+                            // Single license - simple display
+                            <div className="bg-slate-100 p-4 rounded-lg mb-4">
+                                <div className="flex justify-between items-center">
+                                    <span className="text-sm text-slate-600">License Key:</span>
+                                    <span className="font-mono font-bold text-slate-800 select-all">
+                                        {generatedLicense.data?.license_key}
+                                    </span>
+                                </div>
+                            </div>
+                        )}
+
+                        {/* Plan and Status Info */}
+                        <div className="bg-slate-100 p-4 rounded-lg space-y-3">
+                            <div className="flex justify-between items-center border-b border-slate-200 pb-2">
+                                <span className="text-sm text-slate-600">Plan:</span>
+                                <span className="font-bold text-slate-800">{generatedLicense.data?.plan_name}</span>
+                            </div>
+
+                            {generatedLicense.data?.selected_zones && generatedLicense.data.selected_zones.length > 0 && (
+                                <div className="flex justify-between items-center border-b border-slate-200 pb-2">
+                                    <span className="text-sm text-slate-600">Zones:</span>
+                                    <span className="font-bold text-slate-800">
+                                        {generatedLicense.data.selected_zones.join(', ')}
+                                    </span>
+                                </div>
+                            )}
+
+                            <div className="flex justify-between items-center border-b border-slate-200 pb-2">
+                                <span className="text-sm text-slate-600">Status:</span>
+                                <span className="font-bold text-green-600 uppercase">{generatedLicense.data?.status}</span>
+                            </div>
+                            <div className="flex justify-between items-center">
+                                <span className="text-sm text-slate-600">Expires At:</span>
+                                <span className="text-sm text-slate-800">
+                                    {generatedLicense.data?.expires_at ? new Date(generatedLicense.data.expires_at).toLocaleDateString() : 'N/A'}
+                                </span>
+                            </div>
                         </div>
-                        <div className="flex justify-between items-center">
-                            <span className="text-sm text-slate-600">Expires At:</span>
-                            <span className="text-sm text-slate-800">
-                                {generatedLicense.data?.expires_at ? new Date(generatedLicense.data.expires_at).toLocaleDateString() : 'N/A'}
-                            </span>
+                        <div className="mt-4 text-sm text-slate-600">
+                            <p>✓ License key(s) have been sent to the user's email address</p>
+                            <p>✓ User can activate the key(s) in their application</p>
                         </div>
-                    </div>
-                    <div className="mt-4 text-sm text-slate-600">
-                        <p>✓ License key(s) have been sent to the user's email address</p>
-                        <p>✓ User can activate the key(s) in their application</p>
                     </div>
                 </div>
             )}
