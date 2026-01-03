@@ -195,7 +195,7 @@ const HelpPage: React.FC = () => {
                         <li>To report a problem, click on <strong>Send Feedback</strong> and fill out the form. Our team will resolve it as soon as possible.</li>
                     </ul>
                     <p className="mt-2 text-gray-600">
-                        Contact support at <a href="mailto:support@dronesimulator.pro" className="text-blue-600">support@dronesimulator.pro</a>
+                        Contact support at <a href="https://www.dronesimulator.pro/auth/support" className="text-blue-600">support@dronesimulator.pro</a>
                     </p>
                 </>
             )

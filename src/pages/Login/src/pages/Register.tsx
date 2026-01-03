@@ -126,6 +126,10 @@ const Register: React.FC = () => {
           state_province: '' // Reset state when country changes
         }))
       }
+    } else if (name === 'phone_number') {
+      // Only allow numeric characters for phone number (max 15 digits)
+      const numericValue = value.replace(/\D/g, '').slice(0, 15)
+      setFormData(prev => ({ ...prev, [name]: numericValue }))
     } else {
       setFormData(prev => ({ ...prev, [name]: value }))
     }
@@ -166,8 +170,8 @@ const Register: React.FC = () => {
 
     if (!formData.phone_number) {
       newErrors.phone_number = 'Phone number is required'
-    } else if (!/^\d{7,15}$/.test(formData.phone_number.replace(/\D/g, ''))) {
-      newErrors.phone_number = 'Please enter a valid phone number (7-15 digits)'
+    } else if (!/^\d{10,15}$/.test(formData.phone_number)) {
+      newErrors.phone_number = 'Phone number must be 10-15 digits'
     }
 
     if (!formData.city) {

@@ -11,6 +11,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { useToast } from "@/hooks/use-toast";
 import { useNavigate } from 'react-router-dom';
 import { API_ENDPOINTS } from "@/config/api";
+import { DOWNLOAD_CONFIG } from "@/config/download";
 import {
   CheckCircle,
   X,
@@ -44,10 +45,10 @@ const Download = () => {
   };
 
   const handleDownload = () => {
-
+    // Use centralized download config
     const link = document.createElement("a");
-    link.href = "https://www.dropbox.com/scl/fo/1br7lxcv3psm7lels6sz7/AMtPbok7xBC-6B6lBO0ne0U?rlkey=kyx3l8cy0p1ai115az60m9lle&st=1n78nl7c&dl=1";
-    link.download = "Drone_Simulator_Bundle.zip";
+    link.href = DOWNLOAD_CONFIG.URL;
+    link.download = DOWNLOAD_CONFIG.FILENAME;
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);

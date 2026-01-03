@@ -7,6 +7,63 @@ import { useAuth } from '../../hooks/useAuth';
 import { useEffect } from 'react';
 import axios from 'axios';
 
+// Helper function to format date to dd-mm-yyyy
+const formatDate = (dateString: string | null | undefined): string => {
+  if (!dateString) return 'N/A';
+  const date = new Date(dateString);
+  const day = String(date.getDate()).padStart(2, '0');
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  const year = date.getFullYear();
+  return `${day}-${month}-${year}`;
+};
+
+// Helper function to format zone/location names to proper title case
+const formatZoneName = (zoneName: string | null | undefined): string => {
+  if (!zoneName) return '';
+
+  const zoneMap: Record<string, string> = {
+    'rpto_ground': 'RPTO Ground',
+    'agriculture_zone': 'Agriculture Zone',
+    'defence_zone': 'Defence Zone',
+    'hv_line_solar_panel': 'HV Line Solar Panel',
+    'factory': 'Factory',
+    'bridge_and_road': 'Bridge and Road',
+    'city': 'City',
+    // Short names from database
+    'defence': 'Defence Zone',
+    'agriculture': 'Agriculture Zone',
+    'hv_lines_solar_panel': 'HV Line Solar Panel',
+    'rail_road_canal_bridge': 'Bridge and Road',
+    'rpto': 'RPTO Ground'
+  };
+
+  // Normalize the input (lowercase and replace spaces with underscores)
+  const normalized = zoneName.toLowerCase().replace(/\s+/g, '_');
+  return zoneMap[normalized] || zoneName;
+};
+
+// Helper function to format drone names to proper title case
+const formatDroneName = (droneName: string | null | undefined): string => {
+  if (!droneName) return '';
+
+  const droneMap: Record<string, string> = {
+    'agriculture_drone': 'Agriculture Drone',
+    'dji_matrice_350_400_rtk': 'DJI - Matrice 350/400 RTK',
+    'dji_-_matrice_350/400_rtk': 'DJI - Matrice 350/400 RTK',
+    'racing_kamikaze_drone': 'Racing / Kamikaze Drone',
+    'racing_/_kamikaze_drone': 'Racing / Kamikaze Drone',
+    'fighter_vtol_drone': 'Fighter - VTOL Drone',
+    'fighter_-_vtol_drone': 'Fighter - VTOL Drone',
+    'crystal_ball_model_v_drone': 'Crystal Ball - Model V Drone',
+    'crystal_ball_-_model_v_drone': 'Crystal Ball - Model V Drone',
+    'dji_mavic_drone': 'DJI Mavic Drone'
+  };
+
+  // Normalize the input (lowercase and replace spaces with underscores)
+  const normalized = droneName.toLowerCase().replace(/\s+/g, '_');
+  return droneMap[normalized] || droneName;
+};
+
 export const MasterUserDetail: React.FC = () => {
   const { id: email } = useParams<{ id: string }>();
   const navigate = useNavigate();
@@ -58,7 +115,7 @@ export const MasterUserDetail: React.FC = () => {
           status: userData.is_active ? 'Active' : 'Inactive',
           plan: planDisplay,
           planExpiry: userData.plan_expiry_date
-            ? new Date(userData.plan_expiry_date).toLocaleDateString()
+            ? formatDate(userData.plan_expiry_date)
             : 'N/A',
           addOns: {},
           paidAmount: userData.total_paid ? parseFloat(userData.total_paid) : 0,
@@ -70,9 +127,9 @@ export const MasterUserDetail: React.FC = () => {
             totalSimulations: userData.statistics.total_app_sessions || 0,
             totalDuration: userData.statistics.total_duration_formatted || '00:00:00'
           },
-          registrationDate: new Date(userData.created_at).toLocaleDateString(),
+          registrationDate: formatDate(userData.created_at),
           lastLogin: userData.last_login_date
-            ? new Date(userData.last_login_date).toLocaleString()
+            ? formatDate(userData.last_login_date)
             : 'N/A',
           scenarios: userData.all_scenarios?.scenarios || [],
           transactionHistory: userData.transaction_history || [],
@@ -96,10 +153,6 @@ export const MasterUserDetail: React.FC = () => {
   useEffect(() => {
     fetchUserDetails();
   }, [email]);
-
-
-
-
 
   if (!user) {
     return (
@@ -139,9 +192,9 @@ export const MasterUserDetail: React.FC = () => {
       const secs = value.totalSeconds % 60;
 
       return {
-        Scenario,
-        Drone,
-        Location,
+        Scenario: formatZoneName(Scenario),
+        Drone: formatDroneName(Drone),
+        Location: formatZoneName(Location),
         Count: value.count,
         Total_Duration: `${hrs.toString().padStart(2, '0')}:${mins.toString().padStart(2, '0')}:${secs
           .toString()
@@ -151,7 +204,6 @@ export const MasterUserDetail: React.FC = () => {
 
     return result;
   };
-
 
   const sumDurations = (durations: (string | null | undefined)[]) => {
     let totalSeconds = 0;
@@ -232,9 +284,6 @@ export const MasterUserDetail: React.FC = () => {
     updateUser(user.id, editData, currentUser?.name || 'Master Admin');
     setIsEditing(false);
   };
-
-
-
 
   return (
     <div className="space-y-6">
@@ -393,7 +442,7 @@ export const MasterUserDetail: React.FC = () => {
                     {data.map((item, i) => (
                       <tr key={i} className="border-t hover:bg-orange-50 transition duration-200">
                         <td className="px-2 py-1 text-gray-800">{item.Drone}</td>
-                        <td className="px-2 py-1 text-gray-800">{item.Scenario}</td>
+                        <td className="px-2 py-1 text-gray-800 capitalize">{item.Scenario}</td>
                         <td className="px-2 py-1 text-gray-800">{item.Count}</td>
                         <td className="px-2 py-1 text-gray-800">{item.Total_Duration}</td>
                       </tr>
@@ -468,7 +517,7 @@ export const MasterUserDetail: React.FC = () => {
                     <div>
                       <p className="text-gray-600">Payment Date</p>
                       <p className="font-semibold text-gray-900">
-                        {new Date(user.raw.transaction.payment_date).toLocaleDateString()}
+                        {formatDate(user.raw.transaction.payment_date)}
                       </p>
                     </div>
                     <div>
@@ -488,7 +537,7 @@ export const MasterUserDetail: React.FC = () => {
                     <div>
                       <p className="text-gray-600">Plan Expires</p>
                       <p className="font-semibold text-gray-900">
-                        {new Date(user.raw.transaction.plan_expiry_date).toLocaleDateString()}
+                        {formatDate(user.raw.transaction.plan_expiry_date)}
                       </p>
                     </div>
                   </div>
@@ -514,7 +563,7 @@ export const MasterUserDetail: React.FC = () => {
                             {user.transactionHistory.map((txn: any, idx: number) => (
                               <tr key={idx} className="hover:bg-gray-100">
                                 <td className="px-3 py-2 text-gray-900">
-                                  {new Date(txn.payment_date).toLocaleDateString()}
+                                  {formatDate(txn.payment_date)}
                                 </td>
                                 <td className="px-3 py-2 font-semibold text-green-700">
                                   ${parseFloat(txn.amount).toFixed(2)}
@@ -542,7 +591,7 @@ export const MasterUserDetail: React.FC = () => {
                       <h3 className="font-medium text-blue-800 mb-2">Zone Plan Details</h3>
                       <div className="mb-3">
                         <p className="text-sm text-gray-600">Total PCs: <span className="font-semibold text-gray-900">{user.raw.license_info.total_pcs}</span></p>
-                        <p className="text-sm text-gray-600">Overall Plan Expires: <span className="font-semibold text-gray-900">{new Date(user.raw.license_info.expires_at).toLocaleDateString()}</span></p>
+                        <p className="text-sm text-gray-600">Overall Plan Expires: <span className="font-semibold text-gray-900">{formatDate(user.raw.license_info.expires_at)}</span></p>
                       </div>
                       <div>
                         <p className="text-sm font-medium text-gray-700 mb-2">Selected Zones {isEditing && <span className="text-xs text-gray-500">(Edit expiry dates)</span>}:</p>
@@ -550,8 +599,8 @@ export const MasterUserDetail: React.FC = () => {
                           {Object.entries(user.raw.license_info.selected_zones).map(([zone, expiry]) => (
                             <div key={zone} className="bg-white p-3 rounded border border-blue-200">
                               <div className="flex justify-between items-start">
-                                <span className="text-sm font-medium text-gray-900 capitalize flex-1">
-                                  {zone.replace(/_/g, ' ')}
+                                <span className="text-sm font-medium text-gray-900 flex-1">
+                                  {formatZoneName(zone)}
                                 </span>
                                 <div className="flex-1 ml-4">
                                   {isEditing ? (
@@ -573,11 +622,7 @@ export const MasterUserDetail: React.FC = () => {
                                     />
                                   ) : (
                                     <span className="text-xs text-gray-600">
-                                      Expires: {new Date(expiry as string).toLocaleDateString('en-GB', {
-                                        day: '2-digit',
-                                        month: '2-digit',
-                                        year: 'numeric'
-                                      })}
+                                      Expires: {formatDate(expiry as string)}
                                     </span>
                                   )}
                                 </div>
@@ -678,7 +723,7 @@ export const MasterUserDetail: React.FC = () => {
                           <td className="px-4 py-3">
                             {license.expires_at ? (
                               <span className={isExpired ? 'text-red-600 font-semibold' : 'text-gray-900'}>
-                                {new Date(license.expires_at).toLocaleDateString()}
+                                {formatDate(license.expires_at)}
                                 {isExpired && <span className="ml-1">⚠️</span>}
                               </span>
                             ) : (
@@ -693,7 +738,7 @@ export const MasterUserDetail: React.FC = () => {
                             )}
                           </td>
                           <td className="px-4 py-3 text-gray-600">
-                            {new Date(license.created_at).toLocaleDateString()}
+                            {formatDate(license.created_at)}
                           </td>
                         </tr>
 
@@ -714,9 +759,9 @@ export const MasterUserDetail: React.FC = () => {
                                           className={`text-xs px-2 py-1 rounded ${zoneExpired ? 'bg-red-100 text-red-800' : 'bg-blue-100 text-blue-800'
                                             }`}
                                         >
-                                          {zone.replace(/_/g, ' ')}
+                                          {formatZoneName(zone)}
                                           <span className="ml-1 text-xs opacity-75">
-                                            (exp: {new Date(expiry).toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit', year: '2-digit' })})
+                                            (exp: {formatDate(expiry)})
                                           </span>
                                           {zoneExpired && ' ⚠️'}
                                         </span>
@@ -726,7 +771,7 @@ export const MasterUserDetail: React.FC = () => {
                                     // Old format - array of zones
                                     license.selected_zones.map((zone: string) => (
                                       <span key={zone} className="text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded">
-                                        {zone.replace(/_/g, ' ')}
+                                        {formatZoneName(zone)}
                                       </span>
                                     ))
                                   ) : null}

@@ -2,6 +2,55 @@ import React, { useState, useEffect, useRef } from 'react';
 import axios from 'axios';
 import { API_ENDPOINTS } from '@/config/api';
 
+// Helper function to format zone/location names to proper title case
+const formatZoneName = (zoneName: string | null | undefined): string => {
+    if (!zoneName) return '';
+
+    const zoneMap: Record<string, string> = {
+        // Variations with full names
+        'rpto_ground': 'RPTO Ground',
+        'agriculture_zone': 'Agriculture Zone',
+        'defence_zone': 'Defence Zone',
+        'hv_line_solar_panel': 'HV Line Solar Panel',
+        'factory': 'Factory',
+        'bridge_and_road': 'Bridge and Road',
+        'city': 'City',
+        // Short names from database
+        'defence': 'Defence Zone',
+        'agriculture': 'Agriculture Zone',
+        'hv_lines_solar_panel': 'HV Line Solar Panel',
+        'rail_road_canal_bridge': 'Bridge and Road',
+        'rpto': 'RPTO Ground'
+    };
+
+    // Normalize the input (lowercase and replace spaces with underscores)
+    const normalized = zoneName.toLowerCase().replace(/\s+/g, '_');
+    return zoneMap[normalized] || zoneName;
+};
+
+// Helper function to format drone names to proper title case
+const formatDroneName = (droneName: string | null | undefined): string => {
+    if (!droneName) return '';
+
+    const droneMap: Record<string, string> = {
+        'agriculture_drone': 'Agriculture Drone',
+        'dji_matrice_350_400_rtk': 'DJI - Matrice 350/400 RTK',
+        'dji_-_matrice_350/400_rtk': 'DJI - Matrice 350/400 RTK',
+        'racing_kamikaze_drone': 'Racing / Kamikaze Drone',
+        'racing_/_kamikaze_drone': 'Racing / Kamikaze Drone',
+        'fighter_vtol_drone': 'Fighter - VTOL Drone',
+        'fighter_-_vtol_drone': 'Fighter - VTOL Drone',
+        'crystal_ball_model_v_drone': 'Crystal Ball - Model V Drone',
+        'crystal_ball_-_model_v_drone': 'Crystal Ball - Model V Drone',
+        'dji_mavic_drone': 'DJI Mavic Drone'
+    };
+
+    // Normalize the input (lowercase and replace spaces with underscores)
+    const normalized = droneName.toLowerCase().replace(/\s+/g, '_');
+    return droneMap[normalized] || droneName;
+};
+
+
 // Types for API data
 interface Country {
     name: { common: string };
@@ -16,7 +65,6 @@ interface State {
 
 interface UserInfo {
     fullName: string;
-    username: string;
     email: string;
     phone: string;
     country: string;
@@ -65,7 +113,6 @@ const AdminLicenseGenerator: React.FC = () => {
     const [activeTab, setActiveTab] = useState<'register' | 'license'>('register');
     const [userInfo, setUserInfo] = useState<UserInfo>({
         fullName: '',
-        username: '',
         email: '',
         phone: '',
         country: 'India',
@@ -271,14 +318,6 @@ const AdminLicenseGenerator: React.FC = () => {
             newErrors.fullName = 'Full name is required';
         }
 
-        if (!userInfo.username.trim()) {
-            newErrors.username = 'Username is required';
-        } else if (userInfo.username.length < 3) {
-            newErrors.username = 'Username must be at least 3 characters';
-        } else if (!/^[a-zA-Z0-9_]+$/.test(userInfo.username)) {
-            newErrors.username = 'Username can only contain letters, numbers, and underscores';
-        }
-
         if (!userInfo.email.trim()) {
             newErrors.email = 'Email is required';
         } else if (!/\S+@\S+\.\S+/.test(userInfo.email)) {
@@ -340,10 +379,11 @@ const AdminLicenseGenerator: React.FC = () => {
         setGeneratedLicense(null);
 
         try {
-            // Register the user
+            // Register the user - auto-generate username from email
+            const username = userInfo.email.split('@')[0] || userInfo.fullName.split(' ')[0] || 'user';
             const requestBody = {
                 full_name: userInfo.fullName,
-                username: userInfo.username,
+                username: username,
                 email: userInfo.email,
                 phone_number: userInfo.phone,
                 city: userInfo.city,
@@ -374,7 +414,6 @@ const AdminLicenseGenerator: React.FC = () => {
                 // Reset registration form
                 setUserInfo({
                     fullName: '',
-                    username: '',
                     email: '',
                     phone: '',
                     country: 'India',
@@ -524,17 +563,6 @@ const AdminLicenseGenerator: React.FC = () => {
                                         className={`w-full px-4 py-2.5 rounded-md border ${errors.fullName ? 'border-red-500' : 'border-gray-300'} focus:outline-none focus:ring-2 focus:ring-orange-500`}
                                     />
                                     {errors.fullName && <p className="text-red-500 text-xs mt-1">{errors.fullName}</p>}
-                                </div>
-                                <div className="flex flex-col mb-4 w-full">
-                                    <label className="text-gray-600 text-sm font-medium mb-1.5">Username *</label>
-                                    <input
-                                        type="text"
-                                        value={userInfo.username}
-                                        onChange={(e) => handleUserInfoChange('username', e.target.value)}
-                                        placeholder="e.g. pilot_01"
-                                        className={`w-full px-4 py-2.5 rounded-md border ${errors.username ? 'border-red-500' : 'border-gray-300'} focus:outline-none focus:ring-2 focus:ring-orange-500`}
-                                    />
-                                    {errors.username && <p className="text-red-500 text-xs mt-1">{errors.username}</p>}
                                 </div>
                                 <div className="flex flex-col mb-4 w-full">
                                     <label className="text-gray-600 text-sm font-medium mb-1.5">Email Address (ID) *</label>
@@ -784,7 +812,7 @@ const AdminLicenseGenerator: React.FC = () => {
                                                                         <polyline points="20 6 9 17 4 12"></polyline>
                                                                     </svg>
                                                                 </div>
-                                                                <span className="text-sm font-bold text-black group-hover:text-orange-700 transition-colors">{zone.name}</span>
+                                                                <span className="text-sm font-bold text-black group-hover:text-orange-700 transition-colors">{formatZoneName(zone.name)}</span>
                                                             </label>
                                                         ))}
                                                     </div>
@@ -901,7 +929,7 @@ const AdminLicenseGenerator: React.FC = () => {
                                 <div className="flex justify-between items-center border-b border-slate-200 pb-2">
                                     <span className="text-sm text-slate-600">Zones:</span>
                                     <span className="font-bold text-slate-800">
-                                        {generatedLicense.data.selected_zones.join(', ')}
+                                        {generatedLicense.data.selected_zones.map(formatZoneName).join(', ')}
                                     </span>
                                 </div>
                             )}

@@ -1,8 +1,32 @@
 
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
+import { useState, useEffect } from "react";
+import { DOWNLOAD_CONFIG } from "@/config/download";
 
 const HeroSection = () => {
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+
+  useEffect(() => {
+    const token = sessionStorage.getItem('auth_token');
+    setIsLoggedIn(!!token);
+  }, []);
+
+  const handleDownloadClick = (e: React.MouseEvent) => {
+    if (isLoggedIn) {
+      // User is logged in - trigger direct download
+      e.preventDefault();
+      // Use centralized download config
+      const link = document.createElement('a');
+      link.href = DOWNLOAD_CONFIG.URL;
+      link.download = DOWNLOAD_CONFIG.FILENAME;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    }
+    // If not logged in, the Link component will navigate to /download (the form)
+  };
+
   return (
     <section className="pt-16 min-h-screen bg-gradient-to-br from-blue-50 via-white to-orange-50 relative overflow-hidden">
       {/* Background Elements */}
@@ -28,7 +52,7 @@ const HeroSection = () => {
             </p>
 
             <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
-              <Link to="/download">
+              <Link to="/download" onClick={handleDownloadClick}>
                 <Button size="lg" className="bg-primary hover:bg-primary/90 text-white px-8 py-4 text-lg">
                   Download Now
                 </Button>

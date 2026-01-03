@@ -374,6 +374,9 @@ export const AdminSupport: React.FC = () => {
                                         Created
                                     </th>
                                     <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                        Resolved Date
+                                    </th>
+                                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                                         Actions
                                     </th>
                                 </tr>
@@ -402,6 +405,19 @@ export const AdminSupport: React.FC = () => {
                                                 month: 'short',
                                                 day: 'numeric'
                                             })}
+                                        </td>
+                                        <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-500">
+                                            {ticket.is_resolved ? (
+                                                new Date(ticket.updated_at).toLocaleString('en-US', {
+                                                    year: 'numeric',
+                                                    month: 'short',
+                                                    day: 'numeric',
+                                                    hour: '2-digit',
+                                                    minute: '2-digit'
+                                                })
+                                            ) : (
+                                                '-'
+                                            )}
                                         </td>
                                         <td className="px-4 py-3 whitespace-nowrap text-sm">
                                             <button

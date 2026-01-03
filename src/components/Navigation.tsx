@@ -3,6 +3,7 @@ import { Link, useLocation, useNavigate } from "react-router-dom";
 import { HelpCircle, Menu, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { API_ENDPOINTS } from "@/config/api";
+import { DOWNLOAD_CONFIG } from "@/config/download";
 
 const Navigation = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -50,6 +51,21 @@ const Navigation = () => {
     }
   }
 
+  const handleDownloadClick = (e: React.MouseEvent) => {
+    if (isLoggedIn) {
+      // User is logged in - trigger direct download
+      e.preventDefault();
+      // Use centralized download config
+      const link = document.createElement('a');
+      link.href = DOWNLOAD_CONFIG.URL;
+      link.download = DOWNLOAD_CONFIG.FILENAME;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    }
+    // If not logged in, the Link component will navigate to /download (the form)
+  };
+
 
   return (
     <nav className="fixed top-0 w-full bg-white/95 backdrop-blur-sm shadow-lg z-50 font-poppins">
@@ -67,8 +83,8 @@ const Navigation = () => {
                 key={item.name}
                 to={item.path}
                 className={`px-3 py-2 text-sm font-medium transition-colors duration-200 ${isActive(item.path)
-                    ? "text-primary border-b-2 border-primary"
-                    : "text-gray-600 hover:text-primary"
+                  ? "text-primary border-b-2 border-primary"
+                  : "text-gray-600 hover:text-primary"
                   }`}
               >
                 {item.name}
@@ -102,7 +118,7 @@ const Navigation = () => {
               <HelpCircle className="w-4 h-4" />
               Help
             </Link>
-            <Link to="/download">
+            <Link to="/download" onClick={handleDownloadClick}>
               <Button className="bg-primary hover:bg-primary/90 text-white">
                 Download Now
               </Button>
@@ -126,8 +142,8 @@ const Navigation = () => {
                   key={item.name}
                   to={item.path}
                   className={`block px-3 py-2 text-base font-medium transition-colors duration-200 ${isActive(item.path)
-                      ? "text-primary bg-primary/10"
-                      : "text-gray-600 hover:text-primary hover:bg-gray-50"
+                    ? "text-primary bg-primary/10"
+                    : "text-gray-600 hover:text-primary hover:bg-gray-50"
                     }`}
                   onClick={() => setIsOpen(false)}
                 >
@@ -172,15 +188,17 @@ const Navigation = () => {
                 Help
               </Link>
               <div className="px-3 py-2">
-                <Button className="w-full bg-primary hover:bg-primary/90 text-white">
-                  Download Now
-                </Button>
+                <Link to="/download" onClick={handleDownloadClick}>
+                  <Button className="w-full bg-primary hover:bg-primary/90 text-white">
+                    Download Now
+                  </Button>
+                </Link>
               </div>
             </div>
           </div>
         )}
       </div>
-    </nav>
+    </nav >
   );
 };
 
