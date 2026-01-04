@@ -62,8 +62,12 @@ const Profile: React.FC = () => {
     state_province: '',
     country: '',
     purpose_of_use: '',
-    purpose_other: ''
+    purpose_other: '',
+    new_password: '',
+    confirm_password: ''
   })
+  const [showNewPassword, setShowNewPassword] = useState(false)
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false)
 
   // Enhanced mock data with more realistic information
   const mockUser = {
@@ -240,7 +244,9 @@ const Profile: React.FC = () => {
         state_province: currentUser.state_province || '',
         country: currentUser.country || '',
         purpose_of_use: isOtherPurpose ? 'other' : currentUser.purpose_of_use || '',
-        purpose_other: isOtherPurpose ? currentUser.purpose_of_use || '' : ''
+        purpose_other: isOtherPurpose ? currentUser.purpose_of_use || '' : '',
+        new_password: '',
+        confirm_password: ''
       })
     }
   }, [currentUser])
@@ -289,6 +295,18 @@ const Profile: React.FC = () => {
       newErrors.purpose_other = 'Please specify your purpose of use'
     }
 
+    // Password validation (only if user is trying to change password)
+    if (formData.new_password || formData.confirm_password) {
+      if (!formData.new_password) {
+        newErrors.new_password = 'New password is required'
+      } else if (formData.new_password.length < 8) {
+        newErrors.new_password = 'Password must be at least 8 characters'
+      }
+      if (formData.new_password !== formData.confirm_password) {
+        newErrors.confirm_password = 'Passwords do not match'
+      }
+    }
+
     setErrors(newErrors)
     return Object.keys(newErrors).length === 0
   }
@@ -306,17 +324,21 @@ const Profile: React.FC = () => {
 
     setIsLoading(true)
 
-    const payload = {
+    const payload: any = {
       email: formData.email,
       username: formData.username,
-      password: `${formData.username}@1234`,
-      password_confirm: `${formData.username}@1234`,
       full_name: formData.full_name,
       phone_number: formData.phone_number,
       city: formData.city,
       state_province: formData.state_province,
       country: formData.country,
       purpose_of_use: formData.purpose_of_use === 'other' ? formData.purpose_other : formData.purpose_of_use
+    }
+
+    // Only include password if user is changing it
+    if (formData.new_password) {
+      payload.password = formData.new_password
+      payload.password_confirm = formData.confirm_password
     }
 
     try {
@@ -385,12 +407,16 @@ const Profile: React.FC = () => {
         state_province: currentUser.state_province,
         country: currentUser.country,
         purpose_of_use: isOtherPurpose ? 'other' : currentUser.purpose_of_use,
-        purpose_other: isOtherPurpose ? currentUser.purpose_of_use : ''
+        purpose_other: isOtherPurpose ? currentUser.purpose_of_use : '',
+        new_password: '',
+        confirm_password: ''
       })
     }
     setIsEditing(false)
     setErrors({})
     setSuccessMessage('')
+    setShowNewPassword(false)
+    setShowConfirmPassword(false)
   }
 
   const getStatusBadge = (status: string) => {
@@ -1136,6 +1162,70 @@ const Profile: React.FC = () => {
                       />
                       {errors.country && <p className="mt-1 text-sm text-red-600">{errors.country}</p>}
                     </div>
+
+                    {/* Password Change Section */}
+                    {isEditing && (
+                      <div className="lg:col-span-2 w-full mt-6 pt-6 border-t border-gray-300">
+                        <h4 className="text-base font-semibold text-gray-900 mb-4">Change Password (Optional)</h4>
+                        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 lg:gap-6">
+                          {/* New Password */}
+                          <div className="w-full">
+                            <label className="block text-sm font-semibold text-gray-700 mb-2">
+                              New Password
+                            </label>
+                            <div className="relative w-full">
+                              <input
+                                type={showNewPassword ? 'text' : 'password'}
+                                name="new_password"
+                                value={formData.new_password}
+                                onChange={handleChange}
+                                placeholder="Enter new password (min 8 characters)"
+                                className="w-full px-3 py-3 pr-10 border rounded-xl transition-colors text-sm bg-white hover:border-gray-400 focus:border-orange-500 focus:ring-4 focus:ring-orange-100 border-gray-300"
+                              />
+                              <button
+                                type="button"
+                                onClick={() => setShowNewPassword(!showNewPassword)}
+                                className="absolute right-3 top-3 text-gray-400 hover:text-gray-600"
+                              >
+                                {showNewPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                              </button>
+                            </div>
+                            {errors.new_password && <p className="mt-1 text-sm text-red-600">{errors.new_password}</p>}
+                          </div>
+
+                          {/* Confirm Password */}
+                          <div className="w-full">
+                            <label className="block text-sm font-semibold text-gray-700 mb-2">
+                              Confirm New Password
+                            </label>
+                            <div className="relative w-full">
+                              <input
+                                type={showConfirmPassword ? 'text' : 'password'}
+                                name="confirm_password"
+                                value={formData.confirm_password}
+                                onChange={handleChange}
+                                placeholder="Confirm new password"
+                                className="w-full px-3 py-3 pr-10 border rounded-xl transition-colors text-sm bg-white hover:border-gray-400 focus:border-orange-500 focus:ring-4 focus:ring-orange-100 border-gray-300"
+                              />
+                              <button
+                                type="button"
+                                onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                                className="absolute right-3 top-3 text-gray-400 hover:text-gray-600"
+                              >
+                                {showConfirmPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                              </button>
+                            </div>
+                            {errors.confirm_password && <p className="mt-1 text-sm text-red-600">{errors.confirm_password}</p>}
+                          </div>
+
+                          <div className="lg:col-span-2 w-full">
+                            <p className="text-xs text-gray-500">
+                              💡 Leave password fields empty if you don't want to change your password.
+                            </p>
+                          </div>
+                        </div>
+                      </div>
+                    )}
                   </div>
 
                   {errors.submit && (

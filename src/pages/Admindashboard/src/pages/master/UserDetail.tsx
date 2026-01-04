@@ -117,6 +117,7 @@ export const MasterUserDetail: React.FC = () => {
           planExpiry: userData.plan_expiry_date
             ? formatDate(userData.plan_expiry_date)
             : 'N/A',
+          rawPlanExpiry: userData.plan_expiry_date || null, // Store raw ISO date for editing
           addOns: {},
           paidAmount: userData.total_paid ? parseFloat(userData.total_paid) : 0,
           paymentDate: transaction?.payment_date || null,
@@ -233,7 +234,7 @@ export const MasterUserDetail: React.FC = () => {
       const date = new Date(dateString);
       return date.toISOString().split('.')[0]; // "2027-06-16T00:00:00"
     };
-    const formattedExpiry = formatToIsoDate(editData.planExpiry);
+    const formattedExpiry = formatToIsoDate(editData.rawPlanExpiry || editData.planExpiry);
 
     // Call local update functions if there are changes
     if (editData.plan !== user.plan) {
@@ -478,11 +479,12 @@ export const MasterUserDetail: React.FC = () => {
                     {isEditing ? (
                       <input
                         type="date"
-                        value={editData.planExpiry?.split('T')[0]}
+                        value={editData.rawPlanExpiry ? new Date(editData.rawPlanExpiry).toISOString().split('T')[0] : ''}
                         onChange={(e) =>
                           setEditData((prev) => ({
                             ...prev,
-                            planExpiry: e.target.value
+                            rawPlanExpiry: e.target.value,
+                            planExpiry: e.target.value // Keep both in sync
                           }))
                         }
                         className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent"

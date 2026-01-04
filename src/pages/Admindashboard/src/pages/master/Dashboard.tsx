@@ -16,6 +16,7 @@ export const MasterDashboard: React.FC = () => {
 
   const [totalUsers, setTotalUsers] = useState<number>(0);
   const [activeUsers, setActiveUsers] = useState<number>(0);
+  const [inactiveUsers, setInactiveUsers] = useState<number>(0);
   const [usersData, setUsersData] = useState<User[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [totalRevenue, setTotalRevenue] = useState<number>(0);
@@ -23,17 +24,73 @@ export const MasterDashboard: React.FC = () => {
   const { annotations } = useData();
 
   useEffect(() => {
+    // Set loading state when filter changes
+    setLoading(true);
+
     const fetchUserStats = async () => {
       try {
-        const res = await fetch(API_ENDPOINTS.GET_ALL_USERS);
+        // Build query parameters for time period filtering
+        const params = new URLSearchParams();
+
+        if (dateFilter && dateFilter !== 'all') {
+          const now = new Date();
+          let startDate = '';
+          let endDate = '';
+
+          if (dateFilter === 'today') {
+            startDate = now.toISOString().split('T')[0];
+            endDate = startDate;
+          } else if (dateFilter === 'week') {
+            const weekAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+            startDate = weekAgo.toISOString().split('T')[0];
+            endDate = now.toISOString().split('T')[0];
+          } else if (dateFilter === 'month') {
+            const monthAgo = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
+            startDate = monthAgo.toISOString().split('T')[0];
+            endDate = now.toISOString().split('T')[0];
+          } else if (dateFilter === 'quarter') {
+            const quarterAgo = new Date(now.getTime() - 90 * 24 * 60 * 60 * 1000);
+            startDate = quarterAgo.toISOString().split('T')[0];
+            endDate = now.toISOString().split('T')[0];
+          } else if (dateFilter === 'year') {
+            const yearAgo = new Date(now.getTime() - 365 * 24 * 60 * 60 * 1000);
+            startDate = yearAgo.toISOString().split('T')[0];
+            endDate = now.toISOString().split('T')[0];
+          } else if (dateFilter === 'last7') {
+            const last7 = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+            startDate = last7.toISOString().split('T')[0];
+            endDate = now.toISOString().split('T')[0];
+          } else if (dateFilter === 'last30') {
+            const last30 = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
+            startDate = last30.toISOString().split('T')[0];
+            endDate = now.toISOString().split('T')[0];
+          } else if (dateFilter === 'last90') {
+            const last90 = new Date(now.getTime() - 90 * 24 * 60 * 60 * 1000);
+            startDate = last90.toISOString().split('T')[0];
+            endDate = now.toISOString().split('T')[0];
+          } else if (dateFilter === 'custom' && customDateRange) {
+            startDate = customDateRange.start;
+            endDate = customDateRange.end;
+          }
+
+          if (startDate) params.append('start_date', startDate);
+          if (endDate) params.append('end_date', endDate);
+        }
+
+        const url = `${API_ENDPOINTS.GET_ALL_USERS}?${params.toString()}`;
+        const res = await fetch(url);
         const data = await res.json();
-        setTotalUsers(data?.statistics?.total_users || 0);
-        setActiveUsers(data?.statistics?.active_users || 0);
+        const total = data?.statistics?.total_users || 0;
+        const active = data?.statistics?.active_users || 0;
+        setTotalUsers(total);
+        setActiveUsers(active);
+        setInactiveUsers(total - active);
         setUsersData(data?.data || []);
       } catch (error) {
         console.error('Error fetching user stats:', error);
         setTotalUsers(0);
         setActiveUsers(0);
+        setInactiveUsers(0);
         setUsersData([]);
       } finally {
         setLoading(false);
@@ -58,21 +115,26 @@ export const MasterDashboard: React.FC = () => {
 
     fetchUserStats();
     fetchRevenue();
-  }, []);
+  }, [dateFilter, customDateRange]); // Re-fetch when time period changes
 
   const stats = [
     {
+      title: 'Inactive Users',
+      value: loading ? '...' : inactiveUsers.toString(),
+      changeType: 'neutral' as const,
+      icon: Users,
+      subtitle: 'Not currently active'
+    },
+    {
       title: 'Total Users',
       value: loading ? '...' : totalUsers.toString(),
-      change: '+12.5%',
       changeType: 'positive' as const,
       icon: Users,
-      subtitle: loading ? 'Loading...' : `${activeUsers} active`
+      subtitle: loading ? 'Loading...' : `${activeUsers} active, ${inactiveUsers} inactive`
     },
     {
       title: 'Active Users',
       value: loading ? '...' : activeUsers.toString(),
-      change: '+7.9%',
       changeType: 'positive' as const,
       icon: Activity,
       subtitle: 'Currently engaged'
@@ -80,7 +142,6 @@ export const MasterDashboard: React.FC = () => {
     {
       title: 'Total Revenue',
       value: `$${totalRevenue.toLocaleString()}`,
-      change: '+15.3%',
       changeType: 'positive' as const,
       icon: TrendingUp,
       subtitle: 'Overall earnings'
@@ -97,9 +158,10 @@ export const MasterDashboard: React.FC = () => {
   };
 
   const planDistribution = [
-    { label: 'Free Users', color: 'gray', match: (u: User) => u.plan === 'basic' },
-    { label: 'Demo Users', color: 'blue', match: (u: User) => u.plan === 'trial' },
-    { label: 'Premium Users', color: 'purple', match: (u: User) => u.plan === 'premium' }
+    { label: 'Free Basic Plan', color: 'gray', match: (u: User) => u.plan?.toLowerCase() === 'free' },
+    { label: 'Zone Plan', color: 'green', match: (u: User) => u.plan?.toLowerCase() === 'zone' },
+    { label: 'Pro Plan', color: 'blue', match: (u: User) => u.plan?.toLowerCase() === 'pro' },
+    { label: 'Enterprise Plan', color: 'purple', match: (u: User) => u.plan?.toLowerCase() === 'enterprise' }
   ].map(item => ({
     ...item,
     count: usersData.filter(item.match).length
@@ -128,8 +190,7 @@ export const MasterDashboard: React.FC = () => {
               <div>
                 <p className="text-sm font-medium text-gray-600">{stat.title}</p>
                 <p className="text-2xl font-bold text-gray-900 mt-2">{stat.value}</p>
-                <div className="flex items-center space-x-2 mt-1">
-                  <p className={`text-sm ${stat.changeType === 'positive' ? 'text-green-600' : 'text-red-600'}`}>{stat.change}</p>
+                <div className="mt-1">
                   <p className="text-xs text-gray-500">{stat.subtitle}</p>
                 </div>
               </div>
