@@ -108,7 +108,7 @@ export const MasterUsers: React.FC = () => {
   };
 
   const getPaymentStatus = (user: any) => {
-    if (user.plan === 'Free') return { status: 'Free Plan', color: 'text-gray-500' };
+    if (!user.plan || user.plan === 'Free') return { status: 'Free Plan', color: 'text-gray-500' };
 
     if (!user.nextPaymentDate) return { status: 'No Payment Due', color: 'text-gray-500' };
 
@@ -194,7 +194,7 @@ export const MasterUsers: React.FC = () => {
             name: user.full_name || user.username || 'N/A',
             email: user.email,
             status: user.is_active ? 'Active' : 'Inactive',
-            plan: user.plan || user?.transaction?.plan_display_name || "Free",
+            plan: user.plan || user?.transaction?.plan_display_name || null,
             paidAmount: txn ? parseFloat(txn.amount || 0) : 0,
             paymentDate: txn?.payment_date || null,
             nextPaymentDate: txn?.plan_expiry_date || user.license_info?.expires_at || user.plan_expiry_date || null,
@@ -490,10 +490,9 @@ export const MasterUsers: React.FC = () => {
                       </div>
                     </td>
 
-                    {/* Plan */}
                     <td className="px-2 py-2 whitespace-nowrap">
                       <span className={`px-2 py-[2px] rounded-full text-[10px] font-medium ${getPlanColor(user.plan)}`}>
-                        {user.plan}
+                        {user.plan || '-'}
                       </span>
                     </td>
 
@@ -510,7 +509,7 @@ export const MasterUsers: React.FC = () => {
                         {user.plan === 'Free' ? 'Free Plan' : (user.paidAmount ? `₹${user.paidAmount}` : '-')}
                       </div>
                       <div className="text-gray-400 text-[10px]">
-                        {user.plan !== 'Free' && user.nextPaymentDate && paymentStatus.status}
+                        {user.plan && user.plan !== 'Free' && user.nextPaymentDate && paymentStatus.status}
                       </div>
                     </td>
 
