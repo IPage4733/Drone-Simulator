@@ -25,6 +25,7 @@ const Register: React.FC = () => {
     phone_number: '',
     country_code: 'IN',
     phone_code: '+91',
+    address: '',
     city: '',
     state_province: '',
     country: 'India',
@@ -209,6 +210,7 @@ const Register: React.FC = () => {
         password_confirm: formData.password_confirm,
         full_name: formData.full_name,
         phone_number: formData.phone_number,
+        address: formData.address,
         city: formData.city,
         state_province: formData.state_province,
         country: formData.country,
@@ -347,7 +349,6 @@ const Register: React.FC = () => {
               />
               {errors.full_name && <p className="text-red-500 text-xs mt-0.5">{errors.full_name}</p>}
             </div>
-
 
 
             {/* Row 3: Password & Confirm */}
@@ -491,6 +492,19 @@ const Register: React.FC = () => {
                 {errors.purpose_other && <p className="text-red-500 text-xs mt-0.5">{errors.purpose_other}</p>}
               </div>
             )}
+
+            {/* Address Field - Last */}
+            <div>
+              <label className="block text-xs font-medium text-gray-700 mb-0.5">Address</label>
+              <input
+                type="text"
+                name="address"
+                value={formData.address}
+                onChange={handleChange}
+                className="w-full px-1.5 py-1 border border-gray-300 rounded text-xs focus:ring-1 focus:ring-orange-500 focus:border-transparent"
+                placeholder="Street address (optional)"
+              />
+            </div>
 
             {errors.submit && <p className="text-red-500 text-xs text-center">{errors.submit}</p>}
 

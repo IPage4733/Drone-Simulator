@@ -70,6 +70,7 @@ interface UserInfo {
     country: string;
     countryCode: string;
     phoneCode: string;
+    address: string;
     city: string;
     stateProvince: string;
     password: string;
@@ -118,6 +119,7 @@ const AdminLicenseGenerator: React.FC = () => {
         country: 'India',
         countryCode: 'IN',
         phoneCode: '+91',
+        address: '',
         city: '',
         stateProvince: '',
         password: ''
@@ -290,15 +292,28 @@ const AdminLicenseGenerator: React.FC = () => {
                     stateProvince: '' // Reset state when country changes
                 }));
             }
+        } else if (field === 'phone') {
+            // Only allow numeric characters for phone number (max 15 digits)
+            const numericValue = value.replace(/\D/g, '').slice(0, 15);
+            setUserInfo(prev => {
+                const updated = { ...prev, phone: numericValue };
+                // Auto-regenerate password when phone changes
+                updated.password = generatePasswordFromUserInfo(
+                    updated.fullName,
+                    updated.email,
+                    numericValue
+                );
+                return updated;
+            });
         } else {
             setUserInfo(prev => {
                 const updated = { ...prev, [field]: value };
                 // Auto-regenerate password when relevant fields change
-                if (field === 'fullName' || field === 'email' || field === 'phone') {
+                if (field === 'fullName' || field === 'email') {
                     updated.password = generatePasswordFromUserInfo(
                         field === 'fullName' ? value : updated.fullName,
                         field === 'email' ? value : updated.email,
-                        field === 'phone' ? value : updated.phone
+                        updated.phone
                     );
                 }
                 return updated;
@@ -386,6 +401,7 @@ const AdminLicenseGenerator: React.FC = () => {
                 username: username,
                 email: userInfo.email,
                 phone_number: userInfo.phone,
+                address: userInfo.address,
                 city: userInfo.city,
                 state_province: userInfo.stateProvince,
                 country: userInfo.country,
@@ -419,6 +435,7 @@ const AdminLicenseGenerator: React.FC = () => {
                     country: 'India',
                     countryCode: 'IN',
                     phoneCode: '+91',
+                    address: '',
                     city: '',
                     stateProvince: '',
                     password: ''
@@ -642,6 +659,16 @@ const AdminLicenseGenerator: React.FC = () => {
                                         </select>
                                         {errors.stateProvince && <p className="text-red-500 text-xs mt-1">{errors.stateProvince}</p>}
                                     </div>
+                                </div>
+                                <div className="flex flex-col mb-4 w-full">
+                                    <label className="text-gray-600 text-sm font-medium mb-1.5">Address</label>
+                                    <input
+                                        type="text"
+                                        value={userInfo.address}
+                                        onChange={(e) => handleUserInfoChange('address', e.target.value)}
+                                        placeholder="Street address (optional)"
+                                        className="w-full px-4 py-2.5 rounded-md border border-gray-300 focus:outline-none focus:ring-2 focus:ring-orange-500"
+                                    />
                                 </div>
                             </div>
                         </div>

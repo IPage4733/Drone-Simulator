@@ -112,6 +112,11 @@ export const MasterUserDetail: React.FC = () => {
           id: userData.user_id,
           name: userData.full_name || userData.username || 'N/A',
           email: userData.email,
+          address: userData.address || '',
+          city: userData.city || '',
+          stateProvince: userData.state_province || '',
+          country: userData.country || '',
+          phoneNumber: userData.phone_number || '',
           status: userData.is_active ? 'Active' : 'Inactive',
           plan: planDisplay,
           planExpiry: userData.plan_expiry_date
@@ -231,7 +236,19 @@ export const MasterUserDetail: React.FC = () => {
     const is_active = editData.status === 'Active';
     const sanitizedPlan = editData.plan?.toLowerCase();
     const formatToIsoDate = (dateString: string) => {
+      // Handle empty, null, undefined, or "N/A" values
+      if (!dateString || dateString === 'N/A') {
+        return null;
+      }
+
       const date = new Date(dateString);
+
+      // Check if the date is valid
+      if (isNaN(date.getTime())) {
+        console.error('Invalid date string:', dateString);
+        return null;
+      }
+
       return date.toISOString().split('.')[0]; // "2027-06-16T00:00:00"
     };
     const formattedExpiry = formatToIsoDate(editData.rawPlanExpiry || editData.planExpiry);
@@ -245,21 +262,39 @@ export const MasterUserDetail: React.FC = () => {
       updateUserAddOns(user.id, editData.addOns, currentUser?.name || 'Master Admin');
     }
 
+
     try {
       const payload: any = {
         email: editData.email,
         full_name: editData.name,
+        address: editData.address,
         plan: sanitizedPlan,
-        plan_expiry_date: formattedExpiry,
         is_active: is_active,
       };
+
+      // Only include plan_expiry_date if it's valid
+      if (formattedExpiry) {
+        payload.plan_expiry_date = formattedExpiry;
+      }
 
       // Include zone expiry changes if they exist
       console.log('editData.zoneExpiries:', editData.zoneExpiries);
       if (editData.zoneExpiries && Object.keys(editData.zoneExpiries).length > 0) {
-        payload.zone_expiries = editData.zoneExpiries;
-        console.log('Adding zone_expiries to payload:', payload.zone_expiries);
+        // Format zone expiries to ISO format
+        const formattedZoneExpiries: Record<string, string> = {};
+        for (const [zone, dateStr] of Object.entries(editData.zoneExpiries)) {
+          const formatted = formatToIsoDate(dateStr as string);
+          if (formatted) {
+            formattedZoneExpiries[zone] = formatted;
+          }
+        }
+
+        if (Object.keys(formattedZoneExpiries).length > 0) {
+          payload.zone_expiries = formattedZoneExpiries;
+          console.log('Adding zone_expiries to payload:', payload.zone_expiries);
+        }
       }
+
 
       console.log('Full payload being sent:', payload);
 
@@ -370,6 +405,17 @@ export const MasterUserDetail: React.FC = () => {
                   value={user.registrationDate}
                   disabled
                   className="w-full px-3 py-1.5 border border-gray-300 rounded-lg bg-gray-50"
+                />
+              </div>
+              <div>
+                <label className="block text-xs font-medium text-black mb-0.5">Address</label>
+                <input
+                  type="text"
+                  value={isEditing ? editData.address : user.address}
+                  onChange={(e) => setEditData(prev => ({ ...prev, address: e.target.value }))}
+                  disabled={!isEditing}
+                  className={`w-full px-3 py-1.5 border border-gray-300 rounded-lg ${isEditing ? 'focus:ring-2 focus:ring-orange-500' : 'bg-gray-50'}`}
+                  placeholder="Street address"
                 />
               </div>
             </div>
