@@ -22,6 +22,7 @@ const Register: React.FC = () => {
     password: '',
     password_confirm: '',
     full_name: '',
+    company_name: '',
     phone_number: '',
     country_code: 'IN',
     phone_code: '+91',
@@ -29,7 +30,7 @@ const Register: React.FC = () => {
     city: '',
     state_province: '',
     country: 'India',
-    purpose_of_use: 'personal',
+    purpose_of_use: '',
     purpose_other: ''
   })
   const [errors, setErrors] = useState<{ [key: string]: string }>({})
@@ -37,6 +38,8 @@ const Register: React.FC = () => {
   const { register } = useAuth()
   const navigate = useNavigate()
   const [showVerificationPopup, setShowVerificationPopup] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   // API data states
   const [countries, setCountries] = useState<Array<{ code: string; name: string; phone: string }>>([])
@@ -209,6 +212,7 @@ const Register: React.FC = () => {
         password: formData.password,
         password_confirm: formData.password_confirm,
         full_name: formData.full_name,
+        company_name: formData.company_name,
         phone_number: formData.phone_number,
         address: formData.address,
         city: formData.city,
@@ -321,24 +325,10 @@ const Register: React.FC = () => {
           </div>
 
           {/* Form - Ultra Compact */}
-          <form onSubmit={handleSubmit} className="space-y-5">
-            {/* Row 1: Email */}
-            <div className="w-full">
-              <label className="block text-xs font-medium text-gray-700 mb-0.5">Email</label>
-              <input
-                type="email"
-                name="email"
-                value={formData.email}
-                onChange={handleChange}
-                className={`w-full px-1.5 py-1 border rounded text-xs focus:ring-1 focus:ring-orange-500 focus:border-transparent ${errors.email ? 'border-red-500' : 'border-gray-300'}`}
-                placeholder="email@domain.com"
-              />
-              {errors.email && <p className="text-red-500 text-xs mt-0.5">{errors.email}</p>}
-            </div>
-
-            {/* Row 2: Full Name */}
+          <form onSubmit={handleSubmit} className="space-y-3">
+            {/* Row 1: Full Name */}
             <div>
-              <label className="block text-xs font-medium text-gray-700 mb-0.5">Full Name</label>
+              <label className="block text-xs font-medium text-gray-700 mb-0.5">Full Name *</label>
               <input
                 type="text"
                 name="full_name"
@@ -350,40 +340,84 @@ const Register: React.FC = () => {
               {errors.full_name && <p className="text-red-500 text-xs mt-0.5">{errors.full_name}</p>}
             </div>
 
+            {/* Row 2: Company Name */}
+            <div>
+              <label className="block text-xs font-medium text-gray-700 mb-0.5">Company Name</label>
+              <input
+                type="text"
+                name="company_name"
+                value={formData.company_name}
+                onChange={handleChange}
+                className="w-full px-1.5 py-1 border border-gray-300 rounded text-xs focus:ring-1 focus:ring-orange-500 focus:border-transparent"
+                placeholder="Your company name (optional)"
+              />
+            </div>
 
-            {/* Row 3: Password & Confirm */}
+            {/* Row 3: Email */}
+            <div className="w-full">
+              <label className="block text-xs font-medium text-gray-700 mb-0.5">Email *</label>
+              <input
+                type="email"
+                name="email"
+                value={formData.email}
+                onChange={handleChange}
+                className={`w-full px-1.5 py-1 border rounded text-xs focus:ring-1 focus:ring-orange-500 focus:border-transparent ${errors.email ? 'border-red-500' : 'border-gray-300'}`}
+                placeholder="email@domain.com"
+              />
+              {errors.email && <p className="text-red-500 text-xs mt-0.5">{errors.email}</p>}
+            </div>
+
+            {/* Row 4: Password & Confirm Password with Show/Hide */}
             <div className="grid grid-cols-2 gap-1.5">
               <div>
-                <label className="block text-xs font-medium text-gray-700 mb-0.5">Password</label>
-                <input
-                  type="password"
-                  name="password"
-                  value={formData.password}
-                  onChange={handleChange}
-                  className={`w-full px-1.5 py-1 border rounded text-xs focus:ring-1 focus:ring-orange-500 focus:border-transparent ${errors.password ? 'border-red-500' : 'border-gray-300'}`}
-                  placeholder="••••••••"
-                />
+                <label className="block text-xs font-medium text-gray-700 mb-0.5">Password *</label>
+                <div className="relative">
+                  <input
+                    type={showPassword ? "text" : "password"}
+                    name="password"
+                    value={formData.password}
+                    onChange={handleChange}
+                    className={`w-full px-1.5 py-1 pr-7 border rounded text-xs focus:ring-1 focus:ring-orange-500 focus:border-transparent ${errors.password ? 'border-red-500' : 'border-gray-300'}`}
+                    placeholder="••••••••"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    className="absolute right-1 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700 text-xs"
+                  >
+                    {showPassword ? '👁️' : '👁️‍🗨️'}
+                  </button>
+                </div>
                 {errors.password && <p className="text-red-500 text-xs mt-0.5">{errors.password}</p>}
               </div>
               <div>
-                <label className="block text-xs font-medium text-gray-700 mb-0.5">Confirm</label>
-                <input
-                  type="password"
-                  name="password_confirm"
-                  value={formData.password_confirm}
-                  onChange={handleChange}
-                  className={`w-full px-1.5 py-1 border rounded text-xs focus:ring-1 focus:ring-orange-500 focus:border-transparent ${errors.password_confirm ? 'border-red-500' : 'border-gray-300'}`}
-                  placeholder="••••••••"
-                />
+                <label className="block text-xs font-medium text-gray-700 mb-0.5">Confirm *</label>
+                <div className="relative">
+                  <input
+                    type={showConfirmPassword ? "text" : "password"}
+                    name="password_confirm"
+                    value={formData.password_confirm}
+                    onChange={handleChange}
+                    className={`w-full px-1.5 py-1 pr-7 border rounded text-xs focus:ring-1 focus:ring-orange-500 focus:border-transparent ${errors.password_confirm ? 'border-red-500' : 'border-gray-300'}`}
+                    placeholder="••••••••"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                    className="absolute right-1 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700 text-xs"
+                  >
+                    {showConfirmPassword ? '👁️' : '👁️‍🗨️'}
+                  </button>
+                </div>
                 {errors.password_confirm && <p className="text-red-500 text-xs mt-0.5">{errors.password_confirm}</p>}
               </div>
             </div>
 
-            {/* Row 4: Country & Phone */}
+            {/* Row 5: Country & Phone */}
             <div className="grid grid-cols-2 gap-1.5">
               {/* Country Field */}
               <div>
-                <label className="block text-xs font-medium text-gray-700 mb-0.5">Country</label>
+                <label className="block text-xs font-medium text-gray-700 mb-0.5">Country *</label>
                 <select
                   name="country_code"
                   value={formData.country_code}
@@ -405,7 +439,7 @@ const Register: React.FC = () => {
 
               {/* Phone Number Field */}
               <div>
-                <label className="block text-xs font-medium text-gray-700 mb-0.5 whitespace-nowrap">Phone Number</label>
+                <label className="block text-xs font-medium text-gray-700 mb-0.5 whitespace-nowrap">Phone Number *</label>
                 <div className="flex">
                   <div className="flex items-center px-1.5 py-1 bg-gray-50 border border-r-0 border-gray-300 rounded-l text-xs font-medium text-gray-700 min-w-[40px] justify-center">
                     {formData.phone_code}
@@ -423,14 +457,23 @@ const Register: React.FC = () => {
               </div>
             </div>
 
+            {/* Row 6: Address */}
+            <div>
+              <label className="block text-xs font-medium text-gray-700 mb-0.5">Address</label>
+              <input
+                type="text"
+                name="address"
+                value={formData.address}
+                onChange={handleChange}
+                className="w-full px-1.5 py-1 border border-gray-300 rounded text-xs focus:ring-1 focus:ring-orange-500 focus:border-transparent"
+                placeholder="Street address (optional)"
+              />
+            </div>
 
-            {/* Row 5: Removed - Phone moved up */}
-
-
-            {/* Row 6: City, State & Purpose in 3 columns */}
+            {/* Row 7: City, State & Purpose in 3 columns */}
             <div className="grid grid-cols-3 gap-1.5">
               <div>
-                <label className="block text-xs font-medium text-gray-700 mb-0.5">City</label>
+                <label className="block text-xs font-medium text-gray-700 mb-0.5">City *</label>
                 <input
                   type="text"
                   name="city"
@@ -442,7 +485,7 @@ const Register: React.FC = () => {
                 {errors.city && <p className="text-red-500 text-xs mt-0.5">{errors.city}</p>}
               </div>
               <div>
-                <label className="block text-xs font-medium text-gray-700 mb-0.5">State</label>
+                <label className="block text-xs font-medium text-gray-700 mb-0.5">State *</label>
                 <select
                   name="state_province"
                   value={formData.state_province}
@@ -462,19 +505,22 @@ const Register: React.FC = () => {
                 {errors.state_province && <p className="text-red-500 text-xs mt-0.5">{errors.state_province}</p>}
               </div>
               <div>
-                <label className="block text-xs font-medium text-gray-700 mb-0.5">Purpose</label>
+                <label className="block text-xs font-medium text-gray-700 mb-0.5">Purpose *</label>
                 <select
                   name="purpose_of_use"
                   value={formData.purpose_of_use}
                   onChange={handleChange}
-                  className="w-full px-1.5 py-1 border border-gray-300 rounded text-xs focus:ring-1 focus:ring-orange-500 focus:border-transparent"
+                  className={`w-full px-1.5 py-1 border rounded text-xs focus:ring-1 focus:ring-orange-500 focus:border-transparent ${errors.purpose_of_use ? 'border-red-500' : 'border-gray-300'}`}
                 >
+                  <option value="">Select Purpose</option>
                   <option value="personal">Personal</option>
                   <option value="commercial">Commercial</option>
+                  <option value="rpto">RPTO</option>
                   <option value="educational">Educational</option>
-                  <option value="research">Research</option>
+                  <option value="training">Training</option>
                   <option value="other">Other</option>
                 </select>
+                {errors.purpose_of_use && <p className="text-red-500 text-xs mt-0.5">{errors.purpose_of_use}</p>}
               </div>
             </div>
 
@@ -492,19 +538,6 @@ const Register: React.FC = () => {
                 {errors.purpose_other && <p className="text-red-500 text-xs mt-0.5">{errors.purpose_other}</p>}
               </div>
             )}
-
-            {/* Address Field - Last */}
-            <div>
-              <label className="block text-xs font-medium text-gray-700 mb-0.5">Address</label>
-              <input
-                type="text"
-                name="address"
-                value={formData.address}
-                onChange={handleChange}
-                className="w-full px-1.5 py-1 border border-gray-300 rounded text-xs focus:ring-1 focus:ring-orange-500 focus:border-transparent"
-                placeholder="Street address (optional)"
-              />
-            </div>
 
             {errors.submit && <p className="text-red-500 text-xs text-center">{errors.submit}</p>}
 

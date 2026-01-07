@@ -112,6 +112,7 @@ export const MasterUserDetail: React.FC = () => {
           id: userData.user_id,
           name: userData.full_name || userData.username || 'N/A',
           email: userData.email,
+          companyName: userData.company_name || '',
           address: userData.address || '',
           city: userData.city || '',
           stateProvince: userData.state_province || '',
@@ -267,6 +268,7 @@ export const MasterUserDetail: React.FC = () => {
       const payload: any = {
         email: editData.email,
         full_name: editData.name,
+        company_name: editData.companyName,
         address: editData.address,
         plan: sanitizedPlan,
         is_active: is_active,
@@ -373,6 +375,17 @@ export const MasterUserDetail: React.FC = () => {
                   onChange={(e) => setEditData(prev => ({ ...prev, name: e.target.value }))}
                   disabled={!isEditing}
                   className={`w-full px-3 py-1.5 border border-gray-300 rounded-lg ${isEditing ? 'focus:ring-2 focus:ring-orange-500' : 'bg-gray-50'}`}
+                />
+              </div>
+              <div>
+                <label className="block text-xs font-medium text-black mb-0.5">Company Name</label>
+                <input
+                  type="text"
+                  value={isEditing ? editData.companyName : user.companyName}
+                  onChange={(e) => setEditData(prev => ({ ...prev, companyName: e.target.value }))}
+                  disabled={!isEditing}
+                  className={`w-full px-3 py-1.5 border border-gray-300 rounded-lg ${isEditing ? 'focus:ring-2 focus:ring-orange-500' : 'bg-gray-50'}`}
+                  placeholder="Company name"
                 />
               </div>
               <div>

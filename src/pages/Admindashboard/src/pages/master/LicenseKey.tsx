@@ -65,6 +65,7 @@ interface State {
 
 interface UserInfo {
     fullName: string;
+    companyName: string;
     email: string;
     phone: string;
     country: string;
@@ -114,6 +115,7 @@ const AdminLicenseGenerator: React.FC = () => {
     const [activeTab, setActiveTab] = useState<'register' | 'license'>('register');
     const [userInfo, setUserInfo] = useState<UserInfo>({
         fullName: '',
+        companyName: '',
         email: '',
         phone: '',
         country: 'India',
@@ -430,6 +432,7 @@ const AdminLicenseGenerator: React.FC = () => {
                 // Reset registration form
                 setUserInfo({
                     fullName: '',
+                    companyName: '',
                     email: '',
                     phone: '',
                     country: 'India',
@@ -580,6 +583,16 @@ const AdminLicenseGenerator: React.FC = () => {
                                         className={`w-full px-4 py-2.5 rounded-md border ${errors.fullName ? 'border-red-500' : 'border-gray-300'} focus:outline-none focus:ring-2 focus:ring-orange-500`}
                                     />
                                     {errors.fullName && <p className="text-red-500 text-xs mt-1">{errors.fullName}</p>}
+                                </div>
+                                <div className="flex flex-col mb-4 w-full">
+                                    <label className="text-gray-600 text-sm font-medium mb-1.5">Company Name</label>
+                                    <input
+                                        type="text"
+                                        value={userInfo.companyName}
+                                        onChange={(e) => handleUserInfoChange('companyName', e.target.value)}
+                                        placeholder="Company name (optional)"
+                                        className="w-full px-4 py-2.5 rounded-md border border-gray-300 focus:outline-none focus:ring-2 focus:ring-orange-500"
+                                    />
                                 </div>
                                 <div className="flex flex-col mb-4 w-full">
                                     <label className="text-gray-600 text-sm font-medium mb-1.5">Email Address (ID) *</label>
