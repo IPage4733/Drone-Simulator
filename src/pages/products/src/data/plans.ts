@@ -65,6 +65,7 @@ const plans: Plan[] = [
     ],
     buttonText: 'Add to Cart',
     buttonVariant: 'primary',
+    
     mostPopular: true,
     stripe_price_id: STRIPE_PRICE_IDS.PRO_PLAN
   },
